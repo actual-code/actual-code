@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "allowJs": true,
+    "checkJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es2018"],
+    "isolatedModules": true,
+    "strict": false,
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "outDir": "dist"
+  },
+  "include": ["src"]
+}
