@@ -4,7 +4,6 @@ import * as vm from 'vm'
 import { Writable } from 'stream'
 
 import * as babel from '@babel/core'
-// import shellEscape from 'shell-escape'
 
 const presetEnv = require('@babel/preset-env')
 const presetTypescript = require('@babel/preset-typescript')
@@ -68,7 +67,7 @@ export const createNodeJsSandbox = (
           return
         }
 
-        throw new Error(`Sandbox Error: Illegal path ${name}`)
+        throw new Error(`Sandbox Error: require ${name}`)
       }
 
       if (name.startsWith('./') || name.startsWith('../')) {
@@ -86,6 +85,7 @@ export const createNodeJsSandbox = (
         validatePath(fullpath)
         return require(fullpath)
       } else {
+        validatePath(require.resolve(name))
         return require(name)
       }
     },
@@ -113,7 +113,7 @@ export const createNodeJsSandbox = (
       const timeout = opts2.timeout || opts.timeout || 100
       vm.runInContext(compiled.code, ctx, { timeout })
     } catch (error) {
-      console.log(error)
+      console.error(error)
       return { outputs, error }
     }
     return { outputs, error: null }
