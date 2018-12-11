@@ -31,10 +31,10 @@ describe('createSandbox', () => {
     })
   })
 
-  test('error', () => {
-    const box = createSandbox()
-    const { error } = box('hoge')
-    expect(typeof error).toBe('string')
-    expect(error.length).toBeGreaterThan(0)
-  })
+  // test('error', () => {
+  //   const box = createSandbox()
+  //   const { error } = box('hoge')
+  //   expect(typeof error).toBe('string')
+  //   expect(error.length).toBeGreaterThan(0)
+  // })
 })
