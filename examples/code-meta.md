@@ -4,13 +4,13 @@
 console.log(1)
 ```
 
-### quiet mode
+## quiet mode
 
 ```js {quiet}
 console.log(1)
 ```
 
-### write file
+## write file
 
 ```txt {file="hoge.txt"}
 hoge

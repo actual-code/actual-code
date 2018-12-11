@@ -4,6 +4,7 @@ import hljs from 'remark-highlight.js'
 import breaks from 'remark-breaks'
 import katex from 'remark-html-katex'
 import html from 'remark-html'
+import frontmatter from 'remark-frontmatter'
 
 export default remark()
   .use(breaks)
@@ -11,3 +12,4 @@ export default remark()
   .use(katex)
   .use(hljs)
   .use(html)
+  .use(frontmatter, ['yaml'])
