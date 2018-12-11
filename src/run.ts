@@ -1,5 +1,5 @@
 import remark from './markdown'
-import { createSandbox } from './sandbox'
+import { createSandbox, SandboxOptions } from './sandbox'
 
 const traversal = (node, parent, cb, index = 0) => {
   cb(node, parent, index)
@@ -19,11 +19,14 @@ const lang = {
   ts: 'ts',
   typescript: 'ts',
   jsx: 'jsx',
-  tsx: 'tsx'
+  tsx: 'tsx',
+  sh: 'sh',
+  shell: 'sh',
+  bash: 'sh'
 }
 
-export const run = (markdownText: string) => {
-  const box = createSandbox()
+export const run = (markdownText: string, sandboxOpts: SandboxOptions = {}) => {
+  const box = createSandbox(sandboxOpts)
   const vfile = remark.parse(markdownText)
   const results = []
   const nodes = []

@@ -10,6 +10,7 @@
     "@babel/core": "^7.2.0",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-typescript": "^7.1.0",
+    "mkdirp": "^0.5.1",
     "remark": "^10.0.1",
     "remark-breaks": "^1.0.2",
     "remark-highlight.js": "^5.0.0",
