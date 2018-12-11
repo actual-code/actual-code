@@ -13,8 +13,8 @@ export interface SandboxOptions {
 }
 
 export const createSandbox = (
-  opts: SandboxOptions = {},
-  reporter: Reporter
+  reporter: Reporter,
+  opts: SandboxOptions = {}
 ) => {
   const jsBox = createNodeJsSandbox(reporter, opts)
   const shBox = createShellSandbox(reporter, opts)

@@ -1,31 +1,43 @@
 import childProcess from 'child_process'
-import { promisify } from 'util'
 
 import { Output, SandboxOptions } from '.'
 import { Reporter } from '../reporter'
+
+const exec = (cmd: string, reporter: Reporter) => {
+  return new Promise<Output[]>((resolve, reject) => {
+    const outputs: Output[] = []
+    const proc = childProcess.exec(cmd)
+    reporter.info(`run ${cmd}`)
+    proc.stdout.on('data', chunk => {
+      reporter.stdout.write(chunk)
+      outputs.push({ name: 'stdout', value: chunk })
+    })
+    proc.stderr.on('data', chunk => {
+      reporter.stderr.write(chunk)
+      outputs.push({ name: 'stderr', value: chunk })
+    })
+    proc.on('close', code => {
+      resolve(outputs)
+    })
+    proc.on('error', err => {
+      reject(err)
+    })
+  })
+}
 
 export const createShellSandbox = (
   reporter: Reporter,
   opts: SandboxOptions
 ) => {
   return async (code: string, filetype: string, opts2: any = {}) => {
-    const outputs: Output[] = []
-    code.split('\n').forEach(line => {
+    let outputs: Output[] = []
+    for (let line of code.split('\n')) {
       line = line.trimLeft()
       if (line.startsWith('$ ')) {
         line = line.slice(2)
       }
-      // shell escape
-      // stderr > stdout
-      try {
-        const cmd = `${line} 2>&1`
-        const value = childProcess.execSync(cmd).toString('utf-8')
-        outputs.push({ name: line, value })
-      } catch (error) {
-        console.error(error)
-        return { outputs, error }
-      }
-    })
+      outputs = outputs.concat(await exec(line, reporter))
+    }
     return { outputs, error: null }
   }
 }

@@ -20,7 +20,12 @@ export const createNodeJsSandbox = (
 
   let outputs: Output[] = []
   const createWritable = name => {
-    return new Writable({ write: value => outputs.push({ name, value }) })
+    return new Writable({
+      write: value => {
+        reporter[name].write(value)
+        outputs.push({ name, value })
+      }
+    })
   }
   const stdout = createWritable('stdout')
   const stderr = createWritable('stderr')
@@ -43,6 +48,8 @@ export const createNodeJsSandbox = (
         return undefined
       }
       return (...args) => {
+        // FIXME
+        console[name](...args)
         outputs.push({
           name: `console.${name.toString()}`,
           value: args.join(' ')
@@ -95,6 +102,7 @@ export const createNodeJsSandbox = (
   vm.createContext(ctx)
   return async (code: string, filetype: string, opts2: any = {}) => {
     outputs = []
+    reporter.info(`run ${filetype}`)
     const compiled = await babel.transformAsync(code, {
       ast: false,
       presets: [[presetEnv, { targets: { node: '8.0.0' } }], presetTypescript],

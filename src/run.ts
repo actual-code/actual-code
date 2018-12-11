@@ -59,7 +59,7 @@ export const run = async (
   sandboxOpts: SandboxOptions = {},
   reporter: Reporter
 ) => {
-  const box = createSandbox(sandboxOpts, reporter)
+  const box = createSandbox(reporter, sandboxOpts)
   const vfile = remark.parse(markdownText)
   const results = []
   const nodes = []
