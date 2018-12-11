@@ -1,4 +1,4 @@
-import { createSandbox } from './sandbox'
+import { createSandbox } from '.'
 
 describe('createSandbox', () => {
   test('non interactive', async () => {

@@ -72,7 +72,11 @@ export const run = async (
     if (node.type === 'code' && node.lang in lang) {
       const meta = parseMeta(node.meta)
       const filetype = lang[node.lang]
-      const { outputs, error } = await box(node.value, filetype)
+      const opts: any = {}
+      if (meta.timeout) {
+        opts.timeeout = Number.parseInt(meta.timeout)
+      }
+      const { outputs, error } = await box(node.value, filetype, opts)
       const { start, end } = node.position
       if (error) {
         nodes.push({ parent, index, node: createErrorNode(error) })
