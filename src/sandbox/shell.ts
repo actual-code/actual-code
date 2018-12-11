@@ -1,8 +1,13 @@
 import childProcess from 'child_process'
+import { promisify } from 'util'
 
 import { Output, SandboxOptions } from '.'
+import { Reporter } from '../reporter'
 
-export const createShellSandbox = (opts: SandboxOptions) => {
+export const createShellSandbox = (
+  reporter: Reporter,
+  opts: SandboxOptions
+) => {
   return async (code: string, filetype: string, opts2: any = {}) => {
     const outputs: Output[] = []
     code.split('\n').forEach(line => {

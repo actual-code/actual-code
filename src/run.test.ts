@@ -36,10 +36,18 @@ const strip = node => {
   return res
 }
 
+const reporter = {
+  info: () => {},
+  stdout: process.stdout,
+  stderr: process.stderr
+}
+
 describe('run markdown', () => {
   test('run', async () => {
     const { results, vfile } = await run(
-      '# hoge\n\n```js\nconsole.log("hoge")\n```\n'
+      '# hoge\n\n```js\nconsole.log("hoge")\n```\n',
+      {},
+      reporter
     )
     expect(results.length).toBe(1)
     const { outputs, start, end } = results[0]
@@ -63,7 +71,9 @@ describe('run markdown', () => {
 
   test('quiet mode', async () => {
     const { results, vfile } = await run(
-      '```js {quiet}\nconsole.log("hoge")\n```\n'
+      '```js {quiet}\nconsole.log("hoge")\n```\n',
+      {},
+      reporter
     )
     expect(results.length).toBe(1)
     const { outputs, start, end } = results[0]
@@ -93,7 +103,9 @@ describe('run markdown', () => {
     })
 
     const { results, vfile } = await run(
-      '```js {file="hoge.js"}\nconsole.log("hoge")\n```\n'
+      '```js {file="hoge.js"}\nconsole.log("hoge")\n```\n',
+      {},
+      reporter
     )
     expect(results.length).toBe(1)
     const { outputs, start, end } = results[0]

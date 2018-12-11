@@ -10,8 +10,12 @@ const presetEnv = require('@babel/preset-env')
 const presetTypescript = require('@babel/preset-typescript')
 
 import { Output, SandboxOptions } from '.'
+import { Reporter } from '../reporter'
 
-export const createNodeJsSandbox = (opts: SandboxOptions = {}) => {
+export const createNodeJsSandbox = (
+  reporter: Reporter,
+  opts: SandboxOptions = {}
+) => {
   const rootPath = path.resolve(opts.rootPath || process.cwd())
 
   let outputs: Output[] = []

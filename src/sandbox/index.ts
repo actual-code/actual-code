@@ -1,5 +1,6 @@
 import { createNodeJsSandbox } from './node-js'
 import { createShellSandbox } from './shell'
+import { Reporter } from '../reporter'
 
 export interface Output {
   name: string
@@ -11,9 +12,12 @@ export interface SandboxOptions {
   timeout?: number
 }
 
-export const createSandbox = (opts: SandboxOptions = {}) => {
-  const jsBox = createNodeJsSandbox(opts)
-  const shBox = createShellSandbox(opts)
+export const createSandbox = (
+  opts: SandboxOptions = {},
+  reporter: Reporter
+) => {
+  const jsBox = createNodeJsSandbox(reporter, opts)
+  const shBox = createShellSandbox(reporter, opts)
   return async (
     code: string,
     filetype: string = 'js',
