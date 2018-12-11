@@ -1,3 +1,6 @@
+const fs = { ...require('fs'), writeFile: jest.fn() }
+jest.setMock('fs', fs)
+
 import { run, parseMeta } from './run'
 
 test('parseMeta', () => {
@@ -33,17 +36,24 @@ const strip = node => {
   return res
 }
 
-describe('', () => {
-  test('run markdown', () => {
-    const { results, vfile } = run('```js\nconsole.log("hoge")\n```\n')
+describe('run markdown', () => {
+  test('run', async () => {
+    const { results, vfile } = await run(
+      '# hoge\n\n```js\nconsole.log("hoge")\n```\n'
+    )
     expect(results.length).toBe(1)
     const { outputs, start, end } = results[0]
     expect(outputs.length).toBe(1)
     expect(outputs[0]).toEqual({ name: 'console.log', value: 'hoge' })
-    expect(start).toBe(0)
-    expect(end).toBe(29)
+    expect(start).toBe(8)
+    expect(end).toBe(37)
     expect(strip(vfile)).toEqual({
       children: [
+        {
+          children: [{ type: 'text', value: 'hoge' }],
+          depth: 1,
+          type: 'heading'
+        },
         { lang: 'js', type: 'code', value: 'console.log("hoge")' },
         { type: 'code', value: '-- console.log\nhoge' }
       ],
@@ -51,8 +61,10 @@ describe('', () => {
     })
   })
 
-  test('run markdown', () => {
-    const { results, vfile } = run('```js {quiet}\nconsole.log("hoge")\n```\n')
+  test('quiet mode', async () => {
+    const { results, vfile } = await run(
+      '```js {quiet}\nconsole.log("hoge")\n```\n'
+    )
     expect(results.length).toBe(1)
     const { outputs, start, end } = results[0]
     expect(outputs.length).toBe(1)
@@ -70,5 +82,35 @@ describe('', () => {
       ],
       type: 'root'
     })
+  })
+
+  test('write file', async () => {
+    jest.resetAllMocks()
+    fs.writeFile.mockImplementation((filename, content, cb) => {
+      expect(filename).toBe('hoge.js')
+      expect(content).toBe(`console.log("hoge")`)
+      cb(null)
+    })
+
+    const { results, vfile } = await run(
+      '```js {file="hoge.js"}\nconsole.log("hoge")\n```\n'
+    )
+    expect(results.length).toBe(1)
+    const { outputs, start, end } = results[0]
+    expect(outputs.length).toBe(1)
+    expect(outputs[0]).toEqual({ name: 'console.log', value: 'hoge' })
+    expect(strip(vfile)).toEqual({
+      children: [
+        {
+          lang: 'js',
+          type: 'code',
+          meta: '{file="hoge.js"}',
+          value: 'console.log("hoge")'
+        },
+        { type: 'code', value: '-- console.log\nhoge' }
+      ],
+      type: 'root'
+    })
+    expect(fs.writeFile).toHaveBeenCalledTimes(1)
   })
 })

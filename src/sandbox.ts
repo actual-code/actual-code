@@ -99,7 +99,7 @@ export const createSandbox = (opts: SandboxOptions = {}) => {
     console: consoleProxy
   }
   vm.createContext(ctx)
-  return (code: string, filetype: string = 'js') => {
+  return async (code: string, filetype: string = 'js') => {
     outputs = []
     if (filetype === 'sh') {
       code.split('\n').forEach(line => {
@@ -120,8 +120,10 @@ export const createSandbox = (opts: SandboxOptions = {}) => {
       })
       return { outputs, error: null }
     }
-    const compiled = babel.transformSync(code, {
+    const compiled = await babel.transformAsync(code, {
+      ast: false,
       presets: [[presetEnv, { targets: { node: '8.0.0' } }], presetTypescript],
+      sourceType: 'module',
       filename: `file.${filetype}`
     })
     try {

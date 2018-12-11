@@ -13,7 +13,7 @@ export const convert = async (filename: string) => {
   const text = (await readFile(filename)).toString()
   const appState = await setup(filename)
 
-  const { vfile } = run(text, { rootPath: appState.path })
+  const { vfile } = await run(text, { rootPath: appState.path })
   const doc = unified()
     .use(stringify)
     .stringify(vfile)

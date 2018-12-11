@@ -1,11 +1,18 @@
+import * as fs from 'fs'
+import { promisify } from 'util'
+
 import remark from './markdown'
 import { createSandbox, SandboxOptions } from './sandbox'
 
-const traversal = (node, parent, cb, index = 0) => {
-  cb(node, parent, index)
-  ;(node.children || []).forEach((child, index2) =>
-    traversal(child, node, cb, index2)
-  )
+const writeFile = promisify(fs.writeFile)
+
+const traversal = async (node, parent, cb, index = 0) => {
+  await cb(node, parent, index)
+  let i = 0
+  for (const child of node.children || []) {
+    await traversal(child, node, cb, i)
+    i++
+  }
 }
 const createErrorNode = value => ({ type: 'code', lang: 'error', value })
 const createResultNode = outputs => ({
@@ -46,17 +53,26 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
   return results
 }
 
-export const run = (markdownText: string, sandboxOpts: SandboxOptions = {}) => {
+export const run = async (
+  markdownText: string,
+  sandboxOpts: SandboxOptions = {}
+) => {
   const box = createSandbox(sandboxOpts)
   const vfile = remark.parse(markdownText)
   const results = []
   const nodes = []
-  traversal(vfile, vfile, (node, parent, index) => {
+  await traversal(vfile, vfile, async (node, parent, index) => {
+    if (node.type === 'code') {
+      const meta = parseMeta(node.meta)
+      if (meta.file) {
+        await writeFile(meta.file, node.value)
+      }
+    }
+
     if (node.type === 'code' && node.lang in lang) {
       const meta = parseMeta(node.meta)
-      console.log(node.meta, meta)
       const filetype = lang[node.lang]
-      const { outputs, error } = box(node.value, filetype)
+      const { outputs, error } = await box(node.value, filetype)
       const { start, end } = node.position
       if (error) {
         nodes.push({ parent, index, node: createErrorNode(error) })

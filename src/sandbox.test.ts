@@ -1,24 +1,24 @@
 import { createSandbox } from './sandbox'
 
 describe('createSandbox', () => {
-  test('non interactive', () => {
+  test('non interactive', async () => {
     const box = createSandbox()
-    expect(box('const a = 1')).toEqual({ outputs: [], error: null })
+    expect(await box('const a = 1')).toEqual({ outputs: [], error: null })
   })
 
-  test('continuas running', () => {
+  test('continuas running', async () => {
     const box = createSandbox()
-    expect(box('const a = 1')).toEqual({ outputs: [], error: null })
-    expect(box('console.log(a + 1)')).toEqual({
+    expect(await box('const a = 1')).toEqual({ outputs: [], error: null })
+    expect(await box('console.log(a + 1)')).toEqual({
       outputs: [{ name: 'console.log', value: '2' }],
       error: null
     })
   })
 
-  test('outputs', () => {
+  test('outputs', async () => {
     const box = createSandbox()
     expect(
-      box(
+      await box(
         'console.log(1); process.stdout.write("1"); process.stderr.write("2")'
       )
     ).toEqual({
