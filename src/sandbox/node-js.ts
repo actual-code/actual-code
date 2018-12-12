@@ -48,11 +48,13 @@ export const createNodeJsSandbox = (
         return undefined
       }
       return (...args) => {
-        // FIXME
-        console[name](...args)
+        // FIXME time系とか
+        reporter.stdout.write(
+          `${args.map(arg => inspect(arg, { colors: true })).join(' ')}\n`
+        )
         outputs.push({
           name: `console.${name.toString()}`,
-          value: inspect(args)
+          value: args.map(arg => inspect(arg)).join(' ')
         })
       }
     }
