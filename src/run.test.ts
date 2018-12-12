@@ -46,7 +46,7 @@ describe('run markdown', () => {
   test('run', async () => {
     const { results, vfile } = await run(
       '# hoge\n\n```js\nconsole.log("hoge")\n```\n',
-      {},
+      { settings: {} },
       reporter
     )
     expect(results.length).toBe(1)
@@ -72,7 +72,7 @@ describe('run markdown', () => {
   test('quiet mode', async () => {
     const { results, vfile } = await run(
       '```js {quiet}\nconsole.log("hoge")\n```\n',
-      {},
+      { settings: {} },
       reporter
     )
     expect(results.length).toBe(1)
@@ -104,7 +104,7 @@ describe('run markdown', () => {
 
     const { results, vfile } = await run(
       '```js {file="hoge.js"}\nconsole.log("hoge")\n```\n',
-      {},
+      { settings: {} },
       reporter
     )
     expect(results.length).toBe(1)

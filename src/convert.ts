@@ -26,7 +26,6 @@ export const convert = async (filename: string) => {
 
   const matched = reFrontmatter.exec(text)
   const settings = matched ? safeLoad(matched[1]) : {}
-  // console.log(settings)
 
   if (matched) {
     text = text.slice(matched[0].length)
@@ -35,7 +34,11 @@ export const convert = async (filename: string) => {
   const appState = await setup(filename)
 
   reporter.info('run')
-  const { vfile } = await run(text, { rootPath: appState.path }, reporter)
+  const { vfile } = await run(
+    text,
+    { rootPath: appState.path, settings },
+    reporter
+  )
   const doc = unified()
     .use(stringify)
     .stringify(vfile)

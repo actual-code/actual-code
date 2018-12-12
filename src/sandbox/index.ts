@@ -10,18 +10,19 @@ export interface Output {
 export interface SandboxOptions {
   rootPath?: string
   timeout?: number
+  settings: { [props: string]: string }
 }
 
 export const createSandbox = (
   reporter: Reporter,
-  opts: SandboxOptions = {}
+  opts: SandboxOptions = { settings: {} }
 ) => {
   const jsBox = createNodeJsSandbox(reporter, opts)
   const shBox = createShellSandbox(reporter, opts)
   return async (
     code: string,
     filetype: string = 'js',
-    opts2: SandboxOptions = {}
+    opts2: SandboxOptions = { settings: {} }
   ) => {
     if (filetype === 'sh') {
       return shBox(code, filetype, opts2)

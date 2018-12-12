@@ -2,6 +2,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as vm from 'vm'
 import { Writable } from 'stream'
+import { inspect } from 'util'
 
 import * as babel from '@babel/core'
 
@@ -13,7 +14,7 @@ import { Reporter } from '../reporter'
 
 export const createNodeJsSandbox = (
   reporter: Reporter,
-  opts: SandboxOptions = {}
+  opts: SandboxOptions = { settings: {} }
 ) => {
   const rootPath = path.resolve(opts.rootPath || process.cwd())
 
@@ -51,11 +52,15 @@ export const createNodeJsSandbox = (
         console[name](...args)
         outputs.push({
           name: `console.${name.toString()}`,
-          value: args.join(' ')
+          value: inspect(args)
         })
       }
     }
   })
+
+  const actualCodeObject = {
+    getData: () => opts.settings
+  }
 
   const ctx: any = {
     require(name: string) {
@@ -80,6 +85,9 @@ export const createNodeJsSandbox = (
         throw new Error('Sandbox Error: Illegal path')
       }
 
+      if (name === 'actual-code') {
+        return actualCodeObject
+      }
       const fullpath = path.resolve(path.join(rootPath, 'node_modules', name))
       if (fs.existsSync(fullpath)) {
         validatePath(fullpath)

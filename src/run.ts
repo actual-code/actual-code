@@ -56,7 +56,7 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
 
 export const run = async (
   markdownText: string,
-  sandboxOpts: SandboxOptions = {},
+  sandboxOpts: SandboxOptions = { settings: {} },
   reporter: Reporter
 ) => {
   const box = createSandbox(reporter, sandboxOpts)
