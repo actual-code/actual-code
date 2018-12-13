@@ -1,6 +1,6 @@
 import childProcess from 'child_process'
 
-import { Output, SandboxOptions } from '.'
+import { Output, Sandbox, SandboxOptions } from '.'
 import { Reporter } from '../reporter'
 
 const exec = (cmd: string, reporter: Reporter) => {
@@ -25,18 +25,19 @@ const exec = (cmd: string, reporter: Reporter) => {
   })
 }
 
-export const createShellSandbox = (
-  reporter: Reporter,
-  opts: SandboxOptions
-) => {
-  return async (code: string, filetype: string, opts2: any = {}) => {
+export class ShellSandbox implements Sandbox {
+  reporter: Reporter
+  constructor(reporter: Reporter, opts: SandboxOptions) {
+    this.reporter = reporter
+  }
+  async run(code: string, filetype: string, meta: any = {}) {
     let outputs: Output[] = []
     for (let line of code.split('\n')) {
       line = line.trimLeft()
       if (line.startsWith('$ ')) {
         line = line.slice(2)
       }
-      outputs = outputs.concat(await exec(line, reporter))
+      outputs = outputs.concat(await exec(line, this.reporter))
     }
     return { outputs, error: null }
   }

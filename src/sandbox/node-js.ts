@@ -9,21 +9,18 @@ import * as babel from '@babel/core'
 const presetEnv = require('@babel/preset-env')
 const presetTypescript = require('@babel/preset-typescript')
 
-import { Output, SandboxOptions } from '.'
+import { Output, SandboxOptions, Sandbox } from '.'
 import { Reporter } from '../reporter'
 
-export const createNodeJsSandbox = (
+const createProxies = (
   reporter: Reporter,
-  opts: SandboxOptions = { settings: {} }
+  handler: (output: Output) => void
 ) => {
-  const rootPath = path.resolve(opts.rootPath || process.cwd())
-
-  let outputs: Output[] = []
   const createWritable = name => {
     return new Writable({
       write: value => {
         reporter[name].write(value)
-        outputs.push({ name, value })
+        handler({ name, value })
       }
     })
   }
@@ -52,7 +49,7 @@ export const createNodeJsSandbox = (
         reporter.stdout.write(
           `${args.map(arg => inspect(arg, { colors: true })).join(' ')}\n`
         )
-        outputs.push({
+        handler({
           name: `console.${name.toString()}`,
           value: args.map(arg => inspect(arg)).join(' ')
         })
@@ -60,59 +57,89 @@ export const createNodeJsSandbox = (
     }
   })
 
-  const actualCodeObject = {
-    getData: () => opts.settings
+  return { processProxy, consoleProxy }
+}
+
+const createRequire = (rootPath: string, actualCodeObject) => {
+  return (name: string) => {
+    const validatePath = (p: string) => {
+      if (p.startsWith(rootPath)) {
+        return
+      }
+      if (p.startsWith(path.resolve(path.join(__dirname, '..')))) {
+        return
+      }
+
+      throw new Error(`Sandbox Error: require ${name}`)
+    }
+
+    if (name.startsWith('./') || name.startsWith('../')) {
+      const fullPath = require.resolve(name)
+      validatePath(fullPath)
+      return require(fullPath)
+    }
+
+    if (name.startsWith('/') || name.startsWith('.')) {
+      throw new Error('Sandbox Error: Illegal path')
+    }
+
+    if (name === 'actual-code') {
+      return actualCodeObject
+    }
+    const fullpath = path.resolve(path.join(rootPath, 'node_modules', name))
+    if (fs.existsSync(fullpath)) {
+      validatePath(fullpath)
+      return require(fullpath)
+    } else {
+      validatePath(require.resolve(name))
+      return require(name)
+    }
+  }
+}
+
+export class JsSandbox implements Sandbox {
+  outputs: Output[] = []
+  handlers: Array<(output: Output) => void> = []
+  rootPath: string
+  reporter: Reporter
+  timeout: number
+  ctx: any
+  constructor(reporter: Reporter, opts: SandboxOptions = { settings: {} }) {
+    this.reporter = reporter
+    this.rootPath = path.resolve(opts.rootPath || process.cwd())
+    this.timeout = opts.timeout || 100
+
+    this.handleOutput(output => this.outputs.push(output))
+
+    const { consoleProxy, processProxy } = createProxies(reporter, output => {
+      this.handlers.forEach(handler => handler(output))
+    })
+    const actualCodeObject = {
+      getData: () => opts.settings
+    }
+    const requireSandbox = createRequire(this.rootPath, actualCodeObject)
+    this.ctx = {
+      require: requireSandbox,
+      setTimeout,
+      setInterval,
+      setImmediate,
+      clearTimeout,
+      clearInterval,
+      clearImmediate,
+      process: processProxy,
+      Buffer,
+      console: consoleProxy
+    }
+    vm.createContext(this.ctx)
   }
 
-  const ctx: any = {
-    require(name: string) {
-      const validatePath = (p: string) => {
-        if (p.startsWith(rootPath)) {
-          return
-        }
-        if (p.startsWith(path.resolve(path.join(__dirname, '..')))) {
-          return
-        }
-
-        throw new Error(`Sandbox Error: require ${name}`)
-      }
-
-      if (name.startsWith('./') || name.startsWith('../')) {
-        const fullPath = require.resolve(name)
-        validatePath(fullPath)
-        return require(fullPath)
-      }
-
-      if (name.startsWith('/') || name.startsWith('.')) {
-        throw new Error('Sandbox Error: Illegal path')
-      }
-
-      if (name === 'actual-code') {
-        return actualCodeObject
-      }
-      const fullpath = path.resolve(path.join(rootPath, 'node_modules', name))
-      if (fs.existsSync(fullpath)) {
-        validatePath(fullpath)
-        return require(fullpath)
-      } else {
-        validatePath(require.resolve(name))
-        return require(name)
-      }
-    },
-    setTimeout,
-    setInterval,
-    setImmediate,
-    clearTimeout,
-    clearInterval,
-    clearImmediate,
-    process: processProxy,
-    Buffer,
-    console: consoleProxy
+  handleOutput(handler: (output: Output) => void) {
+    this.handlers.push(handler)
   }
-  vm.createContext(ctx)
-  return async (code: string, filetype: string, opts2: any = {}) => {
-    outputs = []
-    reporter.info(`run ${filetype}`)
+
+  async run(code: string, filetype: string, meta) {
+    this.outputs = []
+    this.reporter.info(`run ${filetype}`)
     const compiled = await babel.transformAsync(code, {
       ast: false,
       presets: [[presetEnv, { targets: { node: '8.0.0' } }], presetTypescript],
@@ -120,12 +147,12 @@ export const createNodeJsSandbox = (
       filename: `file.${filetype}`
     })
     try {
-      const timeout = opts2.timeout || opts.timeout || 100
-      vm.runInContext(compiled.code, ctx, { timeout })
+      const timeout = meta.timeout || this.timeout
+      vm.runInContext(compiled.code, this.ctx, { timeout })
     } catch (error) {
       console.error(error)
-      return { outputs, error }
+      return { outputs: this.outputs, error }
     }
-    return { outputs, error: null }
+    return { outputs: this.outputs, error: null }
   }
 }

@@ -52,7 +52,7 @@ describe('run markdown', () => {
     expect(results.length).toBe(1)
     const { outputs, start, end } = results[0]
     expect(outputs.length).toBe(1)
-    expect(outputs[0]).toEqual({ name: 'console.log', value: 'hoge' })
+    expect(outputs[0]).toEqual({ name: 'console.log', value: "'hoge'" })
     expect(start).toBe(8)
     expect(end).toBe(37)
     expect(strip(vfile)).toEqual({
@@ -63,7 +63,7 @@ describe('run markdown', () => {
           type: 'heading'
         },
         { lang: 'js', type: 'code', value: 'console.log("hoge")' },
-        { type: 'code', value: '-- console.log\nhoge' }
+        { type: 'code', value: "-- console.log\n'hoge'" }
       ],
       type: 'root'
     })
@@ -78,7 +78,7 @@ describe('run markdown', () => {
     expect(results.length).toBe(1)
     const { outputs, start, end } = results[0]
     expect(outputs.length).toBe(1)
-    expect(outputs[0]).toEqual({ name: 'console.log', value: 'hoge' })
+    expect(outputs[0]).toEqual({ name: 'console.log', value: "'hoge'" })
     expect(start).toBe(0)
     expect(end).toBe(37)
     expect(strip(vfile)).toEqual({
@@ -110,7 +110,7 @@ describe('run markdown', () => {
     expect(results.length).toBe(1)
     const { outputs, start, end } = results[0]
     expect(outputs.length).toBe(1)
-    expect(outputs[0]).toEqual({ name: 'console.log', value: 'hoge' })
+    expect(outputs[0]).toEqual({ name: 'console.log', value: "'hoge'" })
     expect(strip(vfile)).toEqual({
       children: [
         {
@@ -119,7 +119,7 @@ describe('run markdown', () => {
           meta: '{file="hoge.js"}',
           value: 'console.log("hoge")'
         },
-        { type: 'code', value: '-- console.log\nhoge' }
+        { type: 'code', value: "-- console.log\n'hoge'" }
       ],
       type: 'root'
     })
