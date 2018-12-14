@@ -128,7 +128,8 @@ export class JsSandbox implements Sandbox {
       clearImmediate,
       process: processProxy,
       Buffer,
-      console: consoleProxy
+      console: consoleProxy,
+      exports: {}
     }
     vm.createContext(this.ctx)
   }
