@@ -30,7 +30,8 @@ const lang = {
   tsx: 'tsx',
   sh: 'sh',
   shell: 'sh',
-  bash: 'sh'
+  bash: 'sh',
+  html: 'html'
 }
 
 const reKeyValue = /^(([a-zA-Z0-9]+)(?:=([^" ]+)|="([^"]+)")?)/
@@ -62,7 +63,7 @@ export const run = async (
   const box = createSandbox(reporter, sandboxOpts)
   const vfile = remark.parse(markdownText)
   const results = []
-  const nodes = []
+  const insertNodes = []
   await traversal(vfile, vfile, async (node, parent, index) => {
     if (node.type !== 'code') {
       return
@@ -82,19 +83,23 @@ export const run = async (
     if (meta.timeout) {
       opts.timeeout = Number.parseInt(meta.timeout)
     }
-    const { outputs, error } = await box(node.value, filetype, opts)
+    const { outputs, error, nodes } = await box(node.value, filetype, opts)
     const { start, end } = node.position
     if (error) {
-      nodes.push({ parent, index, node: createErrorNode(error) })
+      insertNodes.push({ parent, index, node: createErrorNode(error) })
     } else {
       results.push({ outputs, start: start.offset, end: end.offset })
       if (outputs.length > 0 && !meta.quiet) {
-        nodes.push({ parent, index, node: createResultNode(outputs) })
+        insertNodes.push({ parent, index, node: createResultNode(outputs) })
       }
+      nodes.forEach(node => {
+        insertNodes.push({ parent, index, node })
+        console.log(JSON.stringify(node, null, '  '))
+      })
     }
   })
 
-  nodes.reverse().forEach(({ parent, index, node }) => {
+  insertNodes.reverse().forEach(({ parent, index, node }) => {
     parent.children = [
       ...parent.children.slice(0, index + 1),
       node,

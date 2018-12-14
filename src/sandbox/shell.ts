@@ -39,6 +39,6 @@ export class ShellSandbox implements Sandbox {
       }
       outputs = outputs.concat(await exec(line, this.reporter))
     }
-    return { outputs, error: null }
+    return { outputs, error: null, nodes: [] }
   }
 }

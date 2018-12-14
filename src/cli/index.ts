@@ -1,7 +1,3 @@
-// FIXME: move
-import * as unified from 'unified'
-import * as html from 'remark-html'
-
 import { convert } from '../convert'
 import { gui } from '../gui'
 import { runMarkdown } from '../convert'
@@ -58,15 +54,11 @@ const bootstrap = async () => {
 
   if (isGui) {
     const reporter = new Reporter()
-    // const stringify = unified().use(html).stringify
     gui(async cApp => {
       const appState = await setup('hoge.md')
       await cApp.exposeFunction('runMarkdown', async code => {
-        console.log(code)
         const vfile = await runMarkdown(code, reporter, appState.rootPath)
         return remark.stringify(vfile)
-        // const html = stringify(vfile)
-        // return html
       })
     })
   }

@@ -1,5 +1,6 @@
 import { JsSandbox } from './node-js'
 import { ShellSandbox } from './shell'
+import { HtmlSandbox } from './html'
 import { Reporter } from '../reporter'
 
 export interface Output {
@@ -16,6 +17,7 @@ export interface SandboxOptions {
 export interface SandboxResult {
   outputs: Output[]
   error?: Error
+  nodes: any[]
 }
 
 export interface Sandbox {
@@ -28,6 +30,7 @@ export const createSandbox = (
 ) => {
   const jsBox = new JsSandbox(reporter, opts)
   const shBox = new ShellSandbox(reporter, opts)
+  const htmlBox = new HtmlSandbox(reporter, opts)
   return async (
     code: string,
     filetype: string = 'js',
@@ -35,6 +38,8 @@ export const createSandbox = (
   ) => {
     if (filetype === 'sh') {
       return shBox.run(code, filetype, opts2)
+    } else if (filetype === 'html') {
+      return htmlBox.run(code, filetype, opts2)
     } else {
       return jsBox.run(code, filetype, opts2)
     }

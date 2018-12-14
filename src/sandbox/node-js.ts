@@ -152,8 +152,8 @@ export class JsSandbox implements Sandbox {
       vm.runInContext(compiled.code, this.ctx, { timeout })
     } catch (error) {
       console.error(error)
-      return { outputs: this.outputs, error }
+      return { outputs: this.outputs, error, nodes: [] }
     }
-    return { outputs: this.outputs, error: null }
+    return { outputs: this.outputs, error: null, nodes: [] }
   }
 }
