@@ -64,29 +64,32 @@ export const run = async (
   const results = []
   const nodes = []
   await traversal(vfile, vfile, async (node, parent, index) => {
-    if (node.type === 'code') {
-      const meta = parseMeta(node.meta)
-      if (meta.file) {
-        await writeFile(meta.file, node.value)
-      }
+    if (node.type !== 'code') {
+      return
     }
 
-    if (node.type === 'code' && node.lang in lang) {
-      const meta = parseMeta(node.meta)
-      const filetype = lang[node.lang]
-      const opts: any = {}
-      if (meta.timeout) {
-        opts.timeeout = Number.parseInt(meta.timeout)
-      }
-      const { outputs, error } = await box(node.value, filetype, opts)
-      const { start, end } = node.position
-      if (error) {
-        nodes.push({ parent, index, node: createErrorNode(error) })
-      } else {
-        results.push({ outputs, start: start.offset, end: end.offset })
-        if (outputs.length > 0 && !meta.quiet) {
-          nodes.push({ parent, index, node: createResultNode(outputs) })
-        }
+    const meta = parseMeta(node.meta)
+    if (meta.file) {
+      await writeFile(meta.file, node.value)
+    }
+
+    if (meta.noexec || !(node.lang in lang)) {
+      return
+    }
+
+    const filetype = lang[node.lang]
+    const opts: any = {}
+    if (meta.timeout) {
+      opts.timeeout = Number.parseInt(meta.timeout)
+    }
+    const { outputs, error } = await box(node.value, filetype, opts)
+    const { start, end } = node.position
+    if (error) {
+      nodes.push({ parent, index, node: createErrorNode(error) })
+    } else {
+      results.push({ outputs, start: start.offset, end: end.offset })
+      if (outputs.length > 0 && !meta.quiet) {
+        nodes.push({ parent, index, node: createResultNode(outputs) })
       }
     }
   })
