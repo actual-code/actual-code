@@ -27,21 +27,24 @@ export interface Sandbox {
 export const createSandbox = (
   reporter: Reporter,
   opts: SandboxOptions = { settings: {} }
-) => {
+): Sandbox => {
+  reporter.info('create Sandbox')
   const jsBox = new JsSandbox(reporter, opts)
   const shBox = new ShellSandbox(reporter, opts)
   const htmlBox = new HtmlSandbox(reporter, opts)
-  return async (
-    code: string,
-    filetype: string = 'js',
-    opts2: SandboxOptions = { settings: {} }
-  ) => {
-    if (filetype === 'sh') {
-      return shBox.run(code, filetype, opts2)
-    } else if (filetype === 'html') {
-      return htmlBox.run(code, filetype, opts2)
-    } else {
-      return jsBox.run(code, filetype, opts2)
+  return {
+    run: async (
+      code: string,
+      filetype: string = 'js',
+      opts2: SandboxOptions = { settings: {} }
+    ) => {
+      if (filetype === 'sh') {
+        return shBox.run(code, filetype, opts2)
+      } else if (filetype === 'html') {
+        return htmlBox.run(code, filetype, opts2)
+      } else {
+        return jsBox.run(code, filetype, opts2)
+      }
     }
   }
 }

@@ -2,7 +2,7 @@ import * as fs from 'fs'
 import { promisify } from 'util'
 
 import remark from './markdown'
-import { createSandbox, SandboxOptions } from './sandbox'
+import { Sandbox } from './sandbox'
 import { Reporter } from './reporter'
 
 const writeFile = promisify(fs.writeFile)
@@ -57,10 +57,9 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
 
 export const run = async (
   markdownText: string,
-  sandboxOpts: SandboxOptions = { settings: {} },
+  box: Sandbox,
   reporter: Reporter
 ) => {
-  const box = createSandbox(reporter, sandboxOpts)
   const vfile = remark.parse(markdownText)
   const results = []
   const insertNodes = []
@@ -83,7 +82,7 @@ export const run = async (
     if (meta.timeout) {
       opts.timeeout = Number.parseInt(meta.timeout)
     }
-    const { outputs, error, nodes } = await box(node.value, filetype, opts)
+    const { outputs, error, nodes } = await box.run(node.value, filetype, opts)
     const { start, end } = node.position
     if (error) {
       insertNodes.push({ parent, index, node: createErrorNode(error) })

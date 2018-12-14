@@ -9,6 +9,7 @@ import { safeLoad } from 'js-yaml'
 import { run } from './run'
 import { setup } from './setup'
 import { Reporter } from './reporter'
+import { Sandbox, SandboxOptions, createSandbox } from './sandbox'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -17,8 +18,8 @@ const reFrontmatter = /^---\n(.*)\n---\n/
 
 export const runMarkdown = async (
   code: string,
-  reporter: Reporter,
-  rootPath: string
+  box: Sandbox,
+  reporter: Reporter
 ) => {
   const cwd = process.cwd()
 
@@ -30,7 +31,7 @@ export const runMarkdown = async (
   }
 
   reporter.info('run')
-  const { vfile } = await run(code, { rootPath, settings }, reporter)
+  const { vfile } = await run(code, box, reporter)
 
   process.chdir(cwd)
 
@@ -46,7 +47,13 @@ export const convert = async (filename: string, outputfile?: string) => {
   let text = (await readFile(filename)).toString()
   const appState = await setup(filename)
 
-  const vfile = await runMarkdown(text, reporter, appState.rootPath)
+  const sandboxOpts: SandboxOptions = {
+    rootPath: appState.rootPath,
+    settings: {}
+  }
+  const box = createSandbox(reporter, sandboxOpts)
+
+  const vfile = await runMarkdown(text, box, reporter)
 
   const doc = unified()
     .use(stringify)

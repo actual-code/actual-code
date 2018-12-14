@@ -18,9 +18,9 @@ $ bin/actual-code
 
 ## TODO
 
-- [ ] carlo app mode で、毎回 Sandbox 作る、大富豪プログラムを修正する
-- [ ] pkg で生の actual-code バイナリを生成する
-  - 問題はどこにアップロードするのか？github の リリースバイナリ？
+* carlo app
+  - [ ] 全体に、実行ボタンと自動実行on/offスイッチ
+  - [ ] コードブロックごとに、実行ボタンと自動実行on/offスイッチ
 - browser sandbox
   - webview を試す
   - iframe?????
@@ -29,6 +29,9 @@ $ bin/actual-code
     - [ ] npm actual-code で sandbox class を登録する
     - [ ] frontmatter で、markdown import
     - [ ] JS vm sandbox で、エラースタックをいい感じにいじる
-
+* リファクタリング！
 * [ ] エラー周りのユニットテストとかを書く
 * [ ] e2e テスト（入力の Markdown と、出力ファイルやレポートなどのテスト）
+- [ ] pkg で生の actual-code バイナリを生成する
+  - 問題はどこにアップロードするのか？github の リリースバイナリ？
+- [x] 毎回 Sandbox 作る、大富豪プログラムを修正する

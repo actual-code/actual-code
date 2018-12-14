@@ -3,6 +3,7 @@ import { gui } from '../gui'
 import { runMarkdown } from '../convert'
 import { Reporter } from '../reporter'
 import { setup } from '../setup'
+import { createSandbox, Sandbox, SandboxOptions } from '../sandbox'
 
 import remark from '../markdown'
 
@@ -54,10 +55,11 @@ const bootstrap = async () => {
 
   if (isGui) {
     const reporter = new Reporter()
+    const box = createSandbox(reporter)
     gui(async cApp => {
       const appState = await setup('hoge.md')
       await cApp.exposeFunction('runMarkdown', async code => {
-        const vfile = await runMarkdown(code, reporter, appState.rootPath)
+        const vfile = await runMarkdown(code, box, reporter)
         return remark.stringify(vfile)
       })
     })
