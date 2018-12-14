@@ -13,39 +13,50 @@ import { Reporter } from './reporter'
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
-export const convert = async (filename: string) => {
-  const reporter = new Reporter()
+const reFrontmatter = /^---\n(.*)\n---\n/
 
+export const runMarkdown = async (
+  code: string,
+  reporter: Reporter,
+  rootPath: string
+) => {
   const cwd = process.cwd()
-  filename = path.resolve(filename)
-  const outFilenme = filename.replace(/\.([^.]+)$/, `.generated.$1`)
 
-  const reFrontmatter = /^---\n(.*)\n---\n/
-  reporter.info(`read: ${filename}`)
-  let text = (await readFile(filename)).toString()
-
-  const matched = reFrontmatter.exec(text)
+  const matched = reFrontmatter.exec(code)
   const settings = matched ? safeLoad(matched[1]) : {}
 
   if (matched) {
-    text = text.slice(matched[0].length)
+    code = code.slice(matched[0].length)
   }
 
+  reporter.info('run')
+  const { vfile } = await run(code, { rootPath, settings }, reporter)
+
+  process.chdir(cwd)
+
+  return vfile
+}
+
+export const convert = async (filename: string, outputfile?: string) => {
+  const reporter = new Reporter()
+
+  filename = path.resolve(filename)
+
+  reporter.info(`read: ${filename}`)
+  let text = (await readFile(filename)).toString()
   const appState = await setup(filename)
 
-  reporter.info('run')
-  const { vfile } = await run(
-    text,
-    { rootPath: appState.path, settings },
-    reporter
-  )
+  const vfile = await runMarkdown(text, reporter, appState.rootPath)
+
   const doc = unified()
     .use(stringify)
     .stringify(vfile)
 
-  process.chdir(cwd)
-  reporter.info(`write ${outFilenme}`)
-  await writeFile(outFilenme, doc)
+  if (outputfile) {
+    reporter.info(`write ${outputfile}`)
+    await writeFile(outputfile, doc)
+  }
+  return doc
 }
 
 export const getSettings = (text: string) => {}

@@ -9,9 +9,9 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,
-    "lib": ["es2018"],
-    "isolatedModules": true,
+    "lib": ["es2018", "dom"],
     "strict": false,
+    "jsx": "react",
     "module": "commonjs",
     "resolveJsonModule": true,
     "outDir": "dist"
