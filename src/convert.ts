@@ -31,7 +31,7 @@ export const runMarkdown = async (
   }
 
   reporter.info('run')
-  const { vfile } = await run(code, box, reporter)
+  const { vfile } = await run(code, box, { settings })
 
   process.chdir(cwd)
 

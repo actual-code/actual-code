@@ -62,6 +62,7 @@ const bootstrap = async () => {
         const vfile = await runMarkdown(code, box, reporter)
         return remark.stringify(vfile)
       })
+      ;(global as any).cApp = cApp
     })
   }
 }

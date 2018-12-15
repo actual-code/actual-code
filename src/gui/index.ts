@@ -4,7 +4,7 @@ import * as carlo from 'carlo'
 import Bundler from 'parcel-bundler'
 
 export const gui = async cb => {
-  const outDir = path.join(__dirname, '..', 'dist', 'app')
+  const outDir = path.join(__dirname, '..', '..', 'dist', 'app')
   const entryFile = path.join(__dirname, '..', '..', 'app', 'index.html')
   const opts = {
     outDir,
