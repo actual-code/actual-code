@@ -24,22 +24,11 @@ bin/actual-code [-o outfile.md] <file.md>
 
 ## TODO
 
-* carlo app
-  - carlo app でリアルタイム実行は危険…かも
-  - [ ] cache directory改善
-* リファクタリング！
-* [ ] エラー周りのユニットテストとかを書く
-* [ ] e2e テスト（入力の Markdown と、出力ファイルやレポートなどのテスト）
-- [ ] pkg で生の actual-code バイナリを生成する
-  - 問題はどこにアップロードするのか？github の リリースバイナリ？
-- puppeteer sandbox
-- Docker sandbox
-- VirtualBox sandbox
-- 図のsandbox
-- シェルスクリプト
-  - #! /bin/sh か /bin/bash で始まってたらシェルスクリプトとして動かす？
-- 実行結果を加工できるようにする
-  - 画像
+* 0.1.0
+  - [ ] RUNキャッシュ
+  - [ ] Markdownの自動保存
+  - [ ] NEWボタン
+  - [ ] 描画綺麗に
 
 ## DONE
 
