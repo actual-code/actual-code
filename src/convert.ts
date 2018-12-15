@@ -24,7 +24,7 @@ export const convert = async (filename: string, outputfile?: string) => {
   const appState = await setup(filename)
 
   const sandboxOpts: SandboxOptions = {
-    rootPath: appState.rootPath,
+    rootPath: appState.path,
     runMode: true
   }
   const box = createSandbox(reporter, sandboxOpts)

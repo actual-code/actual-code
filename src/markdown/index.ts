@@ -19,7 +19,7 @@ const markdown = remark()
 
 export const parseMarkdown = (...args) => markdown.parse(...args)
 export const stringifyHtml = (...args) => markdown.stringify(...args)
-export const stringifyMarkdown = (...args) =>
+export const stringifyMarkdown = (node, file?) =>
   unified()
     .use(stringify)
-    .stringify(...args)
+    .stringify(node, file)

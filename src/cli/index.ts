@@ -55,13 +55,17 @@ const bootstrap = async () => {
 
   if (isGui) {
     const reporter = new Reporter()
-    const box = createSandbox(reporter)
+    const appState = await setup('hoge.md')
+    const rootPath = appState.path
+    const box = createSandbox(reporter, { rootPath })
     gui(async cApp => {
-      const appState = await setup('hoge.md')
       await cApp.exposeFunction(
         'runMarkdown',
         async (code: string, runMode: boolean) => {
-          const vfile = await runMarkdown(code, box, reporter, { runMode })
+          const vfile = await runMarkdown(code, box, reporter, {
+            rootPath,
+            runMode
+          })
           return stringifyHtml(vfile)
         }
       )

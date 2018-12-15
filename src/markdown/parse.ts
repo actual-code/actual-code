@@ -71,15 +71,8 @@ export const getCodeBlocks = async vfile => {
     }
 
     const meta = parseMeta(node.meta)
-    if (meta.file) {
-      await writeFile(meta.file, node.value)
-    }
 
-    if (meta.noexec || !(node.lang in lang)) {
-      return
-    }
-
-    const filetype = lang[node.lang]
+    const filetype = lang[node.lang] || node.lang
     if (meta.timeout) {
       meta.timeout = Number.parseInt(meta.timeout)
     }

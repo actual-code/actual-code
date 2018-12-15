@@ -6,7 +6,7 @@ Markdown にはコードブロックでさまざまなな言語を埋め込め�
 
 - Markdown のコードブロックを実際に Sandbox の中で走らせる
 
-## usage
+## usage (GUI)
 
 ```sh
 $ yarn
@@ -16,17 +16,17 @@ $ bin/actual-code
 
 手元に Chrome or Chromium がインストールされていれば GUI アプリが立ち上がります。一見よくある、Markdown リアルタイムプレビューアプリに見えますが、違うのは、コードブロックが実行されることです。
 
+### markdown to markdown
+
+```sh
+bin/actual-code [-o outfile.md] <file.md>
+```
+
 ## TODO
 
 * carlo app
-  - [ ] コードブロックごとに、実行ボタンと自動実行on/offスイッチ
-- browser sandbox（parcel-bundler使う？）
-  - webview を試す
-  - iframe?????
-- コードブロックの lang、拡張子などの対応付けとかどうするか？
-  - [ ] npm actual-code で sandbox class を登録する
-  - [ ] frontmatter で、markdown import
-  - [ ] JS vm sandbox で、エラースタックをいい感じにいじる
+  - carlo app でリアルタイム実行は危険…かも
+  - [ ] cache directory改善
 * リファクタリング！
 * [ ] エラー周りのユニットテストとかを書く
 * [ ] e2e テスト（入力の Markdown と、出力ファイルやレポートなどのテスト）
@@ -47,3 +47,5 @@ $ bin/actual-code
 - [x] {browser} メタタグで、Node.js上じゃなくて、ブラウザ上で動くようにする
 - [x] carlo appで、実行ボタンと自動実行on/offスイッチ
 - [x] コードをすこーし、綺麗にした
+- [x] browser sandbox（parcel-bundler + iframe）
+- [x] carlo app での自動実行を禁止、RUN ボタンを追加

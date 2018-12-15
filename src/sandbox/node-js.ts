@@ -139,27 +139,6 @@ export class JsSandbox implements Sandbox {
   }
 
   async run(code: string, filetype: string, meta) {
-    if (!meta.runMode) {
-      this.reporter.info('sandbox run mode disabled.')
-
-      return { outputs: [], error: null, nodes: [] }
-    }
-    if (meta.browser) {
-      this.reporter.info(`run browser JS: ${filetype}`)
-      // FIXME: Node.js とは
-      const compiled = await babel.transformAsync(code, {
-          ast: false,
-          presets: [
-            [presetEnv, { targets: { browsers: ['last 2 Chrome versions'] } }],
-            presetTypescript
-          ],
-          filename: `file.${filetype}`
-        })
-        // console.log(compiled.code)
-      ;(global as any).cApp.evaluate(compiled.code).catch(err => {})
-      return { outputs: [], error: null, nodes: [] }
-    }
-
     this.outputs = []
     this.reporter.info(`run Node.js: ${filetype}`)
     const compiled = await babel.transformAsync(code, {

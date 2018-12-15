@@ -1,11 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import Editor from './editor'
 import Preview from './preview'
 
+const { runMarkdown } = window as any
+
 export default props => {
   const [text, setText] = useState('')
-  const [runMode, setRunMode] = useState(true)
+  const [__html, setHtml] = useState('')
+  useEffect(
+    () => {
+      runMarkdown(text, false).then(html => setHtml(html))
+    },
+    [text]
+  )
   return (
     <div
       style={{
@@ -16,8 +24,12 @@ export default props => {
       }}
     >
       <div style={{ gridRow: '1', gridColumn: '1/3' }}>
-        <button onClick={() => setRunMode(!runMode)}>
-          {runMode ? 'stop' : 'start'}
+        <button
+          onClick={() => {
+            runMarkdown(text, true).then(html => setHtml(html))
+          }}
+        >
+          Run
         </button>
       </div>
       <Editor
@@ -25,9 +37,8 @@ export default props => {
         value={text}
         style={{ gridRow: '2', gridColumn: '1' }}
       />
-      <Preview
-        value={text}
-        isRunning={runMode}
+      <div
+        dangerouslySetInnerHTML={{ __html }}
         style={{ gridRow: '2', gridColumn: '2' }}
       />
     </div>

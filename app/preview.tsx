@@ -1,16 +1,17 @@
-import React, { useEffect, useReducer, useRef } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 
 const { runMarkdown } = window as any
 
 export default props => {
   const { value, isRunning: runMode } = props
+  const [__html, setHtml] = useState('')
   const ref = useRef(null)
   useEffect(
     () => {
-      runMarkdown(value, runMode).then(html => (ref.current.innerHTML = html))
+      runMarkdown(value, runMode).then(html => setHtml(html))
     },
     [value]
   )
 
-  return <div ref={ref} />
+  return <div dangerouslySetInnerHTML={{ __html }} />
 }
