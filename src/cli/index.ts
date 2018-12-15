@@ -1,11 +1,5 @@
 import { convert } from '../convert'
-import { gui } from '../gui'
-import { runMarkdown } from '../markdown/runner'
-import { Reporter } from '../reporter'
-import { setup } from '../setup'
-import { createSandbox, Sandbox, SandboxOptions } from '../sandbox'
-
-import { stringifyHtml } from '../markdown'
+import { bootGui } from '../gui'
 
 const bootstrap = async () => {
   const usage = () => {
@@ -54,23 +48,7 @@ const bootstrap = async () => {
   }
 
   if (isGui) {
-    const reporter = new Reporter()
-    const appState = await setup('hoge.md')
-    const rootPath = appState.path
-    const box = createSandbox(reporter, { rootPath })
-    gui(async cApp => {
-      await cApp.exposeFunction(
-        'runMarkdown',
-        async (code: string, runMode: boolean) => {
-          const vfile = await runMarkdown(code, box, reporter, {
-            rootPath,
-            runMode
-          })
-          return stringifyHtml(vfile)
-        }
-      )
-      ;(global as any).cApp = cApp
-    })
+    bootGui()
   }
 }
 
