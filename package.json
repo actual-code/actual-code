@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build ; parcel build -d dist/app -o index.html app/index.html",
     "clean": "rimraf node_modules dist .cache",
     "test": "jest"
   },

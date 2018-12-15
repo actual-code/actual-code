@@ -38,3 +38,4 @@ bin/actual-code [-o outfile.md] <file.md>
 - [x] コードをすこーし、綺麗にした
 - [x] browser sandbox（parcel-bundler + iframe）
 - [x] carlo app での自動実行を禁止、RUN ボタンを追加
+- [x] carlo app のコードをあらかじめビルドするように変更
