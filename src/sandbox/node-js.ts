@@ -11,7 +11,6 @@ const presetTypescript = require('@babel/preset-typescript')
 
 import { Output, SandboxOptions, Sandbox } from '.'
 import { Reporter } from '../reporter'
-import remark from '../markdown'
 
 const createProxies = (
   reporter: Reporter,
@@ -105,7 +104,7 @@ export class JsSandbox implements Sandbox {
   reporter: Reporter
   timeout: number
   ctx: any
-  constructor(reporter: Reporter, opts: SandboxOptions = { settings: {} }) {
+  constructor(reporter: Reporter, opts: SandboxOptions) {
     this.reporter = reporter
     this.rootPath = path.resolve(opts.rootPath || process.cwd())
     this.timeout = opts.timeout || 100
@@ -116,7 +115,7 @@ export class JsSandbox implements Sandbox {
       this.handlers.forEach(handler => handler(output))
     })
     const actualCodeObject = {
-      getData: () => opts.settings
+      getData: () => opts
     }
     const requireSandbox = createRequire(this.rootPath, actualCodeObject)
     this.ctx = {
@@ -140,7 +139,13 @@ export class JsSandbox implements Sandbox {
   }
 
   async run(code: string, filetype: string, meta) {
+    if (!meta.runMode) {
+      this.reporter.info('sandbox run mode disabled.')
+
+      return { outputs: [], error: null, nodes: [] }
+    }
     if (meta.browser) {
+      this.reporter.info(`run browser JS`)
       // FIXME: Node.js とは
       const compiled = await babel.transformAsync(code, {
           ast: false,

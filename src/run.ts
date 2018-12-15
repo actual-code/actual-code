@@ -1,7 +1,7 @@
 import * as fs from 'fs'
 import { promisify } from 'util'
 
-import remark from './markdown'
+import { parseMarkdown } from './markdown'
 import { Sandbox, SandboxOptions } from './sandbox'
 import { Reporter } from './reporter'
 
@@ -55,12 +55,8 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
   return results
 }
 
-export const run = async (
-  markdownText: string,
-  box: Sandbox,
-  opts: SandboxOptions = { settings: {} }
-) => {
-  const vfile = remark.parse(markdownText)
+export const run = async (markdownText: string, box: Sandbox, opts = {}) => {
+  const vfile = parseMarkdown(markdownText)
   const results = []
   const insertNodes = []
   await traversal(vfile, vfile, async (node, parent, index) => {
@@ -77,13 +73,20 @@ export const run = async (
       return
     }
 
-    opts = { ...opts, ...meta }
-
     const filetype = lang[node.lang]
     if (meta.timeout) {
-      opts.timeout = Number.parseInt(meta.timeout)
+      meta.timeout = Number.parseInt(meta.timeout)
     }
-    const { outputs, error, nodes } = await box.run(node.value, filetype, opts)
+    if (typeof meta.runMode === 'string') {
+      meta.runMode = meta.runMode === 'true'
+    }
+    // console.log('run.ts')
+    // console.log(opts)
+    // console.log(meta)
+    const { outputs, error, nodes } = await box.run(node.value, filetype, {
+      ...opts,
+      ...meta
+    })
     const { start, end } = node.position
     if (error) {
       insertNodes.push({ parent, index, node: createErrorNode(error) })

@@ -5,7 +5,7 @@ import { Reporter } from '../reporter'
 import { setup } from '../setup'
 import { createSandbox, Sandbox, SandboxOptions } from '../sandbox'
 
-import remark from '../markdown'
+import { stringifyHtml } from '../markdown'
 
 const bootstrap = async () => {
   const usage = () => {
@@ -58,10 +58,13 @@ const bootstrap = async () => {
     const box = createSandbox(reporter)
     gui(async cApp => {
       const appState = await setup('hoge.md')
-      await cApp.exposeFunction('runMarkdown', async code => {
-        const vfile = await runMarkdown(code, box, reporter)
-        return remark.stringify(vfile)
-      })
+      await cApp.exposeFunction(
+        'runMarkdown',
+        async (code: string, runMode: boolean) => {
+          const vfile = await runMarkdown(code, box, reporter, { runMode })
+          return stringifyHtml(vfile)
+        }
+      )
       ;(global as any).cApp = cApp
     })
   }

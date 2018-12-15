@@ -1,8 +1,6 @@
 import { Output, Sandbox, SandboxOptions } from '.'
 import { Reporter } from '../reporter'
-
-import remark from '../markdown'
-
+import { parseMarkdown } from '../markdown'
 export class HtmlSandbox implements Sandbox {
   reporter: Reporter
   constructor(reporter: Reporter, opts: SandboxOptions) {
@@ -10,7 +8,7 @@ export class HtmlSandbox implements Sandbox {
   }
 
   async run(code: string, filetype: string, meta: any = {}) {
-    const nodes = remark.parse(code).children
+    const nodes = parseMarkdown(code).children
     return { outputs: [], error: null, nodes }
   }
 }

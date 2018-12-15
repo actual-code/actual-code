@@ -19,7 +19,7 @@ $ bin/actual-code
 ## TODO
 
 * carlo app
-  - [ ] 全体に、実行ボタンと自動実行on/offスイッチ
+  - [x] 全体に、実行ボタンと自動実行on/offスイッチ
   - [ ] コードブロックごとに、実行ボタンと自動実行on/offスイッチ
 - browser sandbox
   - webview を試す

@@ -2,14 +2,13 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'
 
-import unified from 'unified'
-import stringify from 'remark-stringify'
 import { safeLoad } from 'js-yaml'
 
 import { run } from './run'
 import { setup } from './setup'
 import { Reporter } from './reporter'
 import { Sandbox, SandboxOptions, createSandbox } from './sandbox'
+import { stringifyMarkdown } from './markdown'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -19,19 +18,22 @@ const reFrontmatter = /^---\n(.*)\n---\n/
 export const runMarkdown = async (
   code: string,
   box: Sandbox,
-  reporter: Reporter
+  reporter: Reporter,
+  opts: SandboxOptions = {}
 ) => {
   const cwd = process.cwd()
 
   const matched = reFrontmatter.exec(code)
-  const settings = matched ? safeLoad(matched[1]) : {}
+  // const opts: SandboxOptions = {
+  //   settings: matched ? safeLoad(matched[1]) : {}
+  // }
 
   if (matched) {
     code = code.slice(matched[0].length)
   }
 
   reporter.info('run')
-  const { vfile } = await run(code, box, { settings })
+  const { vfile } = await run(code, box, opts)
 
   process.chdir(cwd)
 
@@ -49,15 +51,13 @@ export const convert = async (filename: string, outputfile?: string) => {
 
   const sandboxOpts: SandboxOptions = {
     rootPath: appState.rootPath,
-    settings: {}
+    runMode: true
   }
   const box = createSandbox(reporter, sandboxOpts)
 
   const vfile = await runMarkdown(text, box, reporter)
 
-  const doc = unified()
-    .use(stringify)
-    .stringify(vfile)
+  const doc = stringifyMarkdown(vfile)
 
   if (outputfile) {
     reporter.info(`write ${outputfile}`)
@@ -65,5 +65,3 @@ export const convert = async (filename: string, outputfile?: string) => {
   }
   return doc
 }
-
-export const getSettings = (text: string) => {}

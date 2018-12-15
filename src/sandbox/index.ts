@@ -11,7 +11,8 @@ export interface Output {
 export interface SandboxOptions {
   rootPath?: string
   timeout?: number
-  settings: { [props: string]: string }
+  runMode?: boolean
+  // settings: { [props: string]: string }
 }
 
 export interface SandboxResult {
@@ -26,7 +27,7 @@ export interface Sandbox {
 
 export const createSandbox = (
   reporter: Reporter,
-  opts: SandboxOptions = { settings: {} }
+  opts: SandboxOptions = { runMode: true }
 ): Sandbox => {
   reporter.info('create Sandbox')
   const jsBox = new JsSandbox(reporter, opts)
@@ -36,8 +37,9 @@ export const createSandbox = (
     run: async (
       code: string,
       filetype: string = 'js',
-      opts2: SandboxOptions = { settings: {} }
+      opts2: SandboxOptions = { runMode: true }
     ) => {
+      reporter.info('sandbox run')
       if (filetype === 'sh') {
         return shBox.run(code, filetype, opts2)
       } else if (filetype === 'html') {
