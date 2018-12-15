@@ -145,7 +145,7 @@ export class JsSandbox implements Sandbox {
       return { outputs: [], error: null, nodes: [] }
     }
     if (meta.browser) {
-      this.reporter.info(`run browser JS`)
+      this.reporter.info(`run browser JS: ${filetype}`)
       // FIXME: Node.js とは
       const compiled = await babel.transformAsync(code, {
           ast: false,
@@ -161,7 +161,7 @@ export class JsSandbox implements Sandbox {
     }
 
     this.outputs = []
-    this.reporter.info(`run ${filetype}`)
+    this.reporter.info(`run Node.js: ${filetype}`)
     const compiled = await babel.transformAsync(code, {
       ast: false,
       presets: [[presetEnv, { targets: { node: '8.0.0' } }], presetTypescript],

@@ -1,6 +1,6 @@
 import { convert } from '../convert'
 import { gui } from '../gui'
-import { runMarkdown } from '../convert'
+import { runMarkdown } from '../markdown/runner'
 import { Reporter } from '../reporter'
 import { setup } from '../setup'
 import { createSandbox, Sandbox, SandboxOptions } from '../sandbox'

@@ -19,12 +19,10 @@ $ bin/actual-code
 ## TODO
 
 * carlo app
-  - [x] 全体に、実行ボタンと自動実行on/offスイッチ
   - [ ] コードブロックごとに、実行ボタンと自動実行on/offスイッチ
-- browser sandbox
+- browser sandbox（parcel-bundler使う？）
   - webview を試す
   - iframe?????
-- [ ] Sandbox を登録する仕組みにする
 - コードブロックの lang、拡張子などの対応付けとかどうするか？
   - [ ] npm actual-code で sandbox class を登録する
   - [ ] frontmatter で、markdown import
@@ -47,3 +45,5 @@ $ bin/actual-code
 
 - [x] 毎回 Sandbox 作る、大富豪プログラムを修正する
 - [x] {browser} メタタグで、Node.js上じゃなくて、ブラウザ上で動くようにする
+- [x] carlo appで、実行ボタンと自動実行on/offスイッチ
+- [x] コードをすこーし、綺麗にした

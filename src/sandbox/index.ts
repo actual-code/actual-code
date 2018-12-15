@@ -39,7 +39,8 @@ export const createSandbox = (
       filetype: string = 'js',
       opts2: SandboxOptions = { runMode: true }
     ) => {
-      reporter.info('sandbox run')
+      reporter.info(`sandbox run ${filetype}`)
+      console.log(opts2)
       if (filetype === 'sh') {
         return shBox.run(code, filetype, opts2)
       } else if (filetype === 'html') {

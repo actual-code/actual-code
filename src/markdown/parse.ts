@@ -1,9 +1,9 @@
 import * as fs from 'fs'
 import { promisify } from 'util'
 
-import { parseMarkdown } from './markdown'
-import { Sandbox, SandboxOptions } from './sandbox'
-import { Reporter } from './reporter'
+import { safeLoad } from 'js-yaml'
+
+import { parseMarkdown } from '.'
 
 const writeFile = promisify(fs.writeFile)
 
@@ -15,12 +15,6 @@ const traversal = async (node, parent, cb, index = 0) => {
     i++
   }
 }
-const createErrorNode = value => ({ type: 'code', lang: 'error', value })
-const createResultNode = outputs => ({
-  type: 'code',
-  value: outputs.map(({ name, value }) => `-- ${name}\n${value}`).join('\n')
-})
-
 const lang = {
   js: 'js',
   javascript: 'js',
@@ -55,10 +49,22 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
   return results
 }
 
-export const run = async (markdownText: string, box: Sandbox, opts = {}) => {
+const reFrontmatter = /^---\n(.*)\n---\n/
+
+export const parse = async (markdownText: string) => {
+  const matched = reFrontmatter.exec(markdownText)
+  const settings = matched ? safeLoad(matched[1]) : {}
+
+  if (matched) {
+    markdownText = markdownText.slice(matched[0].length)
+  }
+
   const vfile = parseMarkdown(markdownText)
-  const results = []
-  const insertNodes = []
+  return { settings, vfile }
+}
+
+export const getCodeBlocks = async vfile => {
+  const codeBlocks = []
   await traversal(vfile, vfile, async (node, parent, index) => {
     if (node.type !== 'code') {
       return
@@ -80,34 +86,8 @@ export const run = async (markdownText: string, box: Sandbox, opts = {}) => {
     if (typeof meta.runMode === 'string') {
       meta.runMode = meta.runMode === 'true'
     }
-    // console.log('run.ts')
-    // console.log(opts)
-    // console.log(meta)
-    const { outputs, error, nodes } = await box.run(node.value, filetype, {
-      ...opts,
-      ...meta
-    })
-    const { start, end } = node.position
-    if (error) {
-      insertNodes.push({ parent, index, node: createErrorNode(error) })
-    } else {
-      results.push({ outputs, start: start.offset, end: end.offset })
-      if (outputs.length > 0 && !meta.quiet) {
-        insertNodes.push({ parent, index, node: createResultNode(outputs) })
-      }
-      nodes.forEach(node => {
-        insertNodes.push({ parent, index, node })
-        // console.log(JSON.stringify(node, null, '  '))
-      })
-    }
-  })
 
-  insertNodes.reverse().forEach(({ parent, index, node }) => {
-    parent.children = [
-      ...parent.children.slice(0, index + 1),
-      node,
-      ...parent.children.slice(index + 1)
-    ]
+    codeBlocks.push({ code: node.value, filetype, meta, parent, index })
   })
-  return { results, vfile }
+  return codeBlocks
 }
