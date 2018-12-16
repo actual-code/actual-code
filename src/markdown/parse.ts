@@ -52,6 +52,10 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
 const reFrontmatter = /^---\n(.*)\n---\n/
 
 export const parse = async (markdownText: string) => {
+  if (markdownText.startsWith('#! ')) {
+    markdownText = markdownText.slice(markdownText.indexOf('\n'))
+  }
+  console.log(markdownText)
   const matched = reFrontmatter.exec(markdownText)
   const settings = matched ? safeLoad(matched[1]) : {}
 

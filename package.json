@@ -2,6 +2,9 @@
   "name": "actual-code",
   "version": "0.1.0",
   "license": "MIT",
+  "bin": {
+    "actual-code": "bin/actual-code"
+  },
   "scripts": {
     "build": "tsc --build ; env NODE_ENV=development parcel build -d dist/app --no-cache --no-minify --no-content-hash -o index.html app/index.html",
     "clean": "rimraf node_modules dist",

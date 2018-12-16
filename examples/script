@@ -1,0 +1,9 @@
+#! /usr/bin/env actual-code
+
+# script
+
+## hoge: 'hoge'
+
+```js
+console.log(1)
+```
