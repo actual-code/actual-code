@@ -2,11 +2,11 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'
 
-import { setup } from './setup'
+import { setup } from './app-state'
 import { Reporter } from './reporter'
 import { Sandbox, SandboxOptions, createSandbox } from './sandbox'
 import { stringifyMarkdown } from './markdown'
-import { runMarkdown } from './markdown/runner'
+import { createMarkdownRunner } from './markdown/runner'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -27,9 +27,9 @@ export const convert = async (filename: string, outputfile?: string) => {
     rootPath: appState.path,
     runMode: true
   }
-  const box = createSandbox(reporter, sandboxOpts)
+  const { run } = await createMarkdownRunner(filename, appState, reporter)
 
-  const vfile = await runMarkdown(text, box, reporter, sandboxOpts)
+  const vfile = await run(text, sandboxOpts)
 
   const doc = stringifyMarkdown(vfile)
 

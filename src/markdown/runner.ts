@@ -1,6 +1,7 @@
 import { Reporter } from '../reporter'
 import { getCodeBlocks, parse } from './parse'
 import { Sandbox, SandboxOptions, createSandbox } from '../sandbox'
+import { setup } from '../app-state'
 
 const createErrorNode = value => ({ type: 'code', lang: 'error', value })
 const createResultNode = outputs => ({
@@ -23,49 +24,57 @@ const mergeOption = (
   }
 }
 
-export const runMarkdown = async (
-  markdownText: string,
-  box: Sandbox,
-  reporter: Reporter,
-  opts: SandboxOptions = {}
+export const createMarkdownRunner = async (
+  filename: string,
+  appState,
+  reporter: Reporter
 ) => {
-  const cwd = process.cwd()
+  const rootPath = appState.path
+  const box = createSandbox(reporter, { rootPath })
 
-  reporter.info('run markdown')
+  const run = async (markdownText: string, opts: SandboxOptions) => {
+    const cwd = process.cwd()
 
-  const { vfile } = await parse(markdownText)
-  const codeBlocks = await getCodeBlocks(vfile)
+    reporter.info('run markdown')
 
-  const insertNodes = []
-  for (const codeBlock of codeBlocks) {
-    const { code, filetype, meta, parent, index } = codeBlock
-    const { outputs, error, nodes } = await box.run(
-      code,
-      filetype,
-      mergeOption(opts, meta)
-    )
-    if (error) {
-      insertNodes.push({ parent, index, node: createErrorNode(error) })
-    } else {
-      if (outputs.length > 0 && !meta.quiet) {
-        insertNodes.push({ parent, index, node: createResultNode(outputs) })
+    const { vfile } = await parse(markdownText)
+    const codeBlocks = await getCodeBlocks(vfile)
+
+    const insertNodes = []
+    for (const codeBlock of codeBlocks) {
+      const { code, filetype, meta, parent, index } = codeBlock
+      const { outputs, error, nodes } = await box.run(
+        code,
+        filetype,
+        mergeOption(opts, meta)
+      )
+      if (error) {
+        insertNodes.push({ parent, index, node: createErrorNode(error) })
+      } else {
+        if (outputs.length > 0 && !meta.quiet) {
+          insertNodes.push({ parent, index, node: createResultNode(outputs) })
+        }
+        nodes.forEach(node => {
+          insertNodes.push({ parent, index, node })
+          // console.log(JSON.stringify(node, null, '  '))
+        })
       }
-      nodes.forEach(node => {
-        insertNodes.push({ parent, index, node })
-        // console.log(JSON.stringify(node, null, '  '))
-      })
     }
+
+    insertNodes.reverse().forEach(({ parent, index, node }) => {
+      parent.children = [
+        ...parent.children.slice(0, index + 1),
+        node,
+        ...parent.children.slice(index + 1)
+      ]
+    })
+
+    process.chdir(cwd)
+
+    return vfile
   }
-
-  insertNodes.reverse().forEach(({ parent, index, node }) => {
-    parent.children = [
-      ...parent.children.slice(0, index + 1),
-      node,
-      ...parent.children.slice(index + 1)
-    ]
-  })
-
-  process.chdir(cwd)
-
-  return vfile
+  return {
+    run,
+    code: appState.code
+  }
 }

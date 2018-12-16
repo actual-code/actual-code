@@ -2,10 +2,9 @@ import * as path from 'path'
 
 import * as carlo from 'carlo'
 
-import { runMarkdown } from '../markdown/runner'
+import { createMarkdownRunner } from '../markdown/runner'
 import { Reporter } from '../reporter'
-import { setup, updateState } from '../setup'
-import { createSandbox, Sandbox, SandboxOptions } from '../sandbox'
+import { setup, updateState } from '../app-state'
 
 import { stringifyHtml } from '../markdown'
 
@@ -20,17 +19,18 @@ export const gui = async cb => {
 
 export const bootGui = async () => {
   const reporter = new Reporter()
-  let filename = null
+  let run
   let appState
-  let rootPath
-  let box
+  let filename
   gui(async cApp => {
     await cApp.exposeFunction('initSandbox', async (name: string) => {
       filename = name
-      appState = await setup('hoge.md')
-      rootPath = appState.path
-      box = createSandbox(reporter, { rootPath })
-      return appState.code
+      appState = await setup(name)
+      const { rootPath } = appState
+
+      const runner = await createMarkdownRunner(filename, appState, reporter)
+      run = runner.run
+      return runner.code
     })
     await cApp.exposeFunction(
       'runMarkdown',
@@ -39,10 +39,7 @@ export const bootGui = async () => {
           appState.code = code
           updateState(filename, appState)
         }
-        const vfile = await runMarkdown(code, box, reporter, {
-          rootPath,
-          runMode
-        })
+        const vfile = await run(code, { runMode })
         return stringifyHtml(vfile)
       }
     )
