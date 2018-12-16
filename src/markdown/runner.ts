@@ -51,9 +51,6 @@ export const createMarkdownRunner = async (
         mergeOption(opts, meta)
       )
 
-      console.log(1)
-      console.log(cache)
-      console.log(code)
       if (opts.runMode || meta.runMode) {
         cache[i] = { outputs, code }
       } else {
