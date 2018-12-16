@@ -41,3 +41,10 @@ export const setup = async (filename: string) => {
   process.chdir(appState.path)
   return appState
 }
+
+export const updateState = async (filename: string, appState) => {
+  const state = await readState()
+  state.paths = state.paths || {}
+  state.paths[filename] = appState
+  await writeState(state)
+}

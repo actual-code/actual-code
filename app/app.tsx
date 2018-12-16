@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react'
 
 import Editor from './editor'
-import Preview from './preview'
 
-const { runMarkdown } = window as any
+const { runMarkdown, initSandbox } = window as any
 
 export default props => {
   const [text, setText] = useState('')
   const [__html, setHtml] = useState('')
+
+  useEffect(() => {
+    initSandbox('hoge.md').then(md => setText(md))
+  }, [])
+
   useEffect(
     () => {
       runMarkdown(text, false).then(html => setHtml(html))
     },
     [text]
   )
+
   return (
     <div
       style={{
