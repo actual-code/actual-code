@@ -25,21 +25,33 @@ export const bootGui = async () => {
   gui(async cApp => {
     await cApp.exposeFunction('initSandbox', async (name: string) => {
       filename = name
-      appState = await setup(name)
-      const { rootPath } = appState
+      reporter.info('init sandbox')
+      appState = await setup(filename)
 
       const runner = await createMarkdownRunner(filename, appState, reporter)
       run = runner.run
-      return runner.code
+      return { ...appState, code: runner.code }
     })
     await cApp.exposeFunction(
       'runMarkdown',
       async (code: string, runMode: boolean) => {
+        const vfile = await run(code, { runMode })
+
         if (appState) {
+          const found = vfile.children.find(child => child.type === 'heading')
+          const title =
+            found &&
+            found.children &&
+            found.children
+              .map(child => child.value)
+              .filter(s => s)
+              .join(' ')
           appState.code = code
+          appState.title = title
+          appState.updatedAt = Date.now()
           updateState(filename, appState)
         }
-        const vfile = await run(code, { runMode })
+
         return stringifyHtml(vfile)
       }
     )

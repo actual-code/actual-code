@@ -30,11 +30,8 @@ export class BrowserSandbox implements Sandbox {
         sourceMaps: true,
         hmr: false
       }
-      console.log(3)
       const bundler = new Bundler(entryFile, opts)
-      console.log(4)
       await bundler.bundle()
-      console.log(5)
 
       return { outputs: [], error: null, nodes }
     }

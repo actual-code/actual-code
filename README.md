@@ -40,3 +40,4 @@ bin/actual-code [-o outfile.md] <file.md>
 - [x] RUN キャッシュ
 - [x] ファイル選択画面、NEW ボタン、CLOSE ボタン
 - [x] #! /usr/bin/env actual-code
+- [x] バグフィックス

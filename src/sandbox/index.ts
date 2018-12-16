@@ -39,7 +39,6 @@ export const createSandbox = (
   opts: SandboxOptions = { runMode: true }
 ): Sandbox => {
   reporter.info('create Sandbox')
-  console.log(opts)
   const jsBox = new JsSandbox(reporter, opts)
   const shBox = new ShellSandbox(reporter, opts)
   const htmlBox = new HtmlSandbox(reporter, opts)
@@ -51,7 +50,6 @@ export const createSandbox = (
       opts2: SandboxOptions = { runMode: true }
     ) => {
       reporter.info(`sandbox run ${filetype}`)
-      console.log(opts2)
       if (!opts2.runMode) {
         reporter.info('sandbox run mode disabled.')
         return { outputs: [], error: null, nodes: [] }

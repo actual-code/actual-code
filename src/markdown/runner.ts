@@ -13,8 +13,8 @@ const mergeOption = (
   opt1: SandboxOptions,
   opt2: SandboxOptions
 ): SandboxOptions => {
-  console.log(opt1)
-  console.log(opt2)
+  // console.log(opt1)
+  // console.log(opt2)
   return {
     rootPath: opt2.rootPath || opt1.rootPath,
     timeout: opt2.timeout || opt1.timeout,
