@@ -25,7 +25,6 @@ bin/actual-code [-o outfile.md] <file.md>
 ## TODO
 
 * 0.1.0
-  - [ ] RUNキャッシュ
   - [ ] NEWボタン
   - [ ] 描画綺麗に
 
@@ -39,3 +38,4 @@ bin/actual-code [-o outfile.md] <file.md>
 - [x] carlo app での自動実行を禁止、RUN ボタンを追加
 - [x] carlo app のコードをあらかじめビルドするように変更
 - [x] Markdownの自動保存
+- [x] RUNキャッシュ

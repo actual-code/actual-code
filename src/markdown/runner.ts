@@ -31,6 +31,7 @@ export const createMarkdownRunner = async (
 ) => {
   const rootPath = appState.path
   const box = createSandbox(reporter, { rootPath })
+  let cache = []
 
   const run = async (markdownText: string, opts: SandboxOptions) => {
     const cwd = process.cwd()
@@ -41,13 +42,31 @@ export const createMarkdownRunner = async (
     const codeBlocks = await getCodeBlocks(vfile)
 
     const insertNodes = []
+    let i = 0
     for (const codeBlock of codeBlocks) {
       const { code, filetype, meta, parent, index } = codeBlock
-      const { outputs, error, nodes } = await box.run(
+      let { outputs, error, nodes } = await box.run(
         code,
         filetype,
         mergeOption(opts, meta)
       )
+
+      console.log(1)
+      console.log(cache)
+      console.log(code)
+      if (opts.runMode || meta.runMode) {
+        cache[i] = { outputs, code }
+      } else {
+        if (cache.length > i) {
+          if (cache[i].code === code) {
+            outputs = cache[i].outputs
+          } else {
+            // cache purge
+            cache[i] = { code: null, outputs: [] }
+          }
+        }
+      }
+
       if (error) {
         insertNodes.push({ parent, index, node: createErrorNode(error) })
       } else {
@@ -59,6 +78,8 @@ export const createMarkdownRunner = async (
           // console.log(JSON.stringify(node, null, '  '))
         })
       }
+
+      i++
     }
 
     insertNodes.reverse().forEach(({ parent, index, node }) => {
