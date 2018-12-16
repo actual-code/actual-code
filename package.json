@@ -1,7 +1,20 @@
 {
-  "name": "actual-code",
+  "name": "@actual-code/bin",
   "version": "0.1.0",
+  "description": "Markdown is Script Language!",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erukiti/actual-code.git"
+  },
+  "keyword": [
+    "Markdown",
+    "interpreter",
+    "JavaScript",
+    "TypeScript",
+    "shell script"
+  ],
+  "author": "SASAKI Shunsuke <erukiti+npm@gmail.com>",
   "bin": {
     "actual-code": "bin/actual-code"
   },

@@ -1,10 +1,32 @@
-# 実際に動く Markdown
+# Markdown をスクリプト言語化するアプリケーション actual-code
+
+- [#actual_code](https://twitter.com/search?f=tweets&q=%23actual_code)
 
 Markdown はスクリプト言語です。何を言ってるかわからない？
 
 Markdown にはコードブロックでさまざまなな言語を埋め込めます。なら、その言語を順次実行すれば、もうそれはシェルスクリプトなどと同じようなスクリプト言語と言っても過言ではありません！！
 
+![Hello, World](images/hello-world.gif)
+
+ちなみにこの理屈でいうと、任意のコードブロックを埋め込める言語ならなんでもスクリプト言語にできます。JSON でも Re:VIEW でも。
+
 - Markdown のコードブロックを実際に Sandbox の中で走らせる
+
+## install
+
+```sh
+npm i -g @actual-code/bin
+```
+
+```sh
+npm i -D @actual-code/bin
+```
+
+```sh
+yarn add -D @actual-code/bin
+```
+
+お好きなように
 
 ## usage (GUI)
 
@@ -16,28 +38,50 @@ $ bin/actual-code
 
 手元に Chrome or Chromium がインストールされていれば GUI アプリが立ち上がります。一見よくある、Markdown リアルタイムプレビューアプリに見えますが、違うのは、コードブロックが実行されることです。
 
+一応自動セーブ機能ありますが、バグがあって消えたりすることもあるかもしれません。
+
 ### markdown to markdown
 
 ```sh
 bin/actual-code [-o outfile.md] <file.md>
 ```
 
-## TODO
+### markdown script
 
-- 0.1.0
-  - [ ] 描画綺麗に
+````markdown
+#! /usr/bin/env actual-code
 
-## DONE
+# script
 
-- [x] 毎回 Sandbox 作る、大富豪プログラムを修正する
-- [x] {browser} メタタグで、Node.js 上じゃなくて、ブラウザ上で動くようにする
-- [x] carlo app で、実行ボタンと自動実行 on/off スイッチ
-- [x] コードをすこーし、綺麗にした
-- [x] browser sandbox（parcel-bundler + iframe）
-- [x] carlo app での自動実行を禁止、RUN ボタンを追加
-- [x] carlo app のコードをあらかじめビルドするように変更
-- [x] Markdown の自動保存
-- [x] RUN キャッシュ
-- [x] ファイル選択画面、NEW ボタン、CLOSE ボタン
-- [x] #! /usr/bin/env actual-code
-- [x] バグフィックス
+```js
+console.log('Hello, World!')
+```
+````
+
+```sh
+$ npm i -g @actual-code/bin
+$ chmod +x script
+$ ./script
+[INFO] 21:14:24: read: script
+[INFO] 21:14:24: create Sandbox
+[INFO] 21:14:24: run markdown
+[INFO] 21:14:24: sandbox run js
+[INFO] 21:14:24: run Node.js: js
+'Hello, World!'
+```
+
+Markdown is Script Language!!!!!!!!!
+
+# License
+
+MIT
+
+```
+Copyright 2018 SASAKI Shunsuke <erukiti at gmail dot com>
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```

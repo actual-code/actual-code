@@ -2,8 +2,6 @@
 
 # script
 
-## hoge: 'hoge'
-
 ```js
-console.log(1)
+console.log('Hello, World!')
 ```
