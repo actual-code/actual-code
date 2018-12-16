@@ -42,6 +42,11 @@ export const setup = async (filename: string) => {
   return appState
 }
 
+export const getFileList = async () => {
+  const state = await readState()
+  return Object.keys(state.paths || {})
+}
+
 export const updateState = async (filename: string, appState) => {
   const state = await readState()
   state.paths = state.paths || {}

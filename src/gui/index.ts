@@ -4,7 +4,7 @@ import * as carlo from 'carlo'
 
 import { createMarkdownRunner } from '../markdown/runner'
 import { Reporter } from '../reporter'
-import { setup, updateState } from '../app-state'
+import { setup, updateState, getFileList } from '../app-state'
 
 import { stringifyHtml } from '../markdown'
 
@@ -43,6 +43,6 @@ export const bootGui = async () => {
         return stringifyHtml(vfile)
       }
     )
-    ;(global as any).cApp = cApp
+    await cApp.exposeFunction('getFileList', () => getFileList())
   })
 }

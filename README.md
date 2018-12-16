@@ -24,18 +24,19 @@ bin/actual-code [-o outfile.md] <file.md>
 
 ## TODO
 
-* 0.1.0
-  - [ ] NEWボタン
+- 0.1.0
   - [ ] 描画綺麗に
+  - [ ] #! /usr/bin/env actual-code
 
 ## DONE
 
 - [x] 毎回 Sandbox 作る、大富豪プログラムを修正する
-- [x] {browser} メタタグで、Node.js上じゃなくて、ブラウザ上で動くようにする
-- [x] carlo appで、実行ボタンと自動実行on/offスイッチ
+- [x] {browser} メタタグで、Node.js 上じゃなくて、ブラウザ上で動くようにする
+- [x] carlo app で、実行ボタンと自動実行 on/off スイッチ
 - [x] コードをすこーし、綺麗にした
 - [x] browser sandbox（parcel-bundler + iframe）
 - [x] carlo app での自動実行を禁止、RUN ボタンを追加
 - [x] carlo app のコードをあらかじめビルドするように変更
-- [x] Markdownの自動保存
-- [x] RUNキャッシュ
+- [x] Markdown の自動保存
+- [x] RUN キャッシュ
+- [x] ファイル選択画面、NEW ボタン、CLOSE ボタン
