@@ -46,9 +46,14 @@ const createProxies = (
       }
       return (...args) => {
         // FIXME time系とか
-        reporter.stdout.write(
-          `${args.map(arg => inspect(arg, { colors: true })).join(' ')}\n`
-        )
+        const format = (value: any) => {
+          if (typeof value === 'string') {
+            return value
+          } else {
+            return inspect(value, { colors: true })
+          }
+        }
+        reporter.stdout.write(`${args.map(arg => format(arg)).join(' ')}\n`)
         handler({
           name: `console.${name.toString()}`,
           value: args.map(arg => inspect(arg)).join(' ')

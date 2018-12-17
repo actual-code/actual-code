@@ -19,7 +19,7 @@
     "actual-code": "bin/actual-code"
   },
   "scripts": {
-    "build": "tsc --build ; env NODE_ENV=development parcel build -d dist/app --no-cache --no-minify --no-content-hash -o index.html app/index.html",
+    "build": "tsc ; env NODE_ENV=development parcel build -d dist/app --no-cache --no-minify --no-content-hash -o index.html app/index.html",
     "clean": "rimraf node_modules dist",
     "test": "jest"
   },

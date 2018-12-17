@@ -38,7 +38,7 @@ export const createMarkdownRunner = async (
 
     reporter.debug('run markdown script')
 
-    const { vfile } = await parse(markdownText)
+    const { settings, vfile } = await parse(markdownText)
     const codeBlocks = await getCodeBlocks(vfile)
 
     const insertNodes = []
@@ -89,7 +89,7 @@ export const createMarkdownRunner = async (
 
     process.chdir(cwd)
 
-    return vfile
+    return { vfile, settings }
   }
   return {
     run,

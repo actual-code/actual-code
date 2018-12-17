@@ -17,7 +17,8 @@ export default props => {
         value,
         minimap: {
           enabled: false
-        }
+        },
+        wordWrap: 'on'
       })
       ed.onDidChangeModelContent((event: any) => {
         setText(ed.getValue())

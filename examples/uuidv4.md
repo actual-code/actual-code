@@ -2,7 +2,7 @@
 
 ## install
 
-```sh
+```sh {quiet}
 $ yarn init -y
 $ yarn add uuidv4
 ```

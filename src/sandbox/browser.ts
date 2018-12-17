@@ -22,7 +22,7 @@ export class BrowserSandbox implements Sandbox {
         `<iframe src="https://domain/${filename}"></iframe>`
       ).children
 
-      const outDir = path.join(__dirname, '..', '..', 'dist', 'app')
+      const outDir = path.join(__dirname, '..', '..', 'app')
       const entryFile = path.join(this.rootPath, filename)
       const opts = {
         outDir,

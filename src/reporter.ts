@@ -25,19 +25,19 @@ export class Reporter {
 
   info(message: string) {
     if (!this.disableInfo) {
-      console.log(`\x1b[32m[INFO] ${_getTime()}\x1b[m: ${message}`)
+      process.stdout.write(`\x1b[32m[INFO] ${_getTime()}\x1b[m: ${message}\n`)
     }
   }
 
   log(message: string) {
     if (!this.disableLog) {
-      console.log(`\x1b[36m[LOG]  ${_getTime()}\x1b[m: ${message}`)
+      process.stdout.write(`\x1b[36m[LOG]  ${_getTime()}\x1b[m: ${message}\n`)
     }
   }
 
   debug(message: string) {
     if (!this.disableDebug) {
-      console.log(`\x1b[33m[DEBUG]${_getTime()}\x1b[m: ${message}`)
+      process.stdout.write(`\x1b[33m[DEBUG]${_getTime()}\x1b[m: ${message}\n`)
     }
   }
 

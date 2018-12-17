@@ -19,8 +19,12 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
     outputfile = path.resolve(outputfile)
   }
 
-  reporter.info(`read: ${filename}`)
   let text = (await readFile(filename)).toString()
+  if (text.startsWith('#! ') && reporter.disableDebug) {
+    reporter.disableLog = true
+    reporter.disableInfo = true
+  }
+  reporter.info(`read: ${filename}`)
   const appState = await setup(filename)
 
   const sandboxOpts: SandboxOptions = {
@@ -29,7 +33,7 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
   }
   const { run } = await createMarkdownRunner(filename, appState, reporter)
 
-  const vfile = await run(text, sandboxOpts)
+  const { vfile } = await run(text, sandboxOpts)
 
   const doc = stringifyMarkdown(vfile)
 

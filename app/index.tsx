@@ -5,4 +5,4 @@ import App from './app'
 
 // const { doc } = window as any
 
-render(<App />, document.getElementById('root'))
+render(<App style={{ height: '100%' }} />, document.getElementById('root'))

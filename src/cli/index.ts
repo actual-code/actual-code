@@ -17,15 +17,13 @@ const bootstrap = async () => {
     '-v': '--version'
   })
 
-  console.log(args)
-
   const usage = () => {
-    console.log('usage actual-code [-o outputfile] [file.md]')
+    process.stdout.write('usage actual-code [-o outputfile] [file.md]\n')
     process.exit(1)
   }
 
   if (args['--version']) {
-    console.log(version)
+    process.stdout.write(`${version}\n`)
     return
   }
 

@@ -61,7 +61,6 @@ export const parse = async (markdownText: string) => {
 
   const matched = reFrontmatter.exec(markdownText)
   const settings = matched ? safeLoad(matched[1]) : {}
-
   if (matched) {
     markdownText = markdownText.slice(matched[0].length)
   }

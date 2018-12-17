@@ -8,7 +8,7 @@ import { setup, updateState, getFileList } from '../app-state'
 
 import { stringifyHtml } from '../markdown'
 
-const outDir = path.join(__dirname, '..', '..', 'dist', 'app')
+const outDir = path.join(__dirname, '..', '..', 'app')
 
 export const gui = async cb => {
   const cApp = await carlo.launch()
@@ -36,9 +36,11 @@ export const bootGui = async opt => {
     await cApp.exposeFunction(
       'runMarkdown',
       async (code: string, runMode: boolean) => {
-        const vfile = await run(code, { runMode })
+        const { vfile, settings } = await run(code, { runMode })
+        reporter.debug(`settings: ${JSON.stringify(settings)}`)
 
         if (appState) {
+          const tags = settings.tags || ''
           const found = vfile.children.find(child => child.type === 'heading')
           const title =
             found &&
@@ -49,6 +51,7 @@ export const bootGui = async opt => {
               .join(' ')
           appState.code = code
           appState.title = title
+          appState.tags = typeof tags === 'string' ? tags.split(/[ ,]/) : tags
           appState.updatedAt = Date.now()
           updateState(filename, appState)
         }
