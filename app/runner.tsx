@@ -60,6 +60,7 @@ export default props => {
       />
       <div
         dangerouslySetInnerHTML={{ __html }}
+        className="markdown-body"
         style={{ gridRow: '2', gridColumn: '2', padding: '1em' }}
       />
     </div>

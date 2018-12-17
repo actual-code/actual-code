@@ -1,4 +1,4 @@
-# Markdown をスクリプトインタプリタ actual-code
+# Markdown スクリプトインタプリタ actual-code
 
 - [#actual_code](https://twitter.com/search?f=tweets&q=%23actual_code)
 
