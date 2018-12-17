@@ -32,12 +32,16 @@ export class ShellSandbox implements Sandbox {
   }
   async run(code: string, filetype: string, meta: any = {}) {
     let outputs: Output[] = []
-    for (let line of code.split('\n')) {
-      line = line.trimLeft()
-      if (line.startsWith('$ ')) {
-        line = line.slice(2)
+    if (code.startsWith('#! ')) {
+      outputs = await exec(code, this.reporter)
+    } else {
+      for (let line of code.split('\n')) {
+        line = line.trimLeft()
+        if (line.startsWith('$ ')) {
+          line = line.slice(2)
+        }
+        outputs = outputs.concat(await exec(line, this.reporter))
       }
-      outputs = outputs.concat(await exec(line, this.reporter))
     }
     return { outputs, error: null, nodes: [] }
   }
