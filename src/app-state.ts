@@ -44,10 +44,12 @@ export const setup = async (filename: string) => {
 
 export const getFileList = async () => {
   const state = await readState()
-  return Object.keys(state.paths || {}).map(name => ({
-    ...state.paths[name],
-    name
-  }))
+  return Object.keys(state.paths || {})
+    .map(name => ({
+      ...state.paths[name],
+      name
+    }))
+    .filter(appState => 'code' in appState)
 }
 
 export const updateState = async (filename: string, appState) => {

@@ -27,6 +27,7 @@
     "@babel/core": "^7.2.0",
     "@babel/preset-env": "^7.2.0",
     "@babel/preset-typescript": "^7.1.0",
+    "arg": "^3.0.0",
     "carlo": "^0.9.41",
     "js-yaml": "^3.12.0",
     "mkdirp": "^0.5.1",

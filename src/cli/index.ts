@@ -1,54 +1,48 @@
+const arg = require('arg')
+
 import { convert } from '../convert'
 import { bootGui } from '../gui'
 
+import { version } from '../../package.json'
+
 const bootstrap = async () => {
+  const args = arg({
+    '--output': String,
+    '--verbose': Boolean,
+    '--quiet': Boolean,
+    '--version': Boolean,
+    '--help': Boolean,
+
+    '-o': '--output',
+    '-v': '--version'
+  })
+
+  console.log(args)
+
   const usage = () => {
     console.log('usage actual-code [-o outputfile] [file.md]')
     process.exit(1)
   }
 
-  let outputfile = null
-  let isGui = false
-  const argv = process.argv.slice(2)
-  if (argv.length > 0) {
-    while (argv[0].startsWith('-')) {
-      const opt = argv.shift()
-      switch (opt) {
-        case '-o': {
-          if (argv.length === 0) {
-            usage()
-          }
-          outputfile = argv.shift()
-          continue
-        }
-        case '--gui': {
-          isGui = true
-          continue
-        }
-        case '--': {
-          break
-        }
-        default: {
-          usage()
-        }
-      }
-
-      break
-    }
+  if (args['--version']) {
+    console.log(version)
+    return
   }
 
-  if (argv.length === 0) {
-    isGui = true
+  if (args['--help']) {
+    usage()
   }
 
-  // ちゃんと設計してから、あとで綺麗にする
-  if (!isGui) {
-    const filename = argv.shift()
-    const doc = await convert(filename, outputfile)
+  const reporterOpts = {
+    disableInfo: !!args['--quiet'],
+    disableLog: !args['--verbose'],
+    disableDebug: !args['--verbose']
   }
 
-  if (isGui) {
-    bootGui()
+  if (args._.length === 0) {
+    bootGui(reporterOpts)
+  } else {
+    await convert(args._[0], reporterOpts, args['--output'])
   }
 }
 

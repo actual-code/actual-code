@@ -36,7 +36,7 @@ export const createMarkdownRunner = async (
   const run = async (markdownText: string, opts: SandboxOptions) => {
     const cwd = process.cwd()
 
-    reporter.info('run markdown')
+    reporter.debug('run markdown script')
 
     const { vfile } = await parse(markdownText)
     const codeBlocks = await getCodeBlocks(vfile)

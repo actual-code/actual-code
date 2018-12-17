@@ -6,8 +6,8 @@ import { Reporter } from '../reporter'
 const exec = (cmd: string, reporter: Reporter) => {
   return new Promise<Output[]>((resolve, reject) => {
     const outputs: Output[] = []
-    const proc = childProcess.exec(cmd)
     reporter.info(`run ${cmd}`)
+    const proc = childProcess.exec(cmd)
     proc.stdout.on('data', chunk => {
       reporter.stdout.write(chunk)
       outputs.push({ name: 'stdout', value: chunk })

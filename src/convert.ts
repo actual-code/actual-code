@@ -11,8 +11,8 @@ import { createMarkdownRunner } from './markdown/runner'
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
-export const convert = async (filename: string, outputfile?: string) => {
-  const reporter = new Reporter()
+export const convert = async (filename: string, opts, outputfile?: string) => {
+  const reporter = new Reporter(opts)
 
   filename = path.resolve(filename)
   if (outputfile) {

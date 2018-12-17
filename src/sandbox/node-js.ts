@@ -140,7 +140,6 @@ export class JsSandbox implements Sandbox {
 
   async run(code: string, filetype: string, meta) {
     this.outputs = []
-    this.reporter.info(`run Node.js: ${filetype}`)
     const compiled = await babel.transformAsync(code, {
       ast: false,
       presets: [[presetEnv, { targets: { node: '8.0.0' } }], presetTypescript],

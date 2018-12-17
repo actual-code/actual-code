@@ -17,15 +17,16 @@ export const gui = async cb => {
   await cApp.load('index.html')
 }
 
-export const bootGui = async () => {
-  const reporter = new Reporter()
+export const bootGui = async opt => {
+  const reporter = new Reporter(opt)
+  reporter.info('GUI mode')
   let run
   let appState
   let filename
   gui(async cApp => {
     await cApp.exposeFunction('initSandbox', async (name: string) => {
       filename = name
-      reporter.info('init sandbox')
+      reporter.debug('init sandbox')
       appState = await setup(filename)
 
       const runner = await createMarkdownRunner(filename, appState, reporter)
