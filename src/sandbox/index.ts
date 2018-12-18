@@ -46,12 +46,8 @@ export const createSandbox = (
     run: async (
       code: string,
       filetype: string = 'js',
-      opts2: SandboxOptions = { runMode: true }
+      opts2: SandboxOptions
     ) => {
-      if (!opts2.runMode) {
-        reporter.debug(`run ${filetype} disabled.`)
-        return { outputs: [], error: null, nodes: [] }
-      }
       reporter.info(`run ${filetype}`)
 
       if (opts2.file) {

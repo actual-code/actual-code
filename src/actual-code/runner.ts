@@ -37,22 +37,28 @@ export const run = async (
   let i = 0
   for (const codeBlock of codeBlocks) {
     const { code, filetype, meta, parent, index } = codeBlock
-    let { outputs, error, nodes } = await box.run(
-      code,
-      filetype,
-      mergeOption(opts, meta)
-    )
+    const opts2 = mergeOption(opts, meta)
 
-    if (opts.runMode || meta.runMode) {
+    let outputs = []
+    let error = null
+    let nodes = []
+
+    if (opts2.runMode) {
+      const result = await box.run(code, filetype, opts2)
+      outputs = result.outputs
+      error = result.error
+      nodes = result.nodes
+
       cache[i] = { outputs, code }
     } else {
       if (cache.length > i) {
-        if (cache[i].code === code) {
-          outputs = cache[i].outputs
-        } else {
+        if (cache[i].code !== code) {
           // cache purge
           cache[i] = { code: null, outputs: [] }
         }
+        outputs = cache[i].outputs
+        error = cache[i].error
+        nodes = cache[i].nodes
       }
     }
 
@@ -64,7 +70,6 @@ export const run = async (
       }
       nodes.forEach(node => {
         insertNodes.push({ parent, index, node })
-        // console.log(JSON.stringify(node, null, '  '))
       })
     }
 
