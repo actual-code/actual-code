@@ -4,7 +4,7 @@ import Bundler from 'parcel-bundler'
 
 import { Sandbox, SandboxOptions, SandboxResult, Output } from '.'
 import { Reporter } from '../reporter'
-import { parseMarkdown } from '../markdown'
+import { parseMarkdown } from '../source/markdown'
 
 export class BrowserSandbox implements Sandbox {
   reporter: Reporter

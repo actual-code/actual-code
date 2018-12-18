@@ -1,7 +1,7 @@
 const arg = require('arg')
 
-import { convert } from '../convert'
-import { bootGui } from '../gui'
+import { convert } from './convert'
+import { bootGui } from './gui'
 
 import { version } from '../../package.json'
 

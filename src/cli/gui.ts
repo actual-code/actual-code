@@ -1,12 +1,13 @@
 import * as path from 'path'
+import { inspect } from 'util'
 
 import * as carlo from 'carlo'
 
-import { createMarkdownRunner } from '../markdown/runner'
+import { ActualCode } from '../actual-code'
 import { Reporter } from '../reporter'
 import { setup, updateState, getFileList } from '../app-state'
 
-import { stringifyHtml } from '../markdown'
+import { stringifyHtml } from '../source/markdown'
 
 const outDir = path.join(__dirname, '..', '..', 'app')
 
@@ -20,23 +21,29 @@ export const gui = async cb => {
 export const bootGui = async opt => {
   const reporter = new Reporter(opt)
   reporter.info('GUI mode')
-  let run
+  let actualCode: ActualCode
   let appState
   let filename
   gui(async cApp => {
+    const window = cApp.mainWindow()
+    const page = window.pageForTest()
+    page.on('console', message => {
+      reporter.info(message.type())
+      reporter.info(message.text())
+      reporter.info(message.args())
+    })
+
     await cApp.exposeFunction('initSandbox', async (name: string) => {
       filename = name
       reporter.debug('init sandbox')
       appState = await setup(filename)
-
-      const runner = await createMarkdownRunner(filename, appState, reporter)
-      run = runner.run
-      return { ...appState, code: runner.code }
+      actualCode = new ActualCode(appState, reporter)
+      return { ...appState, code: actualCode.code }
     })
     await cApp.exposeFunction(
       'runMarkdown',
       async (code: string, runMode: boolean) => {
-        const { vfile, settings } = await run(code, { runMode })
+        const { vfile, settings } = await actualCode.run(code, { runMode })
         reporter.debug(`settings: ${JSON.stringify(settings)}`)
 
         if (appState) {

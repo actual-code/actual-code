@@ -3,7 +3,7 @@ import { promisify } from 'util'
 
 import { safeLoad } from 'js-yaml'
 
-import { parseMarkdown } from '.'
+import { parseMarkdown } from './markdown'
 
 const writeFile = promisify(fs.writeFile)
 

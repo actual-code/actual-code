@@ -1,6 +1,6 @@
 import { Output, Sandbox, SandboxOptions } from '.'
 import { Reporter } from '../reporter'
-import { parseMarkdown } from '../markdown'
+import { parseMarkdown } from '../source/markdown'
 export class HtmlSandbox implements Sandbox {
   reporter: Reporter
   constructor(reporter: Reporter, opts: SandboxOptions) {
