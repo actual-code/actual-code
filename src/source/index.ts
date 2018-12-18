@@ -1,11 +1,6 @@
-import * as fs from 'fs'
-import { promisify } from 'util'
-
 import { safeLoad } from 'js-yaml'
 
 import { parseMarkdown } from './markdown'
-
-const writeFile = promisify(fs.writeFile)
 
 const traversal = async (node, parent, cb, index = 0) => {
   await cb(node, parent, index)

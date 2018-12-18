@@ -1,4 +1,5 @@
 import { Reporter } from '../reporter'
+import { getCodeBlocks, parse } from '../source'
 import { Sandbox, createSandbox, SandboxOptions } from '../sandbox'
 import { setup } from '../app-state'
 import { run } from './runner'
@@ -18,6 +19,10 @@ export class ActualCode {
   async run(markdownText: string, opts: SandboxOptions) {
     this.code = markdownText
     const cache = []
-    return await run(this._reporter, this._sandbox, cache, markdownText, opts)
+    const { settings, vfile } = await parse(markdownText)
+    const codeBlocks = await getCodeBlocks(vfile)
+
+    await run(this._reporter, this._sandbox, cache, codeBlocks, opts)
+    return { settings, vfile }
   }
 }

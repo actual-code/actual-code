@@ -1,5 +1,4 @@
 import { Reporter } from '../reporter'
-import { getCodeBlocks, parse } from '../source'
 import { Sandbox, SandboxOptions, createSandbox } from '../sandbox'
 
 const createErrorNode = value => ({ type: 'code', lang: 'error', value })
@@ -27,15 +26,12 @@ export const run = async (
   reporter: Reporter,
   box: Sandbox,
   cache,
-  markdownText: string,
+  codeBlocks,
   opts: SandboxOptions
 ) => {
   const cwd = process.cwd()
 
   reporter.debug('run markdown script')
-
-  const { settings, vfile } = await parse(markdownText)
-  const codeBlocks = await getCodeBlocks(vfile)
 
   const insertNodes = []
   let i = 0
@@ -84,6 +80,4 @@ export const run = async (
   })
 
   process.chdir(cwd)
-
-  return { vfile, settings }
 }

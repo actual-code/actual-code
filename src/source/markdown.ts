@@ -1,3 +1,5 @@
+import unified from 'unified'
+
 import remark from 'remark'
 import math from 'remark-math'
 import hljs from 'remark-highlight.js'
@@ -5,8 +7,6 @@ import breaks from 'remark-breaks'
 import katex from 'remark-html-katex'
 import html from 'remark-html'
 import frontmatter from 'remark-frontmatter'
-
-import unified from 'unified'
 import stringify from 'remark-stringify'
 
 const markdown = remark()
