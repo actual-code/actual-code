@@ -13,7 +13,7 @@ export class ActualCode {
     this._reporter = reporter
     this._sandboxPath = appState.path
     this.code = appState.code
-    this._sandbox = createSandbox(reporter, { rootPath: this._sandboxPath })
+    this._sandbox = createSandbox(reporter, this._sandboxPath)
   }
 
   async run(markdownText: string, opts: SandboxOptions) {

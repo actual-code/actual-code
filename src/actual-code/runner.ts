@@ -1,5 +1,5 @@
 import { Reporter } from '../reporter'
-import { Sandbox, SandboxOptions, createSandbox } from '../sandbox'
+import { Sandbox, SandboxOptions } from '../sandbox'
 
 const createErrorNode = value => ({ type: 'code', lang: 'error', value })
 const createResultNode = outputs => ({

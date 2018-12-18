@@ -27,7 +27,7 @@ const exec = (cmd: string, reporter: Reporter) => {
 
 export class ShellSandbox implements Sandbox {
   reporter: Reporter
-  constructor(reporter: Reporter, opts: SandboxOptions) {
+  constructor(reporter: Reporter) {
     this.reporter = reporter
   }
   async run(code: string, filetype: string, meta: any = {}) {

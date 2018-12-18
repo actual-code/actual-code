@@ -1,5 +1,4 @@
 import * as path from 'path'
-import { inspect } from 'util'
 
 import * as carlo from 'carlo'
 

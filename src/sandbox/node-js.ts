@@ -65,7 +65,7 @@ const createProxies = (
   return { processProxy, consoleProxy }
 }
 
-const createRequire = (rootPath: string, actualCodeObject) => {
+const createRequire = (rootPath: string) => {
   return (name: string) => {
     const validatePath = (p: string) => {
       if (p.startsWith(rootPath)) {
@@ -88,9 +88,10 @@ const createRequire = (rootPath: string, actualCodeObject) => {
       throw new Error('Sandbox Error: Illegal path')
     }
 
-    if (name === 'actual-code') {
-      return actualCodeObject
-    }
+    // FIXME: actual-code library
+    // if (name === 'actual-code') {
+    //   return actualCodeObject
+    // }
     const fullpath = path.resolve(path.join(rootPath, 'node_modules', name))
     if (fs.existsSync(fullpath)) {
       validatePath(fullpath)
@@ -105,24 +106,19 @@ const createRequire = (rootPath: string, actualCodeObject) => {
 export class JsSandbox implements Sandbox {
   outputs: Output[] = []
   handlers: Array<(output: Output) => void> = []
-  rootPath: string
   reporter: Reporter
   timeout: number
   ctx: any
-  constructor(reporter: Reporter, opts: SandboxOptions) {
+  constructor(reporter: Reporter, rootPath: string) {
     this.reporter = reporter
-    this.rootPath = path.resolve(opts.rootPath || process.cwd())
-    this.timeout = opts.timeout || 100
+    this.timeout = 100
 
     this.handleOutput(output => this.outputs.push(output))
 
     const { consoleProxy, processProxy } = createProxies(reporter, output => {
       this.handlers.forEach(handler => handler(output))
     })
-    const actualCodeObject = {
-      getData: () => opts
-    }
-    const requireSandbox = createRequire(this.rootPath, actualCodeObject)
+    const requireSandbox = createRequire(rootPath)
     this.ctx = {
       require: requireSandbox,
       setTimeout,

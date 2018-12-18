@@ -1,4 +1,3 @@
-import * as path from 'path'
 import * as fs from 'fs'
 import { promisify } from 'util'
 
@@ -36,13 +35,13 @@ export interface Sandbox {
 
 export const createSandbox = (
   reporter: Reporter,
-  opts: SandboxOptions = { runMode: true }
+  rootPath: string
 ): Sandbox => {
   reporter.debug('create Sandbox')
-  const jsBox = new JsSandbox(reporter, opts)
-  const shBox = new ShellSandbox(reporter, opts)
-  const htmlBox = new HtmlSandbox(reporter, opts)
-  const browserSandbox = new BrowserSandbox(reporter, opts)
+  const jsBox = new JsSandbox(reporter, rootPath)
+  const shBox = new ShellSandbox(reporter)
+  const htmlBox = new HtmlSandbox(reporter)
+  const browserSandbox = new BrowserSandbox(reporter, rootPath)
   return {
     run: async (
       code: string,

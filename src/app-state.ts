@@ -4,7 +4,6 @@ import * as path from 'path'
 import { promisify } from 'util'
 
 import * as mkdirp from 'mkdirp'
-import * as rimraf from 'rimraf'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)

@@ -2,7 +2,7 @@ import * as path from 'path'
 
 import Bundler from 'parcel-bundler'
 
-import { Sandbox, SandboxOptions, SandboxResult, Output } from '.'
+import { Sandbox, SandboxOptions } from '.'
 import { Reporter } from '../reporter'
 import { parseMarkdown } from '../source/markdown'
 
@@ -10,9 +10,9 @@ export class BrowserSandbox implements Sandbox {
   reporter: Reporter
   rootPath: string
 
-  constructor(reporter: Reporter, opts: SandboxOptions) {
+  constructor(reporter: Reporter, rootPath: string) {
     this.reporter = reporter
-    this.rootPath = path.resolve(opts.rootPath)
+    this.rootPath = rootPath
   }
 
   async run(code: string, filetype: string, meta) {

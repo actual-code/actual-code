@@ -4,7 +4,7 @@ import { promisify } from 'util'
 
 import { setup } from '../app-state'
 import { Reporter } from '../reporter'
-import { Sandbox, SandboxOptions, createSandbox } from '../sandbox'
+import { SandboxOptions } from '../sandbox'
 import { stringifyMarkdown } from '../source/markdown'
 import { ActualCode } from '../actual-code'
 
