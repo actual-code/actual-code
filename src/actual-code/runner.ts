@@ -49,12 +49,12 @@ export const run = async (
       error = result.error
       nodes = result.nodes
 
-      cache[i] = { outputs, code }
+      cache[i] = { outputs, code, nodes }
     } else {
       if (cache.length > i) {
         if (cache[i].code !== code) {
-          // cache purge
-          cache[i] = { code: null, outputs: [] }
+          reporter.debug('cache purge')
+          cache[i] = { code: null, outputs: [], nodes: [] }
         }
         outputs = cache[i].outputs
         error = cache[i].error
