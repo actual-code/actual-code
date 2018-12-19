@@ -12,7 +12,16 @@ export interface ReporterOptions {
   disableDebug?: boolean
 }
 
-export class Reporter {
+export interface Reporter {
+  info(message: string): Promise<void>
+  log(message: string): Promise<void>
+  debug(message: string): Promise<void>
+
+  writeStdout(data: string | Buffer): Promise<void>
+  writeStderr(data: string | Buffer): Promise<void>
+}
+
+export class ConsoleReporter implements Reporter {
   disableInfo: boolean
   disableLog: boolean
   disableDebug: boolean
@@ -23,29 +32,29 @@ export class Reporter {
     this.disableDebug = !!opts.disableDebug
   }
 
-  info(message: string) {
+  async info(message: string) {
     if (!this.disableInfo) {
       process.stdout.write(`\x1b[32m[INFO] ${_getTime()}\x1b[m: ${message}\n`)
     }
   }
 
-  log(message: string) {
+  async log(message: string) {
     if (!this.disableLog) {
       process.stdout.write(`\x1b[36m[LOG]  ${_getTime()}\x1b[m: ${message}\n`)
     }
   }
 
-  debug(message: string) {
+  async debug(message: string) {
     if (!this.disableDebug) {
       process.stdout.write(`\x1b[33m[DEBUG]${_getTime()}\x1b[m: ${message}\n`)
     }
   }
 
-  get stdout() {
-    return process.stdout
+  async writeStdout(data: string | Buffer) {
+    process.stdout.write(data)
   }
 
-  get stderr() {
-    return process.stderr
+  async writeStderr(data: string | Buffer) {
+    process.stderr.write(data)
   }
 }

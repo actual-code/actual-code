@@ -2,11 +2,10 @@ import React, { useEffect, useMemo, useRef } from 'react'
 import * as monaco from 'monaco-editor'
 
 export default props => {
-  const { setText, value, filename } = props
+  const { setText, value, filename, run } = props
   const ref = useRef(null)
   const language = 'markdown'
   const style = { width: '100%', height: '100%' }
-  const _init = new Promise(resolve => {})
   const editor: monaco.editor.IStandaloneCodeEditor = useMemo(
     () => {
       if (!ref.current) {
@@ -20,8 +19,14 @@ export default props => {
         },
         wordWrap: 'on'
       })
-      ed.onDidChangeModelContent((event: any) => {
+      ed.onDidChangeModelContent(event => {
         setText(ed.getValue())
+      })
+      ed.onKeyDown(event => {
+        // console.log(event)
+        if ((event.ctrlKey || event.metaKey) && event.code === 'KeyS') {
+          run(ed.getValue(), true)
+        }
       })
       window.addEventListener('resize', () => ed.layout())
       return ed

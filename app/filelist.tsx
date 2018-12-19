@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 const uuidv4 = require('uuidv4')
 
-const { getFileList } = window as any
+import { getFileList } from './frontend'
 
 export default props => {
   const { setFilename } = props

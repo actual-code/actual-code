@@ -9,11 +9,11 @@ const exec = (cmd: string, reporter: Reporter) => {
     reporter.info(`run ${cmd}`)
     const proc = childProcess.exec(cmd)
     proc.stdout.on('data', chunk => {
-      reporter.stdout.write(chunk)
+      reporter.writeStdout(chunk)
       outputs.push({ name: 'stdout', value: chunk })
     })
     proc.stderr.on('data', chunk => {
-      reporter.stderr.write(chunk)
+      reporter.writeStderr(chunk)
       outputs.push({ name: 'stderr', value: chunk })
     })
     proc.on('close', code => {

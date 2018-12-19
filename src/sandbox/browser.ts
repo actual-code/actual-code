@@ -30,6 +30,7 @@ export class BrowserSandbox implements Sandbox {
         sourceMaps: true,
         hmr: false
       }
+      this.reporter.debug('parcel-bundler: compile')
       const bundler = new Bundler(entryFile, opts)
       await bundler.bundle()
 

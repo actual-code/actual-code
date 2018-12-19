@@ -3,7 +3,7 @@ import * as path from 'path'
 import { promisify } from 'util'
 
 import { setup } from '../app-state'
-import { Reporter } from '../reporter'
+import { ConsoleReporter } from '../reporter'
 import { SandboxOptions } from '../sandbox'
 import { stringifyMarkdown } from '../source/markdown'
 import { ActualCode } from '../actual-code'
@@ -12,7 +12,7 @@ const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
 export const convert = async (filename: string, opts, outputfile?: string) => {
-  const reporter = new Reporter(opts)
+  const reporter = new ConsoleReporter(opts)
 
   filename = path.resolve(filename)
   if (outputfile) {

@@ -1,13 +1,15 @@
 import React, { useEffect, useState, useMemo } from 'react'
 
 import Editor from './editor'
-
-const { runMarkdown, initSandbox } = window as any
+import { initSandbox, runMarkdown } from './frontend'
 
 export default props => {
   const { filename, setFilename } = props
   const [text, setText] = useState('')
   const [__html, setHtml] = useState('')
+
+  const run = (s: string, isRunMode: boolean) =>
+    runMarkdown(s, isRunMode).then(html => setHtml(html))
 
   const _init = useMemo(
     () => {
@@ -22,9 +24,7 @@ export default props => {
   useEffect(
     () => {
       _init.then(code => {
-        runMarkdown(text || code, false).then(html => {
-          setHtml(html)
-        })
+        run(text || code, false)
       })
     },
     [text, filename]
@@ -44,7 +44,7 @@ export default props => {
       <nav style={{ gridRow: '1', gridColumn: '1/3' }}>
         <button
           onClick={() => {
-            runMarkdown(text, true).then(html => setHtml(html))
+            run(text, true)
           }}
         >
           Run
@@ -56,6 +56,7 @@ export default props => {
         setText={setText}
         filename={filename}
         value={text}
+        run={run}
         style={{ gridRow: '2', gridColumn: '1' }}
       />
       <div

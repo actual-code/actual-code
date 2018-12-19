@@ -19,7 +19,16 @@ const createProxies = (
   const createWritable = name => {
     return new Writable({
       write: value => {
-        reporter[name].write(value)
+        switch (name) {
+          case 'stdout': {
+            reporter.writeStdout(value)
+            break
+          }
+          case 'stderr': {
+            reporter.writeStderr(value)
+            break
+          }
+        }
         handler({ name, value })
       }
     })
@@ -53,7 +62,7 @@ const createProxies = (
             return inspect(value, { colors: true })
           }
         }
-        reporter.stdout.write(`${args.map(arg => format(arg)).join(' ')}\n`)
+        reporter.writeStdout(`${args.map(arg => format(arg)).join(' ')}\n`)
         handler({
           name: `console.${name.toString()}`,
           value: args.map(arg => inspect(arg)).join(' ')
