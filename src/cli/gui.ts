@@ -74,6 +74,11 @@ export const bootGui = async opt => {
     reporter.info(message.args())
   })
 
+  cApp.serveHandler(request => {
+    reporter.debug(`REQ ${request.url()}`)
+    request.continue()
+  })
+
   await cApp.exposeFunction('initSandbox', async (name: string) => {
     filename = name
     reporter.debug('init sandbox')

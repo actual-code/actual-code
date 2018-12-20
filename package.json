@@ -42,6 +42,7 @@
     "remark-html": "^9.0.0",
     "remark-html-katex": "^1.2.0",
     "remark-math": "^1.0.5",
+    "remark-parse": "^6.0.3",
     "remark-stringify": "^6.0.4",
     "source-map-support": "^0.5.9",
     "unified": "^7.0.2",

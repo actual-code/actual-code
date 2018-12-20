@@ -1,12 +1,14 @@
 # Markdown スクリプトインタプリタ actual-code
 
+![demo](images/demo.gif)
+
 - [#actual_code](https://twitter.com/search?f=tweets&q=%23actual_code)
 
 Markdown はスクリプト言語です。何を言ってるかわからない？
 
 Markdown にはコードブロックでさまざまなな言語を埋め込めます。なら、その言語を順次実行すれば、もうそれはシェルスクリプトなどと同じようなスクリプト言語と言っても過言ではありません！！
 
-![Hello, World](images/hello-world.gif)
+![hello-world](images/hello-world.png)
 
 ちなみにこの理屈でいうと、任意のコードブロックを埋め込める言語ならなんでもスクリプト言語にできます。JSON でも Re:VIEW でも。
 

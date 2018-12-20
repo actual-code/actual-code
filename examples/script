@@ -1,7 +1,13 @@
 #! /usr/bin/env actual-code
 
-# script
+# スクリプト言語なのでShebangで指定したインタプリタで動きます！
+
+ちなみにGUIモードもあります
+
+## script
 
 ```js
 console.log('Hello, World!')
 ```
+
+スクリプト言語なので！

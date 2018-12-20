@@ -6742,7 +6742,7 @@ remark-math@^1.0.5:
   dependencies:
     trim-trailing-lines "^1.1.0"
 
-remark-parse@^6.0.0:
+remark-parse@^6.0.0, remark-parse@^6.0.3:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/remark-parse/-/remark-parse-6.0.3.tgz#c99131052809da482108413f87b0ee7f52180a3a"
   integrity sha512-QbDXWN4HfKTUC0hHa4teU463KclLAnwpn/FBn87j9cKYJWWawbiLgMfP2Q4XwhxxuuuOxHlw+pSN0OKuJwyVvg==
