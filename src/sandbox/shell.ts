@@ -1,23 +1,20 @@
 import childProcess from 'child_process'
 
-import { Output, Sandbox, SandboxOptions } from '.'
+import { Sandbox, SandboxOptions, SandboxPlugin } from '.'
 import { Reporter } from '../reporter'
 
 const exec = (cmd: string, reporter: Reporter) => {
-  return new Promise<Output[]>((resolve, reject) => {
-    const outputs: Output[] = []
-    reporter.info(`run ${cmd}`)
+  return new Promise((resolve, reject) => {
+    reporter.log(`run ${cmd}`)
     const proc = childProcess.exec(cmd)
     proc.stdout.on('data', chunk => {
-      reporter.writeStdout(chunk)
-      outputs.push({ name: 'stdout', value: chunk })
+      reporter.output('stdout', chunk)
     })
     proc.stderr.on('data', chunk => {
-      reporter.writeStderr(chunk)
-      outputs.push({ name: 'stderr', value: chunk })
+      reporter.output('stderr', chunk)
     })
     proc.on('close', code => {
-      resolve(outputs)
+      resolve()
     })
     proc.on('error', err => {
       reject(err)
@@ -26,23 +23,41 @@ const exec = (cmd: string, reporter: Reporter) => {
 }
 
 export class ShellSandbox implements Sandbox {
+  filetypes = {
+    sh: 'sh',
+    shell: 'sh'
+  }
   reporter: Reporter
   constructor(reporter: Reporter) {
     this.reporter = reporter
   }
-  async run(code: string, filetype: string, meta: any = {}) {
-    let outputs: Output[] = []
+  async run(
+    code: string,
+    hash: string,
+    filetype: string,
+    meta: SandboxOptions
+  ) {
+    filetype = this.filetypes[filetype]
+    if (!filetype) {
+      return false
+    }
     if (code.startsWith('#! ')) {
-      outputs = await exec(code, this.reporter)
+      await exec(code, this.reporter)
     } else {
       for (let line of code.split('\n')) {
         line = line.trimLeft()
         if (line.startsWith('$ ')) {
           line = line.slice(2)
         }
-        outputs = outputs.concat(await exec(line, this.reporter))
+        await exec(line, this.reporter)
       }
     }
-    return { outputs, error: null, nodes: [] }
+    return true
   }
 }
+
+const plugin: SandboxPlugin = async (reporter, rootPath) => {
+  return new ShellSandbox(reporter)
+}
+
+export default plugin

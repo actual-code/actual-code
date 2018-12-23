@@ -1,31 +1,124 @@
-import React, { useEffect, useState, useMemo } from 'react'
+import React, { useEffect, useMemo, useReducer } from 'react'
 
 import Editor from './editor'
-import { initSandbox, runMarkdown } from './frontend'
+import { initActualCode, setReportCallback, stringifyHtml } from './frontend'
+
+export interface State {
+  text: string
+  __html: string
+  results: { [hash: string]: string }
+}
+
+const initialState: State = {
+  text: '',
+  __html: '',
+  results: {}
+}
+
+const actions: { [props: string]: (state: State, action) => State } = {
+  SET_TEXT: (state, action) => {
+    const { text } = action
+    return { ...state, text }
+  },
+  SET_HTML: (state, action) => {
+    const { __html } = action
+    return { ...state, __html }
+  },
+  SET_RESULT: (state, action) => {
+    const { hash, data } = action
+    const results = { ...state.results, [hash]: data }
+    return { ...state, results }
+  }
+}
+
+const reducer = (state: State, action) => {
+  if (action.type in actions) {
+    return actions[action.type](state, action)
+  } else {
+    return state
+  }
+}
 
 export default props => {
   const { filename, setFilename } = props
-  const [text, setText] = useState('')
-  const [__html, setHtml] = useState('')
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const { text, __html, results } = state
 
-  const run = (s: string, isRunMode: boolean) =>
-    runMarkdown(s, isRunMode).then(html => setHtml(html))
+  const run = async (actualCode, runMode: boolean) => {
+    const { code } = await actualCode.getAppState()
+    const { vfile, codeBlocks } = await actualCode.run(text || code, {
+      runMode
+    })
+    const nodes: { [hash: string]: any } = {}
+
+    const search = (vfile, node) => {
+      if (JSON.stringify(vfile.pos) === JSON.stringify(node.pos)) {
+        return vfile
+      }
+
+      for (const child of vfile.children) {
+        if ('children' in child) {
+          return search(child, node)
+        }
+      }
+      return null
+    }
+
+    codeBlocks.reverse().forEach(({ parent, index, hash }) => {
+      nodes[hash] = {
+        type: 'code',
+        value: results[hash] || '',
+        lang: hash
+      }
+      parent = search(vfile, parent)
+      parent.children = [
+        ...parent.children.slice(0, index + 1),
+        nodes[hash],
+        ...parent.children.slice(index + 1)
+      ]
+    })
+
+    console.log(vfile)
+    const __html = await stringifyHtml(vfile)
+    dispatch({ type: 'SET_HTML', __html })
+  }
+
+  useEffect(() => {
+    setReportCallback((type, hash, data) => {
+      const outputString = (hash: string, data: string | Buffer) => {
+        const q = document.querySelector(`code.language-${hash}`)
+        if (!q) {
+          return
+        }
+        console.log(hash, results[hash], q)
+        const result = (results[hash] || q.textContent) + data.toString()
+        dispatch({ type: 'SET_RESULT', data: result })
+        q.textContent = result
+      }
+      const outputTypes = {
+        stderr: outputString,
+        stdout: outputString
+      }
+      if (type in outputTypes) {
+        outputTypes[type](hash, data)
+      }
+    })
+  }, [])
 
   const _init = useMemo(
-    () => {
-      return initSandbox(filename).then(res => {
-        setText(res.code || '')
-        return res.code
-      })
+    async () => {
+      const actualCode = await initActualCode(filename)
+      const appState = await actualCode.getAppState()
+      const { code } = appState
+      dispatch({ type: 'SET_TEXT', text: code || '' })
+      return actualCode
     },
     [filename]
   )
 
   useEffect(
     () => {
-      _init.then(code => {
-        run(text || code, false)
-      })
+      _init.then(async actualCode => run(actualCode, false))
     },
     [text, filename]
   )
@@ -44,7 +137,7 @@ export default props => {
       <nav style={{ gridRow: '1', gridColumn: '1/3' }}>
         <button
           onClick={() => {
-            run(text, true)
+            _init.then(async actualCode => run(actualCode, true))
           }}
         >
           Run
@@ -53,7 +146,7 @@ export default props => {
       </nav>
 
       <Editor
-        setText={setText}
+        setText={(text: string) => dispatch({ type: 'SET_TEXT', text })}
         filename={filename}
         value={text}
         run={run}

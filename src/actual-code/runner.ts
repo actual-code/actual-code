@@ -1,5 +1,6 @@
 import { Reporter } from '../reporter'
 import { Sandbox, SandboxOptions } from '../sandbox'
+import { CodeBlock } from '../source'
 
 const createErrorNode = value => ({ type: 'code', lang: 'error', value })
 const createResultNode = outputs => ({
@@ -25,8 +26,7 @@ const mergeOption = (
 export const run = async (
   reporter: Reporter,
   box: Sandbox,
-  cache,
-  codeBlocks,
+  codeBlocks: CodeBlock[],
   opts: SandboxOptions
 ) => {
   const cwd = process.cwd()
@@ -36,31 +36,15 @@ export const run = async (
   const insertNodes = []
   let i = 0
   for (const codeBlock of codeBlocks) {
-    const { code, filetype, meta, parent, index } = codeBlock
+    const { code, filetype, meta, parent, index, hash } = codeBlock
     const opts2 = mergeOption(opts, meta)
 
     let outputs = []
     let error = null
     let nodes = []
 
-    if (opts2.runMode) {
-      const result = await box.run(code, filetype, opts2)
-      outputs = result.outputs
-      error = result.error
-      nodes = result.nodes
-
-      cache[i] = { outputs, code, nodes }
-    } else {
-      if (cache.length > i) {
-        if (cache[i].code !== code) {
-          reporter.debug('cache purge')
-          cache[i] = { code: null, outputs: [], nodes: [] }
-        }
-        outputs = cache[i].outputs
-        error = cache[i].error
-        nodes = cache[i].nodes
-      }
-    }
+    reporter.setHash(hash)
+    await box.run(code, hash, filetype, opts2)
 
     if (error) {
       insertNodes.push({ parent, index, node: createErrorNode(error) })
@@ -84,5 +68,6 @@ export const run = async (
     ]
   })
 
+  reporter.setHash(null)
   process.chdir(cwd)
 }

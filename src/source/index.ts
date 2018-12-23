@@ -1,6 +1,14 @@
+import { createHash } from 'crypto'
+
 import { safeLoad } from 'js-yaml'
 
 import { parseMarkdown } from './markdown'
+
+const sha256 = (text: string) => {
+  const hash = createHash('sha256')
+  hash.write(text)
+  return hash.digest().toString('hex')
+}
 
 const traversal = async (node, parent, cb, index = 0) => {
   await cb(node, parent, index)
@@ -9,18 +17,6 @@ const traversal = async (node, parent, cb, index = 0) => {
     await traversal(child, node, cb, i)
     i++
   }
-}
-const lang = {
-  js: 'js',
-  javascript: 'js',
-  ts: 'ts',
-  typescript: 'ts',
-  jsx: 'jsx',
-  tsx: 'tsx',
-  sh: 'sh',
-  shell: 'sh',
-  bash: 'sh',
-  html: 'html'
 }
 
 const reKeyValue = /^(([a-zA-Z0-9]+)(?:=([^" ]+)|="([^"]+)")?)/
@@ -64,8 +60,17 @@ export const parse = async (markdownText: string) => {
   return { settings, vfile }
 }
 
+export interface CodeBlock {
+  code: string
+  filetype: string
+  meta: { [props: string]: any }
+  parent: any
+  index: number
+  hash: string
+}
+
 export const getCodeBlocks = async vfile => {
-  const codeBlocks = []
+  const codeBlocks: CodeBlock[] = []
   await traversal(vfile, vfile, async (node, parent, index) => {
     if (node.type !== 'code') {
       return
@@ -73,7 +78,7 @@ export const getCodeBlocks = async vfile => {
 
     const meta = parseMeta(node.meta)
 
-    const filetype = lang[node.lang] || node.lang
+    const filetype = node.lang
     if (meta.timeout) {
       meta.timeout = Number.parseInt(meta.timeout)
     }
@@ -81,7 +86,14 @@ export const getCodeBlocks = async vfile => {
       meta.runMode = meta.runMode === 'true'
     }
 
-    codeBlocks.push({ code: node.value, filetype, meta, parent, index })
+    codeBlocks.push({
+      code: node.value,
+      filetype,
+      meta,
+      parent,
+      index,
+      hash: sha256(node.value)
+    })
   })
   return codeBlocks
 }

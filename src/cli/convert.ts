@@ -1,18 +1,55 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'
+import assert from 'assert'
 
 import { setup } from '../app-state'
-import { ConsoleReporter } from '../reporter'
+import { Reporter } from '../reporter'
 import { SandboxOptions } from '../sandbox'
 import { stringifyMarkdown } from '../source/markdown'
 import { ActualCode } from '../actual-code'
+import { CodeBlock } from '../source'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
 
 export const convert = async (filename: string, opts, outputfile?: string) => {
-  const reporter = new ConsoleReporter(opts)
+  const reporter = new Reporter(opts)
+
+  let outputs = []
+  let vfile = null
+  let codeBlocks: CodeBlock[] = null
+  const inserts = []
+
+  reporter.setCallback((type, hash, arg1) => {
+    switch (type) {
+      case 'sandbox end': {
+        assert(hash)
+
+        const codeBlock = codeBlocks.find(v => v.hash === hash)
+
+        assert(codeBlock)
+
+        inserts.push({
+          parent: codeBlock.parent,
+          index: codeBlock.index,
+          outputs: [...outputs]
+        })
+
+        outputs = []
+        hash = null
+        break
+      }
+      case 'stdout': {
+        outputs.push({ type: 'stdout', hash, value: arg1.toString() })
+        break
+      }
+      case 'stderr': {
+        outputs.push({ type: 'stderr', hash, value: arg1.toString() })
+        break
+      }
+    }
+  })
 
   filename = path.resolve(filename)
   if (outputfile) {
@@ -24,7 +61,7 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
     reporter.disableLog = true
     reporter.disableInfo = true
   }
-  reporter.info(`read: ${filename}`)
+  reporter.info('read file', filename)
   const appState = await setup(filename)
 
   const sandboxOpts: SandboxOptions = {
@@ -33,12 +70,39 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
   }
   const actualCode = new ActualCode(appState, reporter)
 
-  const { vfile } = await actualCode.run(text, sandboxOpts)
+  const res = await actualCode.run(text, sandboxOpts)
+  vfile = res.vfile
+  codeBlocks = res.codeBlocks
+
+  await actualCode.waitFinished()
+
+  inserts.reverse().forEach(({ parent, index, outputs }) => {
+    const [, text] = outputs.reduce(
+      (acc, insert) => {
+        const { type, value } = insert
+        if (acc[0] === type) {
+          return [type, acc[1] + value]
+        } else {
+          return [type, `${acc[1]}\n--- ${type}\n${value}`]
+        }
+      },
+      ['', '']
+    )
+    const node = {
+      type: 'code',
+      value: text
+    }
+    parent.children = [
+      ...parent.children.slice(0, index + 1),
+      node,
+      ...parent.children.slice(index + 1)
+    ]
+  })
 
   const doc = stringifyMarkdown(vfile)
 
   if (outputfile) {
-    reporter.info(`write ${outputfile}`)
+    reporter.info('write file', outputfile)
     await writeFile(outputfile, doc)
   }
   return doc

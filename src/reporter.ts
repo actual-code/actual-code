@@ -12,19 +12,19 @@ export interface ReporterOptions {
   disableDebug?: boolean
 }
 
-export interface Reporter {
-  info(message: string): Promise<void>
-  log(message: string): Promise<void>
-  debug(message: string): Promise<void>
+export type ReporterCallback = (
+  type: string,
+  hash: string,
+  arg1: string | Buffer
+) => void
 
-  writeStdout(data: string | Buffer): Promise<void>
-  writeStderr(data: string | Buffer): Promise<void>
-}
-
-export class ConsoleReporter implements Reporter {
+export class Reporter {
   disableInfo: boolean
   disableLog: boolean
   disableDebug: boolean
+  hash: string = null
+
+  private _cb: ReporterCallback = () => {}
 
   constructor(opts: ReporterOptions = {}) {
     this.disableLog = !!opts.disableLog
@@ -32,29 +32,53 @@ export class ConsoleReporter implements Reporter {
     this.disableDebug = !!opts.disableDebug
   }
 
-  async info(message: string) {
+  setHash(hash: string) {
+    this.hash = hash
+  }
+
+  info(event: 'read file', filename: string): Promise<void>
+  info(event: 'write file', filename: string): Promise<void>
+  info(event: 'sandbox run', codeHash: string): Promise<void>
+  info(event: 'sandbox skip', codeHash: string): Promise<void>
+  info(event: 'sandbox end', codeHash: string): Promise<void>
+
+  async info(event: string, message: string) {
     if (!this.disableInfo) {
-      process.stdout.write(`\x1b[32m[INFO] ${_getTime()}\x1b[m: ${message}\n`)
+      process.stdout.write(
+        `\x1b[32m[INFO] ${_getTime()}\x1b[m: ${event}.${this.hash} ${message}\n`
+      )
     }
+    this._cb(event, this.hash, message)
   }
 
   async log(message: string) {
     if (!this.disableLog) {
       process.stdout.write(`\x1b[36m[LOG]  ${_getTime()}\x1b[m: ${message}\n`)
     }
+    this._cb('log', this.hash, message)
   }
 
   async debug(message: string) {
     if (!this.disableDebug) {
       process.stdout.write(`\x1b[33m[DEBUG]${_getTime()}\x1b[m: ${message}\n`)
     }
+    this._cb('debug', this.hash, message)
   }
 
-  async writeStdout(data: string | Buffer) {
-    process.stdout.write(data)
+  async output(filetype: string, data: string | Buffer) {
+    switch (filetype) {
+      case 'stdout': {
+        process.stdout.write(data)
+        break
+      }
+      case 'stderr': {
+        process.stderr.write(data)
+      }
+    }
+    this._cb(filetype, this.hash, data)
   }
 
-  async writeStderr(data: string | Buffer) {
-    process.stderr.write(data)
+  setCallback(cb: ReporterCallback) {
+    this._cb = cb
   }
 }

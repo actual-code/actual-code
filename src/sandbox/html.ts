@@ -1,14 +1,28 @@
-import { Sandbox, SandboxOptions } from '.'
+import { Sandbox, SandboxOptions, SandboxPlugin } from '.'
 import { Reporter } from '../reporter'
-import { parseMarkdown } from '../source/markdown'
+
 export class HtmlSandbox implements Sandbox {
   reporter: Reporter
   constructor(reporter: Reporter) {
     this.reporter = reporter
   }
 
-  async run(code: string, filetype: string, meta: any = {}) {
-    const nodes = parseMarkdown(code).children
-    return { outputs: [], error: null, nodes }
+  async run(
+    code: string,
+    hash: string,
+    filetype: string,
+    meta: SandboxOptions
+  ) {
+    if (filetype !== 'html') {
+      return false
+    }
+    this.reporter.output('text/html', code)
+    return true
   }
 }
+
+const plugin: SandboxPlugin = async (reporter, rootPath) => {
+  return new HtmlSandbox(reporter)
+}
+
+export default plugin

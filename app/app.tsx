@@ -5,6 +5,7 @@ import Filelist from './filelist'
 
 export default props => {
   const [filename, setFilename] = useState(null)
+  console.log('filename', filename)
 
   const content = filename ? (
     <Runner filename={filename} setFilename={setFilename} />

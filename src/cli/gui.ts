@@ -12,106 +12,39 @@ import { stringifyHtml } from '../source/markdown'
 
 const outDir = path.join(__dirname, '..', '..', 'app')
 
-export class CarloReporter implements Reporter {
-  disableInfo: boolean
-  disableLog: boolean
-  disableDebug: boolean
-  cb: (type, data) => Promise<void> = async (type, data) => {
-    console.log(type, data)
+class Backend {
+  reporter: Reporter
+  constructor(reporter: Reporter) {
+    this.reporter = reporter
   }
-
-  constructor(opts: ReporterOptions = {}) {
-    this.disableLog = !!opts.disableLog
-    this.disableInfo = !!opts.disableInfo
-    this.disableDebug = !!opts.disableDebug
-  }
-
-  async info(message: string) {
-    if (!this.disableInfo) {
-      await this.cb('info', message)
-    }
-  }
-
-  async log(message: string) {
-    if (!this.disableLog) {
-      await this.cb('log', message)
-    }
-  }
-
-  async debug(message: string) {
-    if (!this.disableDebug) {
-      await this.cb('debug', message)
-    }
-  }
-
-  async writeStdout(data: string | Buffer) {
-    await this.cb('stdout', data)
-  }
-
-  async writeStderr(data: string | Buffer) {
-    await this.cb('stderr', data)
-  }
-
-  setCallback(cb) {
-    this.cb = cb
+  initActualCode(id: string) {
+    return rpc.handle(new ActualCode(id, this.reporter))
   }
 }
 
 export const bootGui = async opt => {
-  const reporter = new CarloReporter(opt)
-  reporter.info('GUI mode')
-  let actualCode: ActualCode
-  let appState
-  let filename
+  const reporter = new Reporter(opt)
+  const backend = new Backend(reporter)
+  reporter.log('GUI mode')
 
   const cApp = await carlo.launch()
   cApp.serveFolder(outDir)
   const window = cApp.mainWindow()
-  const page = window.pageForTest()
-  page.on('console', message => {
-    reporter.info(message.type())
-    reporter.info(message.text())
-    reporter.info(message.args())
-  })
+  // const page = window.pageForTest()
+  // page.on('console', message => {
+  //   console.log(message.type())
+  //   console.log(message.text())
+  //   console.log(message.args())
+  // })
 
-  cApp.serveHandler(request => {
-    reporter.debug(`REQ ${request.url()}`)
-    request.continue()
-  })
+  // cApp.serveHandler(request => {
+  //   reporter.debug(`REQ ${request.url()}`)
+  //   request.continue()
+  // })
 
-  await cApp.exposeFunction('initSandbox', async (name: string) => {
-    filename = name
-    reporter.debug('init sandbox')
-    appState = await setup(filename)
-    actualCode = new ActualCode(appState, reporter)
-    return { ...appState, code: actualCode.code }
-  })
-  await cApp.exposeFunction(
-    'runMarkdown',
-    async (code: string, runMode: boolean) => {
-      const { vfile, settings } = await actualCode.run(code, { runMode })
-      reporter.debug(`settings: ${JSON.stringify(settings)}`)
-
-      if (appState) {
-        const tags = settings.tags || ''
-        const found = vfile.children.find(child => child.type === 'heading')
-        const title =
-          found &&
-          found.children &&
-          found.children
-            .map(child => child.value)
-            .filter(s => s)
-            .join(' ')
-        appState.code = code
-        appState.title = title
-        appState.tags = typeof tags === 'string' ? tags.split(/[ ,]/) : tags
-        appState.updatedAt = Date.now()
-        updateState(filename, appState)
-      }
-
-      return stringifyHtml(vfile)
-    }
+  await cApp.exposeFunction('stringifyHtml', async vfile =>
+    stringifyHtml(vfile)
   )
-  await cApp.exposeFunction('getFileList', () => getFileList())
-  await cApp.load('index.html', rpc.handle(reporter))
+  await cApp.exposeFunction('getFileList', async () => getFileList())
+  await cApp.load('index.html', rpc.handle(reporter), rpc.handle(backend))
 }

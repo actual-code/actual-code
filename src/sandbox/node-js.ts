@@ -9,27 +9,14 @@ import * as babel from '@babel/core'
 const presetEnv = require('@babel/preset-env')
 const presetTypescript = require('@babel/preset-typescript')
 
-import { Output, SandboxOptions, Sandbox } from '.'
+import { SandboxOptions, Sandbox, SandboxPlugin } from '.'
 import { Reporter } from '../reporter'
 
-const createProxies = (
-  reporter: Reporter,
-  handler: (output: Output) => void
-) => {
+const createProxies = (reporter: Reporter) => {
   const createWritable = name => {
     return new Writable({
       write: value => {
-        switch (name) {
-          case 'stdout': {
-            reporter.writeStdout(value)
-            break
-          }
-          case 'stderr': {
-            reporter.writeStderr(value)
-            break
-          }
-        }
-        handler({ name, value })
+        reporter.output(name, value)
       }
     })
   }
@@ -59,14 +46,10 @@ const createProxies = (
           if (typeof value === 'string') {
             return value
           } else {
-            return inspect(value, { colors: true })
+            return inspect(value, { colors: false })
           }
         }
-        reporter.writeStdout(`${args.map(arg => format(arg)).join(' ')}\n`)
-        handler({
-          name: `console.${name.toString()}`,
-          value: args.map(arg => inspect(arg)).join(' ')
-        })
+        reporter.output('stdout', `${args.map(arg => format(arg)).join(' ')}\n`)
       }
     }
   })
@@ -113,8 +96,14 @@ const createRequire = (rootPath: string) => {
 }
 
 export class JsSandbox implements Sandbox {
-  outputs: Output[] = []
-  handlers: Array<(output: Output) => void> = []
+  filetypes = {
+    js: 'js',
+    javascript: 'js',
+    ts: 'ts',
+    typescript: 'ts',
+    jsx: 'jsx',
+    tsx: 'tsx'
+  }
   reporter: Reporter
   timeout: number
   ctx: any
@@ -122,11 +111,7 @@ export class JsSandbox implements Sandbox {
     this.reporter = reporter
     this.timeout = 100
 
-    this.handleOutput(output => this.outputs.push(output))
-
-    const { consoleProxy, processProxy } = createProxies(reporter, output => {
-      this.handlers.forEach(handler => handler(output))
-    })
+    const { consoleProxy, processProxy } = createProxies(reporter)
     const requireSandbox = createRequire(rootPath)
     this.ctx = {
       require: requireSandbox,
@@ -144,25 +129,45 @@ export class JsSandbox implements Sandbox {
     vm.createContext(this.ctx)
   }
 
-  handleOutput(handler: (output: Output) => void) {
-    this.handlers.push(handler)
-  }
-
-  async run(code: string, filetype: string, meta) {
-    this.outputs = []
-    const compiled = await babel.transformAsync(code, {
-      ast: false,
-      presets: [[presetEnv, { targets: { node: '8.0.0' } }], presetTypescript],
-      sourceType: 'module',
-      filename: `file.${filetype}`
-    })
+  async run(
+    code: string,
+    hash: string,
+    filetype: string,
+    meta: SandboxOptions
+  ) {
+    filetype = this.filetypes[filetype]
+    if (!filetype) {
+      return false
+    }
     try {
+      const compiled = await babel.transformAsync(code, {
+        ast: false,
+        presets: [
+          [
+            presetEnv,
+            {
+              targets: {
+                node: process.version,
+                browsers: ['last 2 Chrome version']
+              }
+            }
+          ],
+          presetTypescript
+        ],
+        sourceType: 'module',
+        filename: `file.${filetype}`
+      })
       const timeout = meta.timeout || this.timeout
       vm.runInContext(compiled.code, this.ctx, { timeout })
     } catch (error) {
-      console.error(error)
-      return { outputs: this.outputs, error, nodes: [] }
+      this.reporter.output('stderr', inspect(error, { colors: false }))
     }
-    return { outputs: this.outputs, error: null, nodes: [] }
+    return true
   }
 }
+
+const plugin: SandboxPlugin = async (reporter, rootPath) => {
+  return new JsSandbox(reporter, rootPath)
+}
+
+export default plugin

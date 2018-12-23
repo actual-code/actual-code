@@ -1,18 +1,12 @@
 import * as fs from 'fs'
 import { promisify } from 'util'
 
-import { JsSandbox } from './node-js'
-import { ShellSandbox } from './shell'
-import { HtmlSandbox } from './html'
-import { BrowserSandbox } from './browser'
+import jsPlugin from './node-js'
+import shellPlugin from './shell'
+import htmlPlugin from './html'
 import { Reporter } from '../reporter'
 
 const writeFile = promisify(fs.writeFile)
-
-export interface Output {
-  name: string
-  value: string
-}
 
 export interface SandboxOptions {
   rootPath?: string
@@ -23,48 +17,61 @@ export interface SandboxOptions {
   // settings: { [props: string]: string }
 }
 
-export interface SandboxResult {
-  outputs: Output[]
-  error?: Error
-  nodes: any[]
-}
-
 export interface Sandbox {
-  run: (code: string, filetype: string, meta) => Promise<SandboxResult>
+  run: (
+    code: string,
+    hash: string,
+    filetype: string,
+    meta: SandboxOptions
+  ) => Promise<boolean>
 }
 
-export const createSandbox = (
+export type SandboxPlugin = (
   reporter: Reporter,
   rootPath: string
-): Sandbox => {
+) => Promise<Sandbox>
+
+export const createSandbox = async (
+  reporter: Reporter,
+  rootPath: string
+): Promise<{
+  run: (
+    code: string,
+    hash: string,
+    filetype: string,
+    opts: SandboxOptions
+  ) => Promise<void>
+}> => {
   reporter.debug('create Sandbox')
-  const jsBox = new JsSandbox(reporter, rootPath)
-  const shBox = new ShellSandbox(reporter)
-  const htmlBox = new HtmlSandbox(reporter)
-  const browserSandbox = new BrowserSandbox(reporter, rootPath)
+  const jsBox = await jsPlugin(reporter, rootPath)
+  const shBox = await shellPlugin(reporter, rootPath)
+  const htmlBox = await htmlPlugin(reporter, rootPath)
+
+  const boxes = [jsBox, shBox, htmlBox]
   return {
     run: async (
       code: string,
-      filetype: string = 'js',
-      opts2: SandboxOptions
+      hash: string,
+      filetype: string,
+      opts: SandboxOptions
     ) => {
-      reporter.info(`run ${filetype}`)
-
-      if (opts2.file) {
-        await writeFile(opts2.file, code)
+      if (!opts.runMode) {
+        reporter.info('sandbox skip', hash)
+        return
       }
 
-      if (opts2.browser) {
-        return browserSandbox.run(code, filetype, opts2)
+      reporter.info('sandbox run', hash)
+
+      if (opts.file) {
+        await writeFile(opts.file, code)
       }
 
-      if (filetype === 'sh') {
-        return shBox.run(code, filetype, opts2)
-      } else if (filetype === 'html') {
-        return htmlBox.run(code, filetype, opts2)
-      } else {
-        return jsBox.run(code, filetype, opts2)
+      for (const box of boxes) {
+        if (await box.run(code, hash, filetype, opts)) {
+          break
+        }
       }
+      reporter.info('sandbox end', hash)
     }
   }
 }

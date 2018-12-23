@@ -32,7 +32,6 @@
     "js-yaml": "^3.12.0",
     "mkdirp": "^0.5.1",
     "monaco-editor": "^0.15.6",
-    "parcel-bundler": "^1.10.3",
     "react": "^16.7.0-alpha.2",
     "react-dom": "^16.7.0-alpha.2",
     "remark": "^10.0.1",
@@ -58,6 +57,7 @@
     "@types/react-dom": "^16.0.11",
     "babel-preset-env": "^1.7.0",
     "jest": "^23.6.0",
+    "parcel-bundler": "^1.10.3",
     "ts-jest": "^23.10.5",
     "typescript": "^3.2.2"
   }
