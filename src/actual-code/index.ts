@@ -1,5 +1,5 @@
 import { Reporter, ReporterOptions } from '../reporter'
-import { getCodeBlocks, parse } from '../source'
+import { getCodeBlocks, parse, MDAST } from '../source'
 import { Sandbox, createSandbox, SandboxOptions } from '../sandbox'
 import { setup, updateState, AppState } from '../app-state'
 import { run } from './runner'
@@ -27,13 +27,15 @@ export class ActualCode {
   async run(markdownText: string, opts: SandboxOptions) {
     const appState = await this._initState
     const sandbox = await this._initSandbox
-    const { settings, vfile } = await parse(markdownText)
-    const codeBlocks = await getCodeBlocks(vfile)
+    const { settings, node } = await parse(markdownText)
+    const codeBlocks = await getCodeBlocks(node)
 
     this._runningState = run(this._reporter, sandbox, codeBlocks, opts).then(
       () => {
         const tags = settings.tags || ''
-        const found = vfile.children.find(child => child.type === 'heading')
+        const found = node.children.find(
+          child => child.type === 'heading'
+        ) as MDAST.Heading
         const title =
           found &&
           found.children &&
@@ -48,7 +50,7 @@ export class ActualCode {
       }
     )
 
-    return { settings, vfile, codeBlocks }
+    return { settings, node, codeBlocks }
   }
 
   async waitFinished() {

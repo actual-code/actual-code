@@ -2,7 +2,8 @@ import { createHash } from 'crypto'
 
 import { safeLoad } from 'js-yaml'
 
-import { parseMarkdown } from './markdown'
+import { parseMarkdown, MDAST } from './markdown'
+export { MDAST }
 
 const sha256 = (text: string) => {
   const hash = createHash('sha256')
@@ -56,8 +57,8 @@ export const parse = async (markdownText: string) => {
     markdownText = markdownText.slice(matched[0].length)
   }
 
-  const vfile = parseMarkdown(markdownText)
-  return { settings, vfile }
+  const node = parseMarkdown(markdownText)
+  return { settings, node }
 }
 
 export interface CodeBlock {

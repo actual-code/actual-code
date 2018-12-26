@@ -70,7 +70,7 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
   }
 
   const res = await actualCode.run(text, sandboxOpts)
-  vfile = res.vfile
+  vfile = res.node
   codeBlocks = res.codeBlocks
 
   await actualCode.waitFinished()

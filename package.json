@@ -55,6 +55,7 @@
     "@types/parcel-bundler": "^1.10.1",
     "@types/react": "^16.7.17",
     "@types/react-dom": "^16.0.11",
+    "@types/unist": "^2.0.2",
     "babel-preset-env": "^1.7.0",
     "jest": "^23.6.0",
     "parcel-bundler": "^1.10.3",

@@ -1,6 +1,6 @@
 import unified from 'unified'
 
-import remark from 'remark'
+import parse from 'remark-parse'
 import math from 'remark-math'
 import hljs from 'remark-highlight.js'
 import breaks from 'remark-breaks'
@@ -9,17 +9,25 @@ import html from 'remark-html'
 import frontmatter from 'remark-frontmatter'
 import stringify from 'remark-stringify'
 
-const markdown = remark()
+import * as MDAST from './types'
+export { MDAST }
+
+const u = unified()
+  .use(parse)
   .use(breaks)
   .use(math)
   .use(katex)
   .use(hljs)
-  .use(html)
   .use(frontmatter, ['yaml'])
 
-export const parseMarkdown = (...args) => markdown.parse(...args)
-export const stringifyHtml = (...args) => markdown.stringify(...args)
-export const stringifyMarkdown = (node, file?) =>
-  unified()
-    .use(stringify)
-    .stringify(node, file)
+const markdown = u.use(stringify)
+
+export const parseMarkdown = vfile => {
+  return markdown.parse(vfile) as MDAST.Root
+}
+
+export const stringifyHtml = (node: MDAST.Node, vfile?) =>
+  u.use(html).stringify(node, vfile)
+
+export const stringifyMarkdown = (node: MDAST.Node, vfile?) =>
+  markdown.stringify(node, vfile)
