@@ -8,7 +8,7 @@ import { ActualCode } from '../actual-code'
 import { Reporter, ReporterOptions } from '../reporter'
 import { getFileList } from '../app-state'
 
-import { stringifyHtml } from '../source/markdown'
+import { stringifyHtml } from '../source/unified'
 
 const outDir = path.join(__dirname, '..', '..', 'app')
 

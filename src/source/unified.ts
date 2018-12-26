@@ -9,7 +9,7 @@ import html from 'remark-html'
 import frontmatter from 'remark-frontmatter'
 import stringify from 'remark-stringify'
 
-import * as MDAST from './types'
+import * as MDAST from './mdast'
 export { MDAST }
 
 const u = unified()

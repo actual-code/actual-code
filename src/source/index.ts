@@ -2,7 +2,7 @@ import { createHash } from 'crypto'
 
 import { safeLoad } from 'js-yaml'
 
-import { parseMarkdown, MDAST } from './markdown'
+import { parseMarkdown, MDAST } from './unified'
 export { MDAST }
 
 const sha256 = (text: string) => {
