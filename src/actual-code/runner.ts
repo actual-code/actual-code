@@ -21,8 +21,6 @@ export const run = async (
   codeBlocks: CodeBlock[],
   opts: SandboxOptions
 ) => {
-  const cwd = process.cwd()
-
   reporter.debug('run markdown script')
 
   const insertNodes = []
@@ -36,5 +34,4 @@ export const run = async (
   }
 
   reporter.setHash(null)
-  process.chdir(cwd)
 }

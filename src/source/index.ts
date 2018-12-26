@@ -11,11 +11,17 @@ const sha256 = (text: string) => {
   return hash.digest().toString('hex')
 }
 
-const traversal = async (node, parent, cb, index = 0) => {
+const traversal = async (
+  node: MDAST.Node,
+  parent: MDAST.Parent,
+  cb: (node: MDAST.Node, parent: MDAST.Parent, index: number) => Promise<void>,
+  index = 0
+) => {
   await cb(node, parent, index)
   let i = 0
-  for (const child of node.children || []) {
-    await traversal(child, node, cb, i)
+  const children = 'children' in node ? (node.children as MDAST.Content[]) : []
+  for (const child of children) {
+    await traversal(child, node as MDAST.Parent, cb, i)
     i++
   }
 }
@@ -57,22 +63,22 @@ export const parse = async (markdownText: string) => {
     markdownText = markdownText.slice(matched[0].length)
   }
 
-  const node = parseMarkdown(markdownText)
-  return { settings, node }
+  const root = parseMarkdown(markdownText)
+  return { settings, root }
 }
 
 export interface CodeBlock {
   code: string
   filetype: string
   meta: { [props: string]: any }
-  parent: any
+  parent: MDAST.Parent
   index: number
   hash: string
 }
 
-export const getCodeBlocks = async vfile => {
+export const getCodeBlocks = async (node: MDAST.Root) => {
   const codeBlocks: CodeBlock[] = []
-  await traversal(vfile, vfile, async (node, parent, index) => {
+  await traversal(node, node, async (node, parent, index) => {
     if (node.type !== 'code') {
       return
     }

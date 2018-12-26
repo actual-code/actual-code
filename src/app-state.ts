@@ -35,7 +35,7 @@ export interface AppState {
   updatedAt: number
 }
 
-export const setup = async (filename: string): Promise<AppState> => {
+export const readAppState = async (filename: string): Promise<AppState> => {
   const state = await readState()
   state.paths = state.paths || {}
   const appState: AppState = state.paths[filename] || {}
@@ -46,9 +46,8 @@ export const setup = async (filename: string): Promise<AppState> => {
   appState.createdAt = appState.createdAt || Date.now()
   if (!('path' in appState) || !fs.existsSync(appState.path)) {
     appState.path = await mkdtemp(path.join(os.tmpdir(), 'actual-'))
-    updateState(filename, appState)
+    updateAppState(filename, appState)
   }
-  process.chdir(appState.path)
   return appState
 }
 
@@ -62,7 +61,7 @@ export const getFileList = async () => {
     .filter(appState => 'code' in appState)
 }
 
-export const updateState = async (filename: string, appState: AppState) => {
+export const updateAppState = async (filename: string, appState: AppState) => {
   const state = await readState()
   state.paths = state.paths || {}
   appState.updatedAt = Date.now()

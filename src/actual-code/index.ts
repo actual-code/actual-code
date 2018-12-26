@@ -1,7 +1,7 @@
 import { Reporter, ReporterOptions } from '../reporter'
 import { getCodeBlocks, parse, MDAST } from '../source'
 import { Sandbox, createSandbox, SandboxOptions } from '../sandbox'
-import { setup, updateState, AppState } from '../app-state'
+import { readAppState, updateAppState, AppState } from '../app-state'
 import { run } from './runner'
 
 export class ActualCode {
@@ -14,10 +14,11 @@ export class ActualCode {
   constructor(id: string, reporter: Reporter) {
     this.id = id
     this._reporter = reporter
-    this._initState = setup(id)
-    this._initSandbox = this._initState.then(appState =>
+    this._initState = readAppState(id)
+    this._initSandbox = this._initState.then(appState => {
+      process.chdir(appState.path)
       createSandbox(reporter, appState.path)
-    )
+    })
   }
 
   getAppState() {
@@ -27,13 +28,13 @@ export class ActualCode {
   async run(markdownText: string, opts: SandboxOptions) {
     const appState = await this._initState
     const sandbox = await this._initSandbox
-    const { settings, node } = await parse(markdownText)
-    const codeBlocks = await getCodeBlocks(node)
+    const { settings, root } = await parse(markdownText)
+    const codeBlocks = await getCodeBlocks(root)
 
     this._runningState = run(this._reporter, sandbox, codeBlocks, opts).then(
       () => {
         const tags = settings.tags || ''
-        const found = node.children.find(
+        const found = root.children.find(
           child => child.type === 'heading'
         ) as MDAST.Heading
         const title =
@@ -46,11 +47,11 @@ export class ActualCode {
         appState.code = markdownText
         appState.title = title
         appState.tags = typeof tags === 'string' ? tags.split(/[ ,]/) : tags
-        updateState(this.id, appState)
+        updateAppState(this.id, appState)
       }
     )
 
-    return { settings, node, codeBlocks }
+    return { settings, node: root, codeBlocks }
   }
 
   async waitFinished() {
