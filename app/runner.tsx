@@ -46,19 +46,19 @@ export default props => {
 
   const run = async (actualCode, runMode: boolean) => {
     const { code } = await actualCode.getAppState()
-    const { vfile, codeBlocks } = await actualCode.run(text || code, {
+    const { node, codeBlocks } = await actualCode.run(text || code, {
       runMode
     })
     const nodes: { [hash: string]: any } = {}
 
-    const search = (vfile, node) => {
-      if (JSON.stringify(vfile.pos) === JSON.stringify(node.pos)) {
+    const search = (vfile, n) => {
+      if (JSON.stringify(vfile.position) === JSON.stringify(n.position)) {
         return vfile
       }
 
       for (const child of vfile.children) {
         if ('children' in child) {
-          return search(child, node)
+          return search(child, n)
         }
       }
       return null
@@ -73,7 +73,7 @@ export default props => {
         value: results[hash] || '',
         lang: hash
       }
-      parent = search(vfile, parent)
+      parent = search(node, parent)
       parent.children = [
         ...parent.children.slice(0, index + 1),
         nodes[hash],
@@ -81,7 +81,7 @@ export default props => {
       ]
     })
 
-    const __html = await stringifyHtml(vfile)
+    const __html = await stringifyHtml(node)
     dispatch({ type: 'SET_HTML', __html })
   }
 

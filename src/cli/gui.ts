@@ -6,7 +6,7 @@ import { rpc } from 'carlo/rpc'
 
 import { ActualCode } from '../actual-code'
 import { Reporter, ReporterOptions } from '../reporter'
-import { getFileList } from '../app-state'
+import { getFileList } from '../storage'
 
 import { stringifyHtml } from '../source/unified'
 

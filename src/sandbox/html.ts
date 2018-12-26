@@ -2,8 +2,10 @@ import { Sandbox, SandboxOptions, SandboxPlugin } from '.'
 import { Reporter } from '../reporter'
 
 export class HtmlSandbox implements Sandbox {
+  rootPath: string
   reporter: Reporter
-  constructor(reporter: Reporter) {
+  constructor(reporter: Reporter, rootPath: string) {
+    this.rootPath = rootPath
     this.reporter = reporter
   }
 
@@ -22,7 +24,7 @@ export class HtmlSandbox implements Sandbox {
 }
 
 const plugin: SandboxPlugin = async (reporter, rootPath) => {
-  return new HtmlSandbox(reporter)
+  return new HtmlSandbox(reporter, rootPath)
 }
 
 export default plugin

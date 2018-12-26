@@ -12,22 +12,23 @@ import stringify from 'remark-stringify'
 import * as MDAST from './mdast'
 export { MDAST }
 
-const u = unified()
+const markdown = unified()
   .use(parse)
   .use(breaks)
   .use(math)
   .use(katex)
   .use(hljs)
   .use(frontmatter, ['yaml'])
-
-const markdown = u.use(stringify)
+  .use(stringify)
 
 export const parseMarkdown = vfile => {
   return markdown.parse(vfile) as MDAST.Root
 }
 
 export const stringifyHtml = (node: MDAST.Node, vfile?) =>
-  u.use(html).stringify(node, vfile)
+  unified()
+    .use(html)
+    .stringify(node, vfile)
 
 export const stringifyMarkdown = (node: MDAST.Node, vfile?) =>
   markdown.stringify(node, vfile)

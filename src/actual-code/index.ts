@@ -1,7 +1,7 @@
 import { Reporter, ReporterOptions } from '../reporter'
 import { getCodeBlocks, parse, MDAST } from '../source'
 import { Sandbox, createSandbox, SandboxOptions } from '../sandbox'
-import { readAppState, updateAppState, AppState } from '../app-state'
+import { readAppState, updateAppState, AppState } from './state'
 import { run } from './runner'
 
 export class ActualCode {
@@ -25,10 +25,10 @@ export class ActualCode {
     return this._initState
   }
 
-  async run(markdownText: string, opts: SandboxOptions) {
+  async run(code: string, opts: SandboxOptions) {
     const appState = await this._initState
     const sandbox = await this._initSandbox
-    const { settings, root } = await parse(markdownText)
+    const { settings, root } = await parse(code)
     const codeBlocks = await getCodeBlocks(root)
 
     this._runningState = run(this._reporter, sandbox, codeBlocks, opts).then(
@@ -44,7 +44,8 @@ export class ActualCode {
             .map(child => child.value)
             .filter(s => s)
             .join(' ')
-        appState.code = markdownText
+        appState.path = sandbox.rootPath
+        appState.code = code
         appState.title = title
         appState.tags = typeof tags === 'string' ? tags.split(/[ ,]/) : tags
         updateAppState(this.id, appState)

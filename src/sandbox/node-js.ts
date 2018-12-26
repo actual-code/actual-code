@@ -96,6 +96,7 @@ const createRequire = (rootPath: string) => {
 }
 
 export class JsSandbox implements Sandbox {
+  rootPath: string
   filetypes = {
     js: 'js',
     javascript: 'js',
@@ -108,6 +109,7 @@ export class JsSandbox implements Sandbox {
   timeout: number
   ctx: any
   constructor(reporter: Reporter, rootPath: string) {
+    this.rootPath = rootPath
     this.reporter = reporter
     this.timeout = 100
 

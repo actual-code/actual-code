@@ -1,5 +1,9 @@
 import * as fs from 'fs'
+import * as os from 'os'
+import * as path from 'path'
 import { promisify } from 'util'
+
+const mkdtemp = promisify(fs.mkdtemp)
 
 import jsPlugin from './node-js'
 import shellPlugin from './shell'
@@ -18,6 +22,7 @@ export interface SandboxOptions {
 }
 
 export interface Sandbox {
+  rootPath: string
   run: (
     code: string,
     hash: string,
@@ -33,15 +38,21 @@ export type SandboxPlugin = (
 
 export const createSandbox = async (
   reporter: Reporter,
-  rootPath: string
+  rootPath?: string
 ): Promise<Sandbox> => {
   reporter.debug('create Sandbox')
+
+  if (!rootPath || !fs.existsSync(rootPath)) {
+    rootPath = await mkdtemp(path.join(os.tmpdir(), 'actual-'))
+  }
+
   const jsBox = await jsPlugin(reporter, rootPath)
   const shBox = await shellPlugin(reporter, rootPath)
   const htmlBox = await htmlPlugin(reporter, rootPath)
 
   const boxes = [jsBox, shBox, htmlBox]
   return {
+    rootPath,
     run: async (
       code: string,
       hash: string,

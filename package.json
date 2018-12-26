@@ -59,6 +59,7 @@
     "babel-preset-env": "^1.7.0",
     "jest": "^23.6.0",
     "parcel-bundler": "^1.10.3",
+    "pkg": "^4.3.5",
     "ts-jest": "^23.10.5",
     "typescript": "^3.2.2"
   }

@@ -23,12 +23,14 @@ const exec = (cmd: string, reporter: Reporter) => {
 }
 
 export class ShellSandbox implements Sandbox {
+  rootPath: string
   filetypes = {
     sh: 'sh',
     shell: 'sh'
   }
   reporter: Reporter
-  constructor(reporter: Reporter) {
+  constructor(reporter: Reporter, rootPath: string) {
+    this.rootPath = rootPath
     this.reporter = reporter
   }
   async run(
@@ -57,7 +59,7 @@ export class ShellSandbox implements Sandbox {
 }
 
 const plugin: SandboxPlugin = async (reporter, rootPath) => {
-  return new ShellSandbox(reporter)
+  return new ShellSandbox(reporter, rootPath)
 }
 
 export default plugin
