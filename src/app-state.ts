@@ -26,16 +26,27 @@ const writeState = async state => {
   await writeFile(stateFile, JSON.stringify(state, null, '  '))
 }
 
-export const setup = async (filename: string) => {
+export interface AppState {
+  path: string
+  code: string
+  title: string
+  tags: string[]
+  createdAt: number
+  updatedAt: number
+}
+
+export const setup = async (filename: string): Promise<AppState> => {
   const state = await readState()
   state.paths = state.paths || {}
-  const appState = state.paths[filename] || {}
+  const appState: AppState = state.paths[filename] || {}
 
-  // FIXME: べき等性…
+  appState.code = appState.code || ''
+  appState.title = appState.title || ''
+  appState.tags = appState.tags || []
+  appState.createdAt = appState.createdAt || Date.now()
   if (!('path' in appState) || !fs.existsSync(appState.path)) {
     appState.path = await mkdtemp(path.join(os.tmpdir(), 'actual-'))
-    state.paths[filename] = appState
-    writeState(state)
+    updateState(filename, appState)
   }
   process.chdir(appState.path)
   return appState
@@ -51,9 +62,10 @@ export const getFileList = async () => {
     .filter(appState => 'code' in appState)
 }
 
-export const updateState = async (filename: string, appState) => {
+export const updateState = async (filename: string, appState: AppState) => {
   const state = await readState()
   state.paths = state.paths || {}
+  appState.updatedAt = Date.now()
   state.paths[filename] = appState
   await writeState(state)
 }

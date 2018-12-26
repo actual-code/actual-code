@@ -1,13 +1,13 @@
 import { Reporter, ReporterOptions } from '../reporter'
 import { getCodeBlocks, parse } from '../source'
 import { Sandbox, createSandbox, SandboxOptions } from '../sandbox'
-import { setup, updateState } from '../app-state'
+import { setup, updateState, AppState } from '../app-state'
 import { run } from './runner'
 
 export class ActualCode {
   private _reporter: Reporter
   private _initSandbox: Promise<any>
-  private _initState: Promise<any>
+  private _initState: Promise<AppState>
   private _runningState: Promise<void> = null
   id: string
 
@@ -44,7 +44,6 @@ export class ActualCode {
         appState.code = markdownText
         appState.title = title
         appState.tags = typeof tags === 'string' ? tags.split(/[ ,]/) : tags
-        appState.updatedAt = Date.now()
         updateState(this.id, appState)
       }
     )
