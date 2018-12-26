@@ -34,14 +34,7 @@ export type SandboxPlugin = (
 export const createSandbox = async (
   reporter: Reporter,
   rootPath: string
-): Promise<{
-  run: (
-    code: string,
-    hash: string,
-    filetype: string,
-    opts: SandboxOptions
-  ) => Promise<void>
-}> => {
+): Promise<Sandbox> => {
   reporter.debug('create Sandbox')
   const jsBox = await jsPlugin(reporter, rootPath)
   const shBox = await shellPlugin(reporter, rootPath)
@@ -57,7 +50,7 @@ export const createSandbox = async (
     ) => {
       if (!opts.runMode) {
         reporter.info('sandbox skip', hash)
-        return
+        return false
       }
 
       reporter.info('sandbox run', hash)
@@ -72,6 +65,7 @@ export const createSandbox = async (
         }
       }
       reporter.info('sandbox end', hash)
+      return true
     }
   }
 }

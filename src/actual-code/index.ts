@@ -6,7 +6,7 @@ import { run } from './runner'
 
 export class ActualCode {
   private _reporter: Reporter
-  private _initSandbox: Promise<any>
+  private _initSandbox: Promise<Sandbox>
   private _initState: Promise<AppState>
   private _runningState: Promise<void> = null
   id: string
@@ -17,7 +17,7 @@ export class ActualCode {
     this._initState = readAppState(id)
     this._initSandbox = this._initState.then(appState => {
       process.chdir(appState.path)
-      createSandbox(reporter, appState.path)
+      return createSandbox(reporter, appState.path)
     })
   }
 

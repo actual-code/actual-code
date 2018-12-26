@@ -23,10 +23,8 @@ export const run = async (
 ) => {
   reporter.debug('run markdown script')
 
-  const insertNodes = []
-  let i = 0
   for (const codeBlock of codeBlocks) {
-    const { code, filetype, meta, parent, index, hash } = codeBlock
+    const { code, filetype, meta, hash } = codeBlock
     const opts2 = mergeOption(opts, meta)
 
     reporter.setHash(hash)
