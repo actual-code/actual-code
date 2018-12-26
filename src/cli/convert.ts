@@ -3,7 +3,6 @@ import * as path from 'path'
 import { promisify } from 'util'
 import assert from 'assert'
 
-import { setup } from '../app-state'
 import { Reporter } from '../reporter'
 import { SandboxOptions } from '../sandbox'
 import { stringifyMarkdown } from '../source/markdown'
@@ -62,13 +61,13 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
     reporter.disableInfo = true
   }
   reporter.info('read file', filename)
-  const appState = await setup(filename)
+  const actualCode = new ActualCode(filename, reporter)
+  const appState = await actualCode.getAppState()
 
   const sandboxOpts: SandboxOptions = {
     rootPath: appState.path,
     runMode: true
   }
-  const actualCode = new ActualCode(appState, reporter)
 
   const res = await actualCode.run(text, sandboxOpts)
   vfile = res.vfile
