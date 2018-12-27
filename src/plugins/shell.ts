@@ -1,6 +1,6 @@
 import childProcess from 'child_process'
 
-import { Sandbox, SandboxOptions, SandboxPlugin } from '.'
+import { Sandbox, SandboxOptions, SandboxPlugin } from '../actual-code'
 import { Reporter } from '../reporter'
 
 const exec = (cmd: string, reporter: Reporter) => {

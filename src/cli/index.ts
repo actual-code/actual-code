@@ -1,4 +1,4 @@
-const arg = require('arg')
+import arg from 'arg'
 
 import { convert } from './convert'
 import { bootGui } from './gui'
