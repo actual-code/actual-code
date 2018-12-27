@@ -19,7 +19,7 @@
     "actual-code": "bin/actual-code"
   },
   "scripts": {
-    "build": "tsc ; env NODE_ENV=development parcel build -d dist/app --no-cache --no-minify --no-content-hash -o index.html app/index.html",
+    "watch": "ts-node scripts/index.ts watch",
     "clean": "rimraf node_modules dist",
     "test": "jest"
   },
@@ -48,19 +48,28 @@
     "uuidv4": "^2.0.0"
   },
   "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.2.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.2.0",
     "@types/babel__core": "^7.0.4",
+    "@types/babel__generator": "^7.0.1",
+    "@types/babel__traverse": "^7.0.4",
+    "@types/chokidar": "^1.7.5",
     "@types/jest": "^23.3.10",
     "@types/js-yaml": "^3.11.2",
     "@types/node": "^10.12.12",
     "@types/parcel-bundler": "^1.10.1",
+    "@types/prettier": "^1.15.2",
     "@types/react": "^16.7.17",
     "@types/react-dom": "^16.0.11",
     "@types/unist": "^2.0.2",
     "babel-preset-env": "^1.7.0",
+    "chokidar": "^2.0.4",
     "jest": "^23.6.0",
     "parcel-bundler": "^1.10.3",
     "pkg": "^4.3.5",
+    "prettier": "^1.15.3",
     "ts-jest": "^23.10.5",
+    "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
   }
 }

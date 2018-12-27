@@ -10,7 +10,7 @@ import { getFileList } from '../storage'
 
 import { stringifyHtml } from '../source/unified'
 
-const outDir = path.join(__dirname, '..', '..', 'app')
+const outDir = path.join(__dirname, '..', 'app')
 
 class Backend {
   reporter: Reporter
