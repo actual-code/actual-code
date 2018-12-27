@@ -4,7 +4,7 @@ import { promisify } from 'util'
 import assert from 'assert'
 
 import { Reporter } from '../reporter'
-import { SandboxOptions } from '../sandbox'
+import { SandboxOptions } from '../'
 import { stringifyMarkdown } from '../source/unified'
 import { ActualCode } from '../actual-code'
 import { CodeBlock } from '../source'

@@ -9,7 +9,7 @@ import * as babel from '@babel/core'
 const presetEnv = require('@babel/preset-env')
 const presetTypescript = require('@babel/preset-typescript')
 
-import { Sandbox, SandboxOptions, SandboxPlugin } from '../actual-code'
+import { Sandbox, SandboxOptions, ActualCodePlugin } from '../'
 import { Reporter } from '../reporter'
 
 const createProxies = (reporter: Reporter) => {
@@ -168,8 +168,11 @@ export class JsSandbox implements Sandbox {
   }
 }
 
-const plugin: SandboxPlugin = async (reporter, rootPath) => {
-  return new JsSandbox(reporter, rootPath)
+const plugin: ActualCodePlugin = () => {
+  return {
+    name: 'Node.js',
+    sandbox: async (reporter, rootPath) => new JsSandbox(reporter, rootPath)
+  }
 }
 
 export default plugin

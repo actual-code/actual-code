@@ -1,14 +1,17 @@
 ```js {plugin}
-const plugin = async (reporter, rootPath) => {
-  const run = async (code, hash, filetype, meta) => {
-    if (filetype !== 'hoge') {
-      return false
+const plugin = () => ({
+  name: 'HOGE',
+  sandbox: async (reporter, rootPath) => {
+    const run = async (code, hash, filetype, meta) => {
+      if (filetype !== 'hoge') {
+        return false
+      }
+      console.log('hoge', code)
+      return true
     }
-    console.log('hoge', code)
-    return true
+    return { rootPath, run }
   }
-  return { rootPath, run }
-}
+})
 
 plugin
 ```

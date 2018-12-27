@@ -41,11 +41,14 @@ export class Reporter {
   info(event: 'sandbox run', codeHash: string): Promise<void>
   info(event: 'sandbox skip', codeHash: string): Promise<void>
   info(event: 'sandbox end', codeHash: string): Promise<void>
+  info(event: 'register plugin', name: string): Promise<void>
 
   async info(event: string, message: string) {
     if (!this.disableInfo) {
       process.stdout.write(
-        `\x1b[32m[INFO] ${_getTime()}\x1b[m: ${event}.${this.hash} ${message}\n`
+        `\x1b[32m[INFO] ${_getTime()}\x1b[m: ${event}${
+          this.hash ? `.${this.hash}` : ''
+        } ${message}\n`
       )
     }
     this._cb(event, this.hash, message)

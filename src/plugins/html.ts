@@ -1,4 +1,4 @@
-import { Sandbox, SandboxOptions, SandboxPlugin } from '../actual-code'
+import { Sandbox, SandboxOptions, ActualCodePlugin } from '../'
 import { Reporter } from '../reporter'
 
 export class HtmlSandbox implements Sandbox {
@@ -23,8 +23,11 @@ export class HtmlSandbox implements Sandbox {
   }
 }
 
-const plugin: SandboxPlugin = async (reporter, rootPath) => {
-  return new HtmlSandbox(reporter, rootPath)
+const plugin: ActualCodePlugin = () => {
+  return {
+    name: 'HTML',
+    sandbox: async (reporter, rootPath) => new HtmlSandbox(reporter, rootPath)
+  }
 }
 
 export default plugin

@@ -1,6 +1,6 @@
 import childProcess from 'child_process'
 
-import { Sandbox, SandboxOptions, SandboxPlugin } from '../actual-code'
+import { Sandbox, SandboxOptions, ActualCodePlugin } from '../'
 import { Reporter } from '../reporter'
 
 const exec = (cmd: string, reporter: Reporter) => {
@@ -58,8 +58,11 @@ export class ShellSandbox implements Sandbox {
   }
 }
 
-const plugin: SandboxPlugin = async (reporter, rootPath) => {
-  return new ShellSandbox(reporter, rootPath)
+const plugin: ActualCodePlugin = () => {
+  return {
+    name: 'shell',
+    sandbox: async (reporter, rootPath) => new ShellSandbox(reporter, rootPath)
+  }
 }
 
 export default plugin

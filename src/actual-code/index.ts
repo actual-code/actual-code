@@ -13,32 +13,7 @@ import nodeJsPlugin from '../plugins/node-js'
 import shellPlugin from '../plugins/shell'
 import htmlPlugin from '../plugins/html'
 
-export interface SandboxOptions {
-  rootPath?: string
-  timeout?: number
-  runMode?: boolean
-  browser?: boolean
-  file?: string
-  // settings: { [props: string]: string }
-}
-
-export interface Sandbox {
-  rootPath: string
-  run: (
-    code: string,
-    hash: string,
-    filetype: string,
-    meta: SandboxOptions
-  ) => Promise<boolean>
-  addPlugin?
-}
-
-export type SandboxPlugin = (
-  reporter: Reporter,
-  rootPath: string
-) => Promise<Sandbox>
-
-export type ActualCodePlugin = SandboxPlugin
+import { Sandbox, SandboxOptions, ActualCodePlugin } from '../'
 
 const mergeOption = (
   opt1: SandboxOptions,
@@ -58,6 +33,7 @@ export class ActualCode {
   private _initSandbox: Promise<void>
   private _initState: Promise<AppState>
   private _runningState: Promise<void> = null
+  rootPath: string
   id: string
   private _plugins: ActualCodePlugin[] = [nodeJsPlugin, shellPlugin, htmlPlugin]
   private _boxes: Sandbox[] = []
@@ -74,24 +50,29 @@ export class ActualCode {
       if (!appState.path || !fs.existsSync(appState.path)) {
         appState.path = await mkdtemp(path.join(os.tmpdir(), 'actual-'))
       }
-      const rootPath = appState.path
-      process.chdir(rootPath)
+      this.rootPath = appState.path
+      process.chdir(this.rootPath)
       this._reporter.debug('create Sandbox')
 
-      this._boxes = await Promise.all(
-        this._plugins.map(plugin => plugin(this._reporter, rootPath))
-      )
+      for (const plugin of this._plugins) {
+        await this._addPlugin(plugin)
+      }
     })
   }
 
+  private async _addPlugin(plugin: ActualCodePlugin) {
+    const { name, sandbox } = plugin()
+    this._reporter.info('register plugin', name)
+    if (sandbox) {
+      this._boxes.push(await sandbox(this._reporter, this.rootPath))
+    }
+  }
   async registerPlugin(plugin: ActualCodePlugin | string) {
-    console.log('add plugin')
-    const plugin2: SandboxPlugin =
-      typeof plugin === 'string' ? eval(plugin) : plugin
-    this._plugins.unshift(plugin2)
-
-    const appState = await this._initState
-    this._boxes.unshift(await plugin2(this._reporter, appState.path))
+    if (typeof plugin === 'string') {
+      this._addPlugin(eval(plugin))
+    } else {
+      this._addPlugin(plugin)
+    }
   }
 
   getAppState() {
@@ -110,7 +91,6 @@ export class ActualCode {
       for (const codeBlock of codeBlocks) {
         const { code, filetype, meta, hash } = codeBlock
         const opts2 = mergeOption(opts, meta)
-        console.log(opts2)
 
         if (meta.plugin) {
           await this.registerPlugin(code)
