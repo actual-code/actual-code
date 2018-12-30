@@ -16,6 +16,8 @@ export interface Transformer {
   transform: (input: Result) => Promise<Result>
 }
 
+export type TransformPlugin = () => Promise<Transformer>
+
 export interface Traverser {
   traverse: (node: MDAST.Node, isEnter: boolean) => Promise<void>
 }
@@ -23,7 +25,7 @@ export interface Traverser {
 export type ActualCodePlugin = () => {
   name: string
   sandbox?: SandboxPlugin
-  transformer?: () => Promise<Transformer>
+  transformer?: TransformPlugin
   traverser?: () => Promise<Traverser>
 }
 

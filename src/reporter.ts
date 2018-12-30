@@ -1,11 +1,3 @@
-const _getTime = () => {
-  const date = new Date()
-  const pad = (n: number) => n.toString().padStart(2, '0')
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(
-    date.getSeconds()
-  )}`
-}
-
 export interface ReporterOptions {
   disableInfo?: boolean
   disableLog?: boolean
@@ -19,18 +11,9 @@ export type ReporterCallback = (
 ) => void
 
 export class Reporter {
-  disableInfo: boolean
-  disableLog: boolean
-  disableDebug: boolean
   hash: string = null
 
-  private _cb: ReporterCallback = () => {}
-
-  constructor(opts: ReporterOptions = {}) {
-    this.disableLog = !!opts.disableLog
-    this.disableInfo = !!opts.disableInfo
-    this.disableDebug = !!opts.disableDebug
-  }
+  private _cbs: ReporterCallback[] = []
 
   setHash(hash: string) {
     this.hash = hash
@@ -44,44 +27,32 @@ export class Reporter {
   info(event: 'register plugin', name: string): Promise<void>
 
   async info(event: string, message: string) {
-    if (!this.disableInfo) {
-      process.stdout.write(
-        `\x1b[32m[INFO] ${_getTime()}\x1b[m: ${event}${
-          this.hash ? `.${this.hash}` : ''
-        } ${message}\n`
-      )
+    this._cbs.forEach(cb => cb(event, this.hash, message))
+    switch (event) {
+      case 'sandbox end': {
+        this.hash = null
+        break
+      }
+      case 'sandbox run': {
+        this.hash = message
+        break
+      }
     }
-    this._cb(event, this.hash, message)
   }
 
   async log(message: string) {
-    if (!this.disableLog) {
-      process.stdout.write(`\x1b[36m[LOG]  ${_getTime()}\x1b[m: ${message}\n`)
-    }
-    this._cb('log', this.hash, message)
+    this._cbs.forEach(cb => cb('log', this.hash, message))
   }
 
   async debug(message: string) {
-    if (!this.disableDebug) {
-      process.stdout.write(`\x1b[33m[DEBUG]${_getTime()}\x1b[m: ${message}\n`)
-    }
-    this._cb('debug', this.hash, message)
+    this._cbs.forEach(cb => cb('debug', this.hash, message))
   }
 
   async output(filetype: string, data: string | Buffer) {
-    switch (filetype) {
-      case 'stdout': {
-        process.stdout.write(data)
-        break
-      }
-      case 'stderr': {
-        process.stderr.write(data)
-      }
-    }
-    this._cb(filetype, this.hash, data)
+    this._cbs.forEach(cb => cb(filetype, this.hash, data))
   }
 
-  setCallback(cb: ReporterCallback) {
-    this._cb = cb
+  addCallback(cb: ReporterCallback) {
+    this._cbs.push(cb)
   }
 }

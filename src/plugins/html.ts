@@ -1,4 +1,5 @@
-import { Sandbox, SandboxOptions, ActualCodePlugin } from '../'
+import { Sandbox, SandboxOptions } from '../actual-code/sandbox'
+import { ActualCodePlugin } from '../actual-code'
 import { Reporter } from '../reporter'
 
 export class HtmlSandbox implements Sandbox {

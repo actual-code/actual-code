@@ -9,7 +9,9 @@ import * as babel from '@babel/core'
 const presetEnv = require('@babel/preset-env')
 const presetTypescript = require('@babel/preset-typescript')
 
-import { Sandbox, SandboxOptions, ActualCodePlugin } from '../'
+import { Sandbox, SandboxOptions } from '../actual-code/sandbox'
+import { ActualCodePlugin } from '../actual-code'
+
 import { Reporter } from '../reporter'
 
 const createProxies = (reporter: Reporter) => {

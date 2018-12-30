@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useReducer } from 'react'
 
 import Editor from './editor'
-import { initActualCode, setReportCallback, stringifyHtml } from './frontend'
+import { initActualCode, addReportCallback, stringifyHtml } from './frontend'
 
 export interface State {
   text: string
@@ -86,7 +86,7 @@ export default props => {
   }
 
   useEffect(() => {
-    setReportCallback((type, hash, data) => {
+    addReportCallback((type, hash, data) => {
       const outputString = (hash: string, data: string | Buffer) => {
         const q = document.querySelector(`code.language-${hash}`)
         if (!q) {
