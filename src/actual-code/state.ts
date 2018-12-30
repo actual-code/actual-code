@@ -25,6 +25,7 @@ export const readAppState = async (filename: string): Promise<AppState> => {
 export const updateAppState = async (filename: string, appState: AppState) => {
   const state = await readState()
   state.paths = state.paths || {}
+
   appState.updatedAt = Date.now()
   state.paths[filename] = appState
   await writeState(state)

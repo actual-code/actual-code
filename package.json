@@ -3,10 +3,7 @@
   "version": "0.1.0",
   "description": "Markdown is Script Language!",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/erukiti/actual-code.git"
-  },
+  "repository": "git+https://github.com/erukiti/actual-code.git",
   "keyword": [
     "Markdown",
     "interpreter",
@@ -71,5 +68,6 @@
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
-  }
+  },
+  "main": "index.js"
 }
