@@ -1,7 +1,9 @@
 import React, { useEffect, useMemo, useReducer } from 'react'
 
 import Editor from './editor'
-import { initActualCode, addReportCallback, stringifyHtml } from './frontend'
+import { initActualCode, addReportCallback } from './frontend'
+
+const { stringifyHtml } = window
 
 export interface State {
   text: string
@@ -44,7 +46,7 @@ export default props => {
   const [state, dispatch] = useReducer(reducer, initialState)
   const { text, __html, results } = state
 
-  const run = async (actualCode, runMode: boolean) => {
+  const run = async (actualCode: ActualCode, runMode: boolean) => {
     const { code } = await actualCode.getAppState()
     const { node, codeBlocks } = await actualCode.run(text || code, {
       runMode
@@ -86,16 +88,17 @@ export default props => {
   }
 
   useEffect(() => {
-    addReportCallback((type, hash, data) => {
-      const outputString = (hash: string, data: string | Buffer) => {
-        const q = document.querySelector(`code.language-${hash}`)
-        if (!q) {
-          return
-        }
-        const result = (results[hash] || q.textContent) + data.toString()
-        dispatch({ type: 'SET_RESULT', data: result, hash })
-        q.textContent = result
+    const outputString = (hash: string, data: string | Buffer) => {
+      const q = document.querySelector(`code.language-${hash}`)
+      if (!q) {
+        return
       }
+      const result = (results[hash] || q.textContent) + data.toString()
+      dispatch({ type: 'SET_RESULT', data: result, hash })
+      q.textContent = result
+    }
+
+    addReportCallback((type, hash, data) => {
       const outputTypes = {
         stderr: outputString,
         stdout: outputString

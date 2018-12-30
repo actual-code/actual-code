@@ -23,7 +23,7 @@ class Backend {
 }
 
 export const bootGui = async opt => {
-  const reporter = new Reporter(opt)
+  const reporter = new Reporter()
   const backend = new Backend(reporter)
   reporter.log('GUI mode')
 
