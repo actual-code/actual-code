@@ -47,7 +47,7 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
   return results
 }
 
-const reFrontmatter = /^---\n(.*)\n---\n/
+const reFrontmatter = /^---\n([^]*)\n---\n/
 
 export const parse = async (markdownText: string) => {
   if (!markdownText) {

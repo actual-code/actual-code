@@ -1,6 +1,6 @@
 import { Reporter, ReporterOptions } from '../reporter'
 import { getCodeBlocks, parse, MDAST } from '../source'
-import { readAppState, updateAppState, AppState } from './state'
+import { createStorage, Storage, AppState } from '../storage'
 import nodeJsPlugin from '../plugins/node-js'
 import shellPlugin from '../plugins/shell'
 import htmlPlugin from '../plugins/html'
@@ -32,46 +32,47 @@ export type ActualCodePlugin = () => {
 export class ActualCode {
   private _reporter: Reporter
   private _init: Promise<void>
-  private _initState: Promise<AppState>
   private _runningState: Promise<void> = null
   private _sandbox: ActualCodeSandbox
   id: string
+  private _storage?: Storage
   private _plugins: ActualCodePlugin[] = [nodeJsPlugin, shellPlugin, htmlPlugin]
 
-  constructor(id: string, reporter: Reporter) {
+  constructor(id: string, reporter: Reporter, storage?: Storage) {
     this.id = id
     this._reporter = reporter
-    this._initState = readAppState(id)
-    this._init = this._initState.then(async appState => {
-      this._sandbox = new ActualCodeSandbox(this, this._reporter, appState)
+    this._storage = storage
+    const init = async () => {
+      this._sandbox = new ActualCodeSandbox(this, this._reporter)
       for (const plugin of this._plugins) {
         await this._addPlugin(plugin)
       }
-    })
+    }
+    this._init = init()
   }
 
   private async _addPlugin(plugin: ActualCodePlugin) {
     const { name, sandbox } = plugin()
     this._reporter.info('register plugin', name)
     if (sandbox) {
-      this._sandbox.addPlugin(sandbox)
+      await this._sandbox.addPlugin(sandbox)
     }
   }
 
   async registerPlugin(plugin: ActualCodePlugin | string) {
     if (typeof plugin === 'string') {
-      this._addPlugin(eval(plugin))
+      await this._addPlugin(eval(plugin))
     } else {
-      this._addPlugin(plugin)
+      await this._addPlugin(plugin)
     }
   }
 
-  getAppState() {
-    return this._initState
+  async getAppState(): Promise<AppState> {
+    this._init
+    return this._storage.readAppState(this.id)
   }
 
   async run(code: string, opts: SandboxOptions) {
-    const appState = await this._initState
     await this._init
     const { settings, root } = await parse(code)
     const codeBlocks = await getCodeBlocks(root)
@@ -84,20 +85,17 @@ export class ActualCode {
       }
 
       this._reporter.setHash(null)
-      await this._updateAppState(appState, code, settings, root)
+      if (opts.runMode) {
+        await this._updateAppState(code, settings, root)
+      }
     }
     this._runningState = runner()
 
     return { settings, node: root, codeBlocks }
   }
 
-  private async _updateAppState(
-    appState: AppState,
-    code: string,
-    settings,
-    root: MDAST.Root
-  ) {
-    const tags = settings.tags || ''
+  private async _updateAppState(code: string, settings, root: MDAST.Root) {
+    await this._init
     const found = root.children.find(
       child => child.type === 'heading'
     ) as MDAST.Heading
@@ -108,10 +106,11 @@ export class ActualCode {
         .map(child => child.value)
         .filter(s => s)
         .join(' ')
-    appState.code = code
-    appState.title = title
-    appState.tags = typeof tags === 'string' ? tags.split(/[ ,]/) : tags
-    await updateAppState(this.id, appState)
+
+    code = `---\n  title: ${title}\n  id: ${this.id}\n---\n${code}`
+    if (this._storage) {
+      await this._storage.updateAppState(this.id, { code, title })
+    }
   }
 
   async waitFinished() {

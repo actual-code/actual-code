@@ -98,10 +98,8 @@ export const convert = async (
 
   reporter.info('read file', filename)
   const actualCode = new ActualCode(filename, reporter)
-  const appState = await actualCode.getAppState()
 
   const sandboxOpts: SandboxOptions = {
-    rootPath: appState.path,
     runMode: true
   }
 

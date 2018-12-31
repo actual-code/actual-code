@@ -14,7 +14,7 @@ export default props => {
 
   const files = fileList.map(info => {
     return (
-      <li key={info.name} onClick={() => setFilename(info.name)}>
+      <li key={info.id} onClick={() => setFilename(info.id)}>
         {info.title} at {new Date(info.updatedAt).toLocaleString()}{' '}
         {info.tags ? info.tags.join(', ') : ''}
       </li>

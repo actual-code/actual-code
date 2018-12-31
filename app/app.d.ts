@@ -1,10 +1,9 @@
 import { ActualCode, ActualCodePlugin } from '../src/actual-code'
 import { SandboxOptions } from '../src/actual-code/sandbox'
-import { AppState } from '../src/actual-code/state'
+import { AppState } from '../src/storage'
 import { Reporter } from '../src/reporter'
 import { CodeBlock } from '../src/source'
 import { stringifyHtml, MDAST } from '../src/source/unified'
-import { getFileList } from '../src/storage'
 
 interface Backend {
   initActualCode: (id: string) => Promise<ActualCode>
@@ -18,7 +17,7 @@ interface Carlo {
 declare global {
   interface Window {
     stringifyHtml: typeof stringifyHtml
-    getFileList: typeof getFileList
+    getFileList: () => Promise<AppState[]>
     carlo: Carlo
     rpc
   }

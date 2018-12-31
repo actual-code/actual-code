@@ -42,7 +42,8 @@
     "remark-stringify": "^6.0.4",
     "source-map-support": "^0.5.9",
     "unified": "^7.0.2",
-    "uuidv4": "^2.0.0"
+    "uuidv4": "^2.0.0",
+    "write-file-atomic": "^2.3.0"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.2.3",
@@ -59,6 +60,7 @@
     "@types/react": "^16.7.17",
     "@types/react-dom": "^16.0.11",
     "@types/unist": "^2.0.2",
+    "@types/write-file-atomic": "^2.1.1",
     "babel-preset-env": "^1.7.0",
     "chokidar": "^2.0.4",
     "jest": "^23.6.0",
