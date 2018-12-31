@@ -39,7 +39,7 @@ const transpile = async (source: Source) => {
 }
 
 export const watchSrc = async (entry: string) => {
-  const watcher = chokidar.watch(entry, { ignored: /\.test\.ts$/ })
+  const watcher = chokidar.watch(entry, { ignored: /\.{test|d}\.ts$/ })
   const watches: { [name: string]: Watch } = {}
   watcher.on('add', async (filename: string) => {
     const watch: Watch = {
