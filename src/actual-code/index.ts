@@ -86,7 +86,7 @@ export class ActualCode {
 
       this._reporter.setHash(null)
       if (opts.runMode) {
-        await this._updateAppState(code, settings, root)
+        await this._updateAppState(code, root)
       }
     }
     this._runningState = runner()
@@ -94,7 +94,13 @@ export class ActualCode {
     return { settings, node: root, codeBlocks }
   }
 
-  private async _updateAppState(code: string, settings, root: MDAST.Root) {
+  async save(code: string) {
+    const { root } = await parse(code)
+    await this._updateAppState(code, root)
+  }
+
+  private async _updateAppState(code: string, root: MDAST.Root) {
+    console.log('_update', code)
     await this._init
     const found = root.children.find(
       child => child.type === 'heading'
@@ -107,7 +113,6 @@ export class ActualCode {
         .filter(s => s)
         .join(' ')
 
-    code = `---\n  title: ${title}\n  id: ${this.id}\n---\n${code}`
     if (this._storage) {
       await this._storage.updateAppState(this.id, { code, title })
     }

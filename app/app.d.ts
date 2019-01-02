@@ -30,5 +30,6 @@ declare global {
       code: string,
       opts: SandboxOptions
     ): Promise<{ settings: any; node: MDAST.Root; codeBlocks: CodeBlock[] }>
+    save(code: string): Promise<void>
   }
 }

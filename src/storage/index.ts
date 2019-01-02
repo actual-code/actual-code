@@ -37,7 +37,6 @@ class NodeJsStorage implements Storage {
     this._appDir = appDir
     const createIndex = async () => {
       const hashes = Array.from(new Set(await listBlobs()))
-      console.log(hashes)
       for (const hash of hashes) {
         const { buf, stat } = await readBlob(hash)
         if (sha256(buf) !== hash) {
@@ -79,7 +78,6 @@ class NodeJsStorage implements Storage {
           hash,
           updatedAt: stat.mtime
         })
-        console.log(JSON.stringify(this._appStates, null, '  '))
       }
     }
     this._init = createIndex()
@@ -93,11 +91,15 @@ class NodeJsStorage implements Storage {
   async updateAppState(id: string, appState: Partial<AppState>) {
     await this._init
     if ('code' in appState) {
-      await writeBlob(appState.code, '.md')
+      const code = `---\n  title: ${appState.title}\n  id: ${id}\n---\n${
+        appState.code
+      }`
+      await writeBlob(code, '.md')
     }
+
     this._appStates[id] = {
-      ...appState,
-      ...this._appStates[id]
+      ...this._appStates[id],
+      ...appState
     }
   }
 

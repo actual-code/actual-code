@@ -141,12 +141,21 @@ export default props => {
       <nav style={{ gridRow: '1', gridColumn: '1/3' }}>
         <button
           onClick={() => {
-            _init.then(async actualCode => run(actualCode, true))
+            _init.then(actualCode => run(actualCode, true))
           }}
         >
           Run
         </button>
-        <button onClick={() => setFilename(null)}>Close</button>
+        <button
+          onClick={async () => {
+            const actualCode = await _init
+            console.log('save', text)
+            actualCode.save(text)
+            setFilename(null)
+          }}
+        >
+          Close
+        </button>
       </nav>
 
       <Editor
