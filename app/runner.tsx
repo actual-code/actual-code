@@ -67,9 +67,6 @@ export default props => {
     }
 
     codeBlocks.reverse().forEach(({ parent, index, hash, meta }) => {
-      if (runMode || meta.runMode === 'true') {
-        dispatch({ type: 'SET_RESULT', data: '', hash })
-      }
       nodes[hash] = {
         type: 'code',
         value: results[hash] || '',
@@ -93,7 +90,7 @@ export default props => {
       if (!q) {
         return
       }
-      const result = (results[hash] || q.textContent) + data.toString()
+      const result = data.toString() || results[hash] || q.textContent
       dispatch({ type: 'SET_RESULT', data: result, hash })
       q.textContent = result
     }
@@ -162,7 +159,6 @@ export default props => {
         setText={(text: string) => dispatch({ type: 'SET_TEXT', text })}
         filename={filename}
         value={text}
-        run={run}
         style={{ gridRow: '2', gridColumn: '1' }}
       />
       <div

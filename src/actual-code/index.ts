@@ -100,7 +100,6 @@ export class ActualCode {
   }
 
   private async _updateAppState(code: string, root: MDAST.Root) {
-    console.log('_update', code)
     await this._init
     const found = root.children.find(
       child => child.type === 'heading'

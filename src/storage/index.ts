@@ -2,10 +2,8 @@ import * as os from 'os'
 import * as path from 'path'
 
 import * as mkdirp from 'mkdirp'
-import { safeLoad } from 'js-yaml'
 
-import { readBlob, writeBlob, listBlobs } from './blob'
-import { sha256 } from '../utils'
+import { writeBlob, createIndex } from './blob'
 
 export interface BlobHistory {
   hash: string
@@ -27,60 +25,16 @@ export interface Storage {
   find: () => Promise<AppState[]>
 }
 
-const reFrontmatter = /^---\n([^]*)\n---\n/
-
 class NodeJsStorage implements Storage {
   private _appDir: string
   private _appStates: { [props: string]: AppState } = {}
-  private _init
+  private _init: Promise<void>
   constructor(appDir: string) {
     this._appDir = appDir
-    const createIndex = async () => {
-      const hashes = Array.from(new Set(await listBlobs()))
-      for (const hash of hashes) {
-        const { buf, stat } = await readBlob(hash)
-        if (sha256(buf) !== hash) {
-          // FIXME
-          // unlink
-          // report error
-          return
-        }
 
-        const data = buf.toString('utf-8')
-        const matched = reFrontmatter.exec(data)
-        const metadata = safeLoad(matched[1])
-        const { id, title, tags } = metadata
-        if (!(id in this._appStates)) {
-          this._appStates[id] = {
-            codeHistory: [],
-            createdAt: new Date(999999999999999),
-            updatedAt: new Date(0),
-            code: '',
-            title: '',
-            tags: []
-          }
-        }
-        if (
-          !this._appStates[id].codeHistory.find(
-            tm => tm.updatedAt.valueOf() > stat.mtime.valueOf()
-          )
-        ) {
-          this._appStates[id].code = data.slice(matched[0].length)
-          this._appStates[id].title = title
-          this._appStates[id].tags = tags
-          this._appStates[id].updatedAt = stat.mtime
-        }
-
-        if (this._appStates[id].createdAt.valueOf() > stat.ctime.valueOf()) {
-          this._appStates[id].createdAt = stat.ctime
-        }
-        this._appStates[id].codeHistory.push({
-          hash,
-          updatedAt: stat.mtime
-        })
-      }
-    }
-    this._init = createIndex()
+    this._init = createIndex().then(appStates => {
+      this._appStates = appStates
+    })
   }
 
   async readAppState(id: string) {

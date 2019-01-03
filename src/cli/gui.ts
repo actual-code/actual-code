@@ -48,10 +48,6 @@ export const bootGui = async opt => {
   await cApp.exposeFunction('stringifyHtml', async vfile =>
     stringifyHtml(vfile)
   )
-  await cApp.exposeFunction('getFileList', async () => {
-    const list = await storage.find()
-    console.log(list)
-    return list
-  })
+  await cApp.exposeFunction('getFileList', () => storage.find())
   await cApp.load('index.html', rpc.handle(reporter), rpc.handle(backend))
 }
