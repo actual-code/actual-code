@@ -53,7 +53,7 @@ const createProxies = (reporter: Reporter, hash: string) => {
         }
         reporter.output(
           hash,
-          'stdout',
+          name !== 'error' ? 'stdout' : 'stderr',
           `${args.map(arg => format(arg)).join(' ')}\n`
         )
       }

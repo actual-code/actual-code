@@ -15,7 +15,7 @@ export interface Result {
 
 export interface ResultProcessor {
   transform?: (input: Result) => Promise<Result>
-  output?: () => Promise<any>
+  output?: (results: { [props: string]: Result[] }) => Promise<any>
 }
 
 export type ResultProcessorPlugin = (
@@ -32,7 +32,7 @@ export type ActualCodePlugin = () => {
 export class ActualCode {
   private _reporter: Reporter
   private _init: Promise<void>
-  private _runningState: Promise<void> = null
+  private _runningState: Promise<any> = null
   private _sandbox: ActualCodeSandbox
   id: string
   private _storage?: Storage
@@ -86,18 +86,30 @@ export class ActualCode {
       resultProcessors.push(await plugin(root, codeBlocks))
     }
 
+    const results: { [props: string]: Result[] } = {}
+
     this._reporter.addCallback(async (filetype, hash, data) => {
       await this._init
 
       for (const p of resultProcessors) {
         if (p.transform) {
           const res = await p.transform({ hash, filetype, data })
+          if (!res) {
+            return
+          }
           hash = res.hash
           filetype = res.filetype
           data = res.data
         }
       }
+
+      if (!(hash in results)) {
+        results[hash] = []
+      }
+      results[hash].push({ filetype, hash, data })
     })
+
+    const outputProcessor = resultProcessors.find(p => 'output' in p)
 
     const runner = async () => {
       this._reporter.debug('run markdown script')
@@ -110,12 +122,16 @@ export class ActualCode {
       if (opts.runMode) {
         await this._updateAppState(code, root)
       }
+      if (outputProcessor) {
+        return outputProcessor.output(results)
+      } else {
+        return null
+      }
     }
     this._runningState = runner()
 
-    const outputProcessor = resultProcessors.find(p => 'output' in p)
     if (outputProcessor) {
-      return outputProcessor.output()
+      return outputProcessor.output(null)
     } else {
       return null
     }
@@ -147,7 +163,8 @@ export class ActualCode {
   }
 
   async waitFinished() {
-    await this._runningState
+    const result = await this._runningState
     this._runningState = null
+    return result
   }
 }
