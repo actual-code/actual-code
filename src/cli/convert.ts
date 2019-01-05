@@ -60,15 +60,15 @@ export const convert = async (
       case 'sandbox end': {
         assert(hash)
 
-        const codeBlock = codeBlocks.find(v => v.hash === hash)
+        // const codeBlock = codeBlocks.find(v => v.hash === hash)
 
-        assert(codeBlock)
+        // assert(codeBlock)
 
-        inserts.push({
-          parent: codeBlock.parent,
-          index: codeBlock.index,
-          outputs: [...outputs]
-        })
+        // inserts.push({
+        //   parent: codeBlock.parent,
+        //   index: codeBlock.index,
+        //   outputs: [...outputs]
+        // })
 
         outputs = []
         // FALLTHRU

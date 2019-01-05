@@ -14,11 +14,11 @@ import { ActualCodePlugin } from '../actual-code'
 
 import { Reporter } from '../actual-code/reporter'
 
-const createProxies = (reporter: Reporter) => {
+const createProxies = (reporter: Reporter, hash: string) => {
   const createWritable = name => {
     return new Writable({
       write: value => {
-        reporter.output(name, value)
+        reporter.output(hash, name, value)
       }
     })
   }
@@ -51,7 +51,11 @@ const createProxies = (reporter: Reporter) => {
             return inspect(value, { colors: false })
           }
         }
-        reporter.output('stdout', `${args.map(arg => format(arg)).join(' ')}\n`)
+        reporter.output(
+          hash,
+          'stdout',
+          `${args.map(arg => format(arg)).join(' ')}\n`
+        )
       }
     }
   })
@@ -115,7 +119,7 @@ export class JsSandbox implements Sandbox {
     this.reporter = reporter
     this.timeout = 100
 
-    const { consoleProxy, processProxy } = createProxies(reporter)
+    const { consoleProxy, processProxy } = createProxies(reporter, null)
     const requireSandbox = createRequire(rootPath)
     this.ctx = {
       require: requireSandbox,
@@ -162,9 +166,12 @@ export class JsSandbox implements Sandbox {
         filename: `file.${filetype}`
       })
       const timeout = meta.timeout || this.timeout
+      const { consoleProxy, processProxy } = createProxies(this.reporter, hash)
+      this.ctx.console = consoleProxy
+      this.ctx.process = processProxy
       vm.runInContext(compiled.code, this.ctx, { timeout })
     } catch (error) {
-      this.reporter.output('stderr', inspect(error, { colors: false }))
+      this.reporter.output(hash, 'stderr', inspect(error, { colors: false }))
     }
     return true
   }

@@ -19,7 +19,7 @@ export class HtmlSandbox implements Sandbox {
     if (filetype !== 'html') {
       return false
     }
-    this.reporter.output('text/html', code)
+    this.reporter.output(hash, 'text/html', code)
     return true
   }
 }

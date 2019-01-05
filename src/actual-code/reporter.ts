@@ -48,8 +48,8 @@ export class Reporter {
     this._cbs.forEach(cb => cb('debug', this.hash, message))
   }
 
-  async output(filetype: string, data: string | Buffer) {
-    this._cbs.forEach(cb => cb(filetype, this.hash, data))
+  async output(hash: string, filetype: string, data: string | Buffer) {
+    this._cbs.forEach(cb => cb(filetype, hash, data))
   }
 
   addCallback(cb: ReporterCallback) {
