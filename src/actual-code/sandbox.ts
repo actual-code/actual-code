@@ -8,7 +8,7 @@ const writeFile = promisify(fs.writeFile)
 
 import { ActualCode } from '.'
 import { CodeBlock } from '../source'
-import { Reporter } from '../reporter'
+import { Reporter } from './reporter'
 
 export interface SandboxOptions {
   timeout?: number

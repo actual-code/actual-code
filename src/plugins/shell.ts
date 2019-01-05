@@ -3,7 +3,7 @@ import childProcess from 'child_process'
 import { Sandbox, SandboxOptions } from '../actual-code/sandbox'
 import { ActualCodePlugin } from '../actual-code'
 
-import { Reporter } from '../reporter'
+import { Reporter } from '../actual-code/reporter'
 
 const exec = (cmd: string, reporter: Reporter) => {
   return new Promise((resolve, reject) => {

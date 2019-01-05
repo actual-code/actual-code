@@ -1,6 +1,6 @@
 import { Sandbox, SandboxOptions } from '../actual-code/sandbox'
 import { ActualCodePlugin } from '../actual-code'
-import { Reporter } from '../reporter'
+import { Reporter } from '../actual-code/reporter'
 
 export class HtmlSandbox implements Sandbox {
   rootPath: string

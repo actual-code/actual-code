@@ -12,7 +12,7 @@ const presetTypescript = require('@babel/preset-typescript')
 import { Sandbox, SandboxOptions } from '../actual-code/sandbox'
 import { ActualCodePlugin } from '../actual-code'
 
-import { Reporter } from '../reporter'
+import { Reporter } from '../actual-code/reporter'
 
 const createProxies = (reporter: Reporter) => {
   const createWritable = name => {

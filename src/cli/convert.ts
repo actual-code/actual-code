@@ -3,7 +3,7 @@ import * as path from 'path'
 import { promisify } from 'util'
 import assert from 'assert'
 
-import { Reporter, ReporterOptions } from '../reporter'
+import { Reporter, ReporterOptions } from '../actual-code/reporter'
 import { SandboxOptions } from '../actual-code/sandbox'
 import { stringifyMarkdown } from '../source/unified'
 import { ActualCode } from '../actual-code'
