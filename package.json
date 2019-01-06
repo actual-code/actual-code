@@ -16,6 +16,7 @@
     "actual-code": "bin/actual-code"
   },
   "scripts": {
+    "build": "ts-node scripts/index.ts build",
     "watch": "ts-node scripts/index.ts watch",
     "clean": "rimraf node_modules dist",
     "test": "jest"
@@ -63,8 +64,9 @@
     "@types/write-file-atomic": "^2.1.1",
     "babel-preset-env": "^1.7.0",
     "chokidar": "^2.0.4",
+    "globby": "^8.0.1",
     "jest": "^23.6.0",
-    "parcel-bundler": "^1.10.3",
+    "parcel-bundler": "^1.11.0",
     "pkg": "^4.3.5",
     "prettier": "^1.15.3",
     "ts-jest": "^23.10.5",
