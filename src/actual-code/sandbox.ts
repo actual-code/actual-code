@@ -78,11 +78,11 @@ export class ActualCodeSandbox {
       return
     }
     if (!opts2.runMode) {
-      this._reporter.info('sandbox skip', hash)
+      this._reporter.event('sandbox skip', { hash })
       return
     }
 
-    this._reporter.info('sandbox run', hash)
+    this._reporter.event('sandbox run', { hash })
 
     if (opts2.file) {
       await writeFile(opts2.file, code)
@@ -93,6 +93,6 @@ export class ActualCodeSandbox {
         break
       }
     }
-    this._reporter.info('sandbox end', hash)
+    this._reporter.event('sandbox end', { hash })
   }
 }

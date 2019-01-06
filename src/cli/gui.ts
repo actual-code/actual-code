@@ -5,7 +5,7 @@ import * as carlo from 'carlo'
 import { rpc } from 'carlo/rpc'
 
 import { ActualCode, ActualCodePlugin, Output } from '../actual-code'
-import { Reporter, ReporterOptions } from '../actual-code/reporter'
+import { Reporter } from '../actual-code/reporter'
 import { createStorage, Storage } from '../storage'
 
 import { CodeBlock } from '../source'

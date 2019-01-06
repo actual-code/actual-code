@@ -3,7 +3,7 @@ import * as path from 'path'
 import { promisify } from 'util'
 import assert from 'assert'
 
-import { Reporter, ReporterOptions } from '../actual-code/reporter'
+import { Reporter, Report } from '../actual-code/reporter'
 import { SandboxOptions } from '../actual-code/sandbox'
 import { stringifyMarkdown, MDAST } from '../source/unified'
 import { ActualCode, ActualCodePlugin, Transform, Output } from '../actual-code'
@@ -21,8 +21,14 @@ const getTime = () => {
 }
 
 const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
-  const transform: Transform = async ({ filetype, data, hash }) => {
-    switch (filetype) {
+  const transform: Transform = async ({
+    type,
+    subType,
+    data,
+    hash,
+    payload
+  }) => {
+    switch (type) {
       case 'log': {
         if (!opts.disableLog) {
           process.stdout.write(`\x1b[36m[LOG]  ${getTime()}\x1b[m: ${data}\n`)
@@ -38,20 +44,20 @@ const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
       default: {
         if (!opts.disableInfo) {
           process.stdout.write(
-            `\x1b[32m[INFO] ${getTime()}\x1b[m: ${filetype}${
+            `\x1b[32m[EVENT]${getTime()}\x1b[m: ${subType}${
               hash ? `.${hash}` : ''
             }${hash === data ? '' : ` ${data}`}\n`
           )
         }
         return null
       }
-      case 'stdout': {
-        process.stdout.write(data.toString())
-        return { filetype, data, hash }
-      }
-      case 'stderr': {
-        process.stderr.write(data.toString())
-        return { filetype, data, hash }
+      case 'output': {
+        if (subType === 'stdout') {
+          process.stdout.write(data.toString())
+        } else if (subType === 'stderr') {
+          process.stderr.write(data.toString())
+        }
+        return { type, subType, data, hash }
       }
     }
   }
@@ -64,15 +70,19 @@ const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
         if (codeBlock.hash in results) {
           const { data } = results[codeBlock.hash].reduce(
             (acc, res) => {
+              if (res.type !== 'output') {
+                return acc
+              }
+
               let data = acc.data
-              if (acc.filetype !== res.filetype) {
+              if (acc.filetype !== res.subType) {
                 if (data.length > 0) {
                   data += '\n'
                 }
-                data += `---${res.filetype}\n`
+                data += `---${res.subType}\n`
               }
               data += res.data
-              return { filetype: res.filetype, data }
+              return { filetype: res.subType, data }
             },
             { filetype: '', data: '' }
           )
@@ -101,11 +111,7 @@ const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
   }
 }
 
-export const convert = async (
-  filename: string,
-  opts: ReporterOptions,
-  outputfile?: string
-) => {
+export const convert = async (filename: string, opts, outputfile?: string) => {
   const reporter = new Reporter()
 
   filename = path.resolve(filename)
@@ -119,7 +125,7 @@ export const convert = async (
     opts.disableInfo = true
   }
 
-  reporter.info('read file', filename)
+  reporter.event('read file', { filename })
   const actualCode = new ActualCode(filename, reporter)
 
   const sandboxOpts: SandboxOptions = {
@@ -132,7 +138,7 @@ export const convert = async (
   const doc = await actualCode.waitFinished()
 
   if (outputfile) {
-    reporter.info('write file', outputfile)
+    reporter.event('write file', { filename: outputfile })
     await writeFile(outputfile, doc)
   }
   return doc

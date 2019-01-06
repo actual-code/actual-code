@@ -1,4 +1,4 @@
-import { Reporter, ReporterOptions } from './reporter'
+import { Reporter, Report } from './reporter'
 import { getCodeBlocks, parse, MDAST, CodeBlock } from '../source'
 import { createStorage, Storage, AppState } from '../storage'
 import nodeJsPlugin from '../plugins/node-js'
@@ -7,14 +7,8 @@ import htmlPlugin from '../plugins/html'
 
 import { SandboxOptions, ActualCodeSandbox, SandboxPlugin } from './sandbox'
 
-export interface Result {
-  hash: string
-  filetype: string
-  data: string | Buffer
-}
-
-export type Transform = (input: Result) => Promise<Result>
-export type Output = (results: { [props: string]: Result[] }) => Promise<any>
+export type Transform = (input: Report) => Promise<Report>
+export type Output = (results: { [props: string]: Report[] }) => Promise<any>
 
 export interface ResultProcessor {
   transform?: Transform
@@ -57,7 +51,7 @@ export class ActualCode {
 
   private async _addPlugin(plugin: ActualCodePlugin) {
     const { name, sandbox, resultProcessor } = plugin()
-    this._reporter.info('register plugin', name)
+    this._reporter.event('register plugin', { name })
     if (sandbox) {
       await this._sandbox.addPlugin(sandbox)
     }
@@ -89,27 +83,24 @@ export class ActualCode {
       resultProcessors.push(await plugin(root, codeBlocks))
     }
 
-    const results: { [props: string]: Result[] } = {}
+    const results: { [props: string]: Report[] } = {}
 
-    this._reporter.addCallback(async (filetype, hash, data) => {
+    this._reporter.addCallback(async report => {
       await this._init
 
       for (const p of resultProcessors) {
         if (p.transform) {
-          const res = await p.transform({ hash, filetype, data })
-          if (!res) {
+          report = await p.transform(report)
+          if (!report) {
             return
           }
-          hash = res.hash
-          filetype = res.filetype
-          data = res.data
         }
       }
 
-      if (!(hash in results)) {
-        results[hash] = []
+      if (!(report.hash in results)) {
+        results[report.hash] = []
       }
-      results[hash].push({ filetype, hash, data })
+      results[report.hash].push(report)
     })
 
     const outputProcessor = resultProcessors.find(p => 'output' in p)

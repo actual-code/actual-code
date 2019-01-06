@@ -1,41 +1,39 @@
-export interface ReporterOptions {
-  disableInfo?: boolean
-  disableLog?: boolean
-  disableDebug?: boolean
+export interface Report {
+  type: 'output' | 'event' | 'log' | 'debug'
+  subType?: string
+  hash?: string
+  data?: string | Buffer
+  payload?: any
 }
 
-export type ReporterCallback = (
-  type: string,
-  hash: string,
-  arg1: string | Buffer
-) => void
+export type ReporterCallback = (report: Report) => void
 
 export class Reporter {
-  hash: string = null
-
   private _cbs: ReporterCallback[] = []
 
-  info(event: 'read file', filename: string): Promise<void>
-  info(event: 'write file', filename: string): Promise<void>
-  info(event: 'sandbox run', codeHash: string): Promise<void>
-  info(event: 'sandbox skip', codeHash: string): Promise<void>
-  info(event: 'sandbox end', codeHash: string): Promise<void>
-  info(event: 'register plugin', name: string): Promise<void>
+  event(event: 'read file', payload: { filename: string }): Promise<void>
+  event(event: 'write file', payload: { filename: string }): Promise<void>
+  event(event: 'sandbox run', payload: { hash: string }): Promise<void>
+  event(event: 'sandbox skip', payload: { hash: string }): Promise<void>
+  event(event: 'sandbox end', payload: { hash: string }): Promise<void>
+  event(event: 'register plugin', payload: { name: string }): Promise<void>
 
-  async info(event: string, message: string) {
-    this._cbs.forEach(cb => cb(event, null, message))
+  async event(event: string, payload: any) {
+    this._cbs.forEach(cb => cb({ type: 'event', subType: event, payload }))
   }
 
   async log(message: string) {
-    this._cbs.forEach(cb => cb('log', null, message))
+    this._cbs.forEach(cb => cb({ type: 'log', data: message }))
   }
 
   async debug(message: string) {
-    this._cbs.forEach(cb => cb('debug', null, message))
+    this._cbs.forEach(cb => cb({ type: 'debug', data: message }))
   }
 
   async output(hash: string, filetype: string, data: string | Buffer) {
-    this._cbs.forEach(cb => cb(filetype, hash, data))
+    this._cbs.forEach(cb =>
+      cb({ type: 'output', subType: filetype, hash, data })
+    )
   }
 
   addCallback(cb: ReporterCallback) {
