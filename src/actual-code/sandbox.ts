@@ -77,7 +77,6 @@ export class ActualCodeSandbox {
       await this._actualCode.registerPlugin(code)
       return
     }
-    this._reporter.setHash(hash)
     if (!opts2.runMode) {
       this._reporter.info('sandbox skip', hash)
       return

@@ -118,7 +118,6 @@ export class ActualCode {
         await this._sandbox.run(codeBlock, opts)
       }
 
-      this._reporter.setHash(null)
       if (opts.runMode) {
         await this._updateAppState(code, root)
       }
