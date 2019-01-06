@@ -10,7 +10,7 @@ interface Backend {
 }
 
 interface Carlo {
-  loadParams: () => Promise<[Reporter, Backend]>
+  loadParams: () => Promise<[Backend]>
   [props: string]: any
 }
 
