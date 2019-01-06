@@ -4,13 +4,45 @@ import { inspect } from 'util'
 import * as carlo from 'carlo'
 import { rpc } from 'carlo/rpc'
 
-import { ActualCode, Result, ResultProcessorPlugin } from '../actual-code'
+import { ActualCode, ActualCodePlugin, Output } from '../actual-code'
 import { Reporter, ReporterOptions } from '../actual-code/reporter'
 import { createStorage, Storage } from '../storage'
 
-import { stringifyHtml } from '../source/unified'
+import { CodeBlock } from '../source'
+import { MDAST, stringifyHtml } from '../source/unified'
 
 const outDir = path.join(__dirname, '..', 'app')
+
+const actualCodeCarloPlugin = (): ActualCodePlugin => () => {
+  const createOutput = (
+    root: MDAST.Root,
+    codeBlocks: CodeBlock[]
+  ): Output => async results => {
+    codeBlocks.reverse().forEach(codeBlock => {
+      if (results && codeBlock.hash in results) {
+        const value = results[codeBlock.hash].reduce(
+          (acc, res) => acc + res.data,
+          ''
+        )
+        const node: MDAST.Code = { type: 'code', value }
+        codeBlock.parent.children = [
+          ...codeBlock.parent.children.slice(0, codeBlock.index + 1),
+          node,
+          ...codeBlock.parent.children.slice(codeBlock.index + 1)
+        ]
+      }
+    })
+    return stringifyHtml(root)
+  }
+  return {
+    name: 'actual-code carlo app',
+    resultProcessor: async (root, codeBlocks) => {
+      return {
+        output: createOutput(root, codeBlocks)
+      }
+    }
+  }
+}
 
 class Backend {
   _reporter: Reporter
@@ -23,16 +55,7 @@ class Backend {
   initActualCode(id: string) {
     const actualCode = new ActualCode(id, this._reporter, this._storage)
 
-    actualCode.registerPlugin(() => ({
-      name: 'carlo apps',
-      resultProcessor: async (root, codeBlocks) => {
-        return {
-          output: async () => {
-            return stringifyHtml(root)
-          }
-        }
-      }
-    }))
+    actualCode.registerPlugin(actualCodeCarloPlugin())
     return rpc.handle(actualCode)
   }
 }

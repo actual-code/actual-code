@@ -28,5 +28,6 @@ declare global {
     getAppState(): Promise<AppState>
     run(code: string, opts: SandboxOptions): Promise<any>
     save(code: string): Promise<void>
+    waitFinished(): Promise<any>
   }
 }

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useReducer } from 'react'
 
 import Editor from './editor'
-import { initActualCode, addReportCallback } from './frontend'
+import { initActualCode } from './frontend'
 
 export interface State {
   text: string
@@ -46,63 +46,25 @@ export default props => {
 
   const run = async (actualCode: ActualCode, runMode: boolean) => {
     const { code } = await actualCode.getAppState()
-    const __html = await actualCode.run(text || code, {
-      runMode
-    })
-    // const nodes: { [hash: string]: any } = {}
-
-    // const search = (vfile, n) => {
-    //   if (JSON.stringify(vfile.position) === JSON.stringify(n.position)) {
-    //     return vfile
-    //   }
-
-    //   for (const child of vfile.children) {
-    //     if ('children' in child) {
-    //       return search(child, n)
-    //     }
-    //   }
-    //   return null
-    // }
-
-    // codeBlocks.reverse().forEach(({ parent, index, hash, meta }) => {
-    //   nodes[hash] = {
-    //     type: 'code',
-    //     value: results[hash] || '',
-    //     lang: hash
-    //   }
-    //   parent = search(node, parent)
-    //   parent.children = [
-    //     ...parent.children.slice(0, index + 1),
-    //     nodes[hash],
-    //     ...parent.children.slice(index + 1)
-    //   ]
-    // })
-
-    // const __html = await stringifyHtml(node)
+    let __html = await actualCode.run(text || code, { runMode })
+    dispatch({ type: 'SET_HTML', __html })
+    __html = await actualCode.waitFinished()
     dispatch({ type: 'SET_HTML', __html })
   }
 
-  useEffect(() => {
-    const outputString = (hash: string, data: string | Buffer) => {
-      const q = document.querySelector(`code.language-${hash}`)
-      if (!q) {
-        return
-      }
-      const result = data.toString() || results[hash] || q.textContent
-      dispatch({ type: 'SET_RESULT', data: result, hash })
-      q.textContent = result
-    }
+  // useEffect(() => {
+  //   const outputString = (hash: string, data: string | Buffer) => {
+  //     const q = document.querySelector(`code.language-${hash}`)
+  //     if (!q) {
+  //       return
+  //     }
+  //     const result = data.toString() || results[hash] || q.textContent
+  //     dispatch({ type: 'SET_RESULT', data: result, hash })
+  //     q.textContent = result
+  //   }
 
-    addReportCallback((type, hash, data) => {
-      const outputTypes = {
-        stderr: outputString,
-        stdout: outputString
-      }
-      if (type in outputTypes) {
-        outputTypes[type](hash, data)
-      }
-    })
-  }, [])
+  //   // reporter を plugin に書き換える
+  // }, [])
 
   const _init = useMemo(
     async () => {

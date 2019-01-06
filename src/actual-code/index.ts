@@ -13,9 +13,12 @@ export interface Result {
   data: string | Buffer
 }
 
+export type Transform = (input: Result) => Promise<Result>
+export type Output = (results: { [props: string]: Result[] }) => Promise<any>
+
 export interface ResultProcessor {
-  transform?: (input: Result) => Promise<Result>
-  output?: (results: { [props: string]: Result[] }) => Promise<any>
+  transform?: Transform
+  output?: Output
 }
 
 export type ResultProcessorPlugin = (
