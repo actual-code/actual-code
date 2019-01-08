@@ -1,12 +1,10 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'
-import assert from 'assert'
 
-import { Reporter, ReporterOptions } from '../reporter'
 import { SandboxOptions } from '../actual-code/sandbox'
-import { stringifyMarkdown } from '../source/unified'
-import { ActualCode } from '../actual-code'
+import { stringifyMarkdown, MDAST } from '../source/unified'
+import { ActualCode, ActualCodePlugin, Transform, Output } from '../actual-code'
 import { CodeBlock } from '../source'
 
 const readFile = promisify(fs.readFile)
@@ -20,124 +18,119 @@ const getTime = () => {
   )}`
 }
 
-export const convert = async (
-  filename: string,
-  opts: ReporterOptions,
-  outputfile?: string
-) => {
-  const reporter = new Reporter()
+const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
+  const transform: Transform = async ({
+    type,
+    subType,
+    data,
+    hash,
+    payload
+  }) => {
+    switch (type) {
+      case 'log': {
+        if (opts.isVerbose) {
+          process.stdout.write(`\x1b[36m[LOG]  ${getTime()}\x1b[m: ${data}\n`)
+        }
+        return null
+      }
+      case 'debug': {
+        if (opts.isVerbose) {
+          process.stdout.write(`\x1b[33m[DEBUG]${getTime()}\x1b[m: ${data}\n`)
+        }
+        return null
+      }
+      case 'event': {
+        if (opts.isVerbose) {
+          process.stdout.write(
+            `\x1b[32m[EVENT]${getTime()}\x1b[m: ${subType}${
+              hash ? `.${hash}` : ''
+            }${hash === data ? '' : ` ${data}`}\n`
+          )
+        }
+        return null
+      }
+      case 'output': {
+        if (subType === 'stdout') {
+          process.stdout.write(data.toString())
+        } else if (subType === 'stderr') {
+          process.stderr.write(data.toString())
+        }
+        return { type, subType, data, hash }
+      }
+    }
+  }
+  const createOutput = (
+    root: MDAST.Root,
+    codeBlocks: CodeBlock[]
+  ): Output => async results => {
+    if (results) {
+      codeBlocks.reverse().forEach(codeBlock => {
+        if (codeBlock.hash in results) {
+          const { data } = results[codeBlock.hash].reduce(
+            (acc, res) => {
+              if (res.type !== 'output') {
+                return acc
+              }
 
-  let outputs = []
-  let vfile = null
-  let codeBlocks: CodeBlock[] = null
-  const inserts = []
+              let data = acc.data
+              if (acc.filetype !== res.subType) {
+                if (data.length > 0) {
+                  data += '\n'
+                }
+                data += `---${res.subType}\n`
+              }
+              data += res.data
+              return { filetype: res.subType, data }
+            },
+            { filetype: '', data: '' }
+          )
+          const node: MDAST.Code = {
+            type: 'code',
+            value: data
+          }
+          codeBlock.parent.children = [
+            ...codeBlock.parent.children.slice(0, codeBlock.index + 1),
+            node,
+            ...codeBlock.parent.children.slice(codeBlock.index + 1)
+          ]
+        }
+      })
+    }
+    return stringifyMarkdown(root)
+  }
+  return {
+    name: 'actual-code CLI',
+    resultProcessor: async (root, codeBlocks) => {
+      return {
+        transform,
+        output: createOutput(root, codeBlocks)
+      }
+    }
+  }
+}
 
+export const convert = async (filename: string, opts, outputfile?: string) => {
   filename = path.resolve(filename)
   if (outputfile) {
     outputfile = path.resolve(outputfile)
   }
 
-  let text = (await readFile(filename)).toString()
-  if (text.startsWith('#! ') && opts.disableDebug) {
-    opts.disableLog = true
-    opts.disableInfo = true
-  }
+  const text = (await readFile(filename)).toString()
 
-  reporter.addCallback((type, hash, arg1) => {
-    switch (type) {
-      case 'log': {
-        if (!opts.disableLog) {
-          process.stdout.write(`\x1b[36m[LOG]  ${getTime()}\x1b[m: ${arg1}\n`)
-        }
-        break
-      }
-      case 'debug': {
-        if (!opts.disableDebug) {
-          process.stdout.write(`\x1b[33m[DEBUG]${getTime()}\x1b[m: ${arg1}\n`)
-        }
-        break
-      }
-      case 'sandbox end': {
-        assert(hash)
-
-        const codeBlock = codeBlocks.find(v => v.hash === hash)
-
-        assert(codeBlock)
-
-        inserts.push({
-          parent: codeBlock.parent,
-          index: codeBlock.index,
-          outputs: [...outputs]
-        })
-
-        outputs = []
-        // FALLTHRU
-      }
-      default: {
-        if (!opts.disableInfo) {
-          process.stdout.write(
-            `\x1b[32m[INFO] ${getTime()}\x1b[m: ${type}${
-              hash ? `.${hash}` : ''
-            }${hash === arg1 ? '' : ` ${arg1}`}\n`
-          )
-        }
-        break
-      }
-      case 'stdout': {
-        process.stdout.write(arg1.toString())
-        outputs.push({ type: 'stdout', hash, value: arg1.toString() })
-        break
-      }
-      case 'stderr': {
-        process.stderr.write(arg1.toString())
-        outputs.push({ type: 'stderr', hash, value: arg1.toString() })
-        break
-      }
-    }
-  })
-
-  reporter.info('read file', filename)
-  const actualCode = new ActualCode(filename, reporter)
-  const appState = await actualCode.getAppState()
+  // reporter.event('read file', { filename })
+  const actualCode = new ActualCode(filename)
 
   const sandboxOpts: SandboxOptions = {
-    rootPath: appState.path,
     runMode: true
   }
 
-  const res = await actualCode.run(text, sandboxOpts)
-  vfile = res.node
-  codeBlocks = res.codeBlocks
+  actualCode.registerPlugin(actualCodeCliPlugin(opts))
 
-  await actualCode.waitFinished()
-
-  inserts.reverse().forEach(({ parent, index, outputs }) => {
-    const [, text] = outputs.reduce(
-      (acc, insert) => {
-        const { type, value } = insert
-        if (acc[0] === type) {
-          return [type, acc[1] + value]
-        } else {
-          return [type, `${acc[1]}\n--- ${type}\n${value}`]
-        }
-      },
-      ['', '']
-    )
-    const node = {
-      type: 'code',
-      value: text
-    }
-    parent.children = [
-      ...parent.children.slice(0, index + 1),
-      node,
-      ...parent.children.slice(index + 1)
-    ]
-  })
-
-  const doc = stringifyMarkdown(vfile)
+  await actualCode.run(text, sandboxOpts)
+  const doc = await actualCode.waitFinished()
 
   if (outputfile) {
-    reporter.info('write file', outputfile)
+    // reporter.event('write file', { filename: outputfile })
     await writeFile(outputfile, doc)
   }
   return doc

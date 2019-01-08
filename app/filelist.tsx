@@ -12,14 +12,23 @@ export default props => {
     getFileList().then(list => setFileList(list))
   }, [])
 
+  const formatDate = (at: Date) => {
+    const pad = (n: number) => n.toString(10).padStart(2, '0')
+
+    return `${pad(at.getFullYear())}/${pad(at.getMonth() + 1)}/${pad(
+      at.getDate()
+    )} ${pad(at.getHours())}:${pad(at.getMinutes())}:${pad(at.getSeconds())}`
+  }
+
   const files = fileList.map(info => {
+    const at = formatDate(new Date(info.at))
     return (
-      <li key={info.name} onClick={() => setFilename(info.name)}>
-        {info.title} at {new Date(info.updatedAt).toLocaleString()}{' '}
-        {info.tags ? info.tags.join(', ') : ''}
+      <li key={info.id} onClick={() => setFilename(info.id)}>
+        {info.title} at {at} {info.tags ? info.tags.join(', ') : ''}
       </li>
     )
   })
+
   return (
     <div
       style={{

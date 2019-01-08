@@ -1,31 +1,65 @@
 import * as path from 'path'
-import { inspect } from 'util'
 
 import * as carlo from 'carlo'
 import { rpc } from 'carlo/rpc'
 
-import { ActualCode } from '../actual-code'
-import { Reporter, ReporterOptions } from '../reporter'
-import { getFileList } from '../storage'
+import { ActualCode, ActualCodePlugin, Output } from '../actual-code'
+import { createStorage, Storage } from '../storage'
 
-import { stringifyHtml } from '../source/unified'
+import { CodeBlock } from '../source'
+import { MDAST, stringifyHtml } from '../source/unified'
 
 const outDir = path.join(__dirname, '..', 'app')
 
-class Backend {
-  reporter: Reporter
-  constructor(reporter: Reporter) {
-    this.reporter = reporter
+const actualCodeCarloPlugin = (): ActualCodePlugin => () => {
+  const createOutput = (
+    root: MDAST.Root,
+    codeBlocks: CodeBlock[]
+  ): Output => async results => {
+    codeBlocks.reverse().forEach(codeBlock => {
+      if (results && codeBlock.hash in results) {
+        const value = results[codeBlock.hash].reduce(
+          (acc, res) => acc + res.data,
+          ''
+        )
+        const node: MDAST.Code = { type: 'code', value }
+        codeBlock.parent.children = [
+          ...codeBlock.parent.children.slice(0, codeBlock.index + 1),
+          node,
+          ...codeBlock.parent.children.slice(codeBlock.index + 1)
+        ]
+      }
+    })
+    return stringifyHtml(root)
   }
+  return {
+    name: 'actual-code carlo app',
+    resultProcessor: async (root, codeBlocks) => {
+      return {
+        output: createOutput(root, codeBlocks)
+      }
+    }
+  }
+}
+
+class Backend {
+  _storage: Storage
+  constructor(storage: Storage) {
+    this._storage = storage
+  }
+
   initActualCode(id: string) {
-    return rpc.handle(new ActualCode(id, this.reporter))
+    const actualCode = new ActualCode(id, this._storage)
+
+    actualCode.registerPlugin(actualCodeCarloPlugin())
+    return rpc.handle(actualCode)
   }
 }
 
 export const bootGui = async opt => {
-  const reporter = new Reporter()
-  const backend = new Backend(reporter)
-  reporter.log('GUI mode')
+  const storage = await createStorage()
+  const backend = new Backend(storage)
+  // reporter.log('GUI mode')
 
   const cApp = await carlo.launch()
   cApp.serveFolder(outDir)
@@ -45,6 +79,6 @@ export const bootGui = async opt => {
   await cApp.exposeFunction('stringifyHtml', async vfile =>
     stringifyHtml(vfile)
   )
-  await cApp.exposeFunction('getFileList', async () => getFileList())
-  await cApp.load('index.html', rpc.handle(reporter), rpc.handle(backend))
+  await cApp.exposeFunction('getFileList', () => storage.find())
+  await cApp.load('index.html', rpc.handle(backend))
 }

@@ -10,6 +10,11 @@ export interface Literal extends Unist.Literal {
   value: string
 }
 
+/**
+ * Root node of MDAST
+ * see. https://github.com/syntax-tree/mdast
+ * see. https://github.com/remarkjs/remark
+ */
 export interface Root extends Parent {
   type: 'root'
 }

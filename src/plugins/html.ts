@@ -1,6 +1,6 @@
 import { Sandbox, SandboxOptions } from '../actual-code/sandbox'
 import { ActualCodePlugin } from '../actual-code'
-import { Reporter } from '../reporter'
+import { Reporter } from '../actual-code/reporter'
 
 export class HtmlSandbox implements Sandbox {
   rootPath: string
@@ -10,16 +10,11 @@ export class HtmlSandbox implements Sandbox {
     this.reporter = reporter
   }
 
-  async run(
-    code: string,
-    hash: string,
-    filetype: string,
-    meta: SandboxOptions
-  ) {
-    if (filetype !== 'html') {
+  async run(code: string, hash: string, lang: string, meta: SandboxOptions) {
+    if (lang !== 'html') {
       return false
     }
-    this.reporter.output('text/html', code)
+    this.reporter.output(hash, 'text/html', code)
     return true
   }
 }

@@ -3,17 +3,17 @@ import childProcess from 'child_process'
 import { Sandbox, SandboxOptions } from '../actual-code/sandbox'
 import { ActualCodePlugin } from '../actual-code'
 
-import { Reporter } from '../reporter'
+import { Reporter } from '../actual-code/reporter'
 
-const exec = (cmd: string, reporter: Reporter) => {
+const exec = (cmd: string, reporter: Reporter, hash: string) => {
   return new Promise((resolve, reject) => {
     reporter.log(`run ${cmd}`)
     const proc = childProcess.exec(cmd)
     proc.stdout.on('data', chunk => {
-      reporter.output('stdout', chunk)
+      reporter.output(hash, 'stdout', chunk)
     })
     proc.stderr.on('data', chunk => {
-      reporter.output('stderr', chunk)
+      reporter.output(hash, 'stderr', chunk)
     })
     proc.on('close', code => {
       resolve()
@@ -35,25 +35,20 @@ export class ShellSandbox implements Sandbox {
     this.rootPath = rootPath
     this.reporter = reporter
   }
-  async run(
-    code: string,
-    hash: string,
-    filetype: string,
-    meta: SandboxOptions
-  ) {
-    filetype = this.filetypes[filetype]
-    if (!filetype) {
+  async run(code: string, hash: string, lang: string, meta: SandboxOptions) {
+    lang = this.filetypes[lang]
+    if (!lang) {
       return false
     }
     if (code.startsWith('#! ')) {
-      await exec(code, this.reporter)
+      await exec(code, this.reporter, hash)
     } else {
       for (let line of code.split('\n')) {
         line = line.trimLeft()
         if (line.startsWith('$ ')) {
           line = line.slice(2)
         }
-        await exec(line, this.reporter)
+        await exec(line, this.reporter, hash)
       }
     }
     return true
