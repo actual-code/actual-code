@@ -27,7 +27,7 @@ export type ActualCodePlugin = () => {
 }
 
 export class ActualCode {
-  private _reporter: Reporter
+  private _reporter: Reporter = new Reporter()
   private _init: Promise<void>
   private _runningState: Promise<any> = null
   private _sandbox: ActualCodeSandbox
@@ -36,9 +36,8 @@ export class ActualCode {
   private _plugins: ActualCodePlugin[] = [nodeJsPlugin, shellPlugin, htmlPlugin]
   private _resultProcessors: ResultProcessorPlugin[] = []
 
-  constructor(id: string, reporter: Reporter, storage?: Storage) {
+  constructor(id: string, storage?: Storage) {
     this.id = id
-    this._reporter = reporter
     this._storage = storage
     const init = async () => {
       this._sandbox = new ActualCodeSandbox(this, this._reporter)
@@ -69,8 +68,7 @@ export class ActualCode {
   }
 
   async getAppState(): Promise<AppState> {
-    this._init
-    return this._storage.readAppState(this.id)
+    return this._storage.readById(this.id)
   }
 
   async run(code: string, opts: SandboxOptions) {
@@ -85,7 +83,7 @@ export class ActualCode {
 
     const results: { [props: string]: Report[] } = {}
 
-    this._reporter.addCallback(async report => {
+    this._reporter.setCallback(async report => {
       await this._init
 
       for (const p of resultProcessors) {
@@ -113,7 +111,7 @@ export class ActualCode {
       }
 
       if (opts.runMode) {
-        await this._updateAppState(code, root)
+        await this.save(code, results)
       }
       if (outputProcessor) {
         return outputProcessor.output(results)
@@ -128,30 +126,13 @@ export class ActualCode {
     } else {
       return null
     }
-
-    // return { settings, node: root, codeBlocks }
   }
 
-  async save(code: string) {
-    const { root } = await parse(code)
-    await this._updateAppState(code, root)
-  }
-
-  private async _updateAppState(code: string, root: MDAST.Root) {
+  async save(code: string, results?: { [props: string]: Report[] }) {
     await this._init
-    const found = root.children.find(
-      child => child.type === 'heading'
-    ) as MDAST.Heading
-    const title =
-      found &&
-      found.children &&
-      found.children
-        .map(child => child.value)
-        .filter(s => s)
-        .join(' ')
 
     if (this._storage) {
-      await this._storage.updateAppState(this.id, { code, title })
+      await this._storage.updateAppState(this.id, code, results)
     }
   }
 

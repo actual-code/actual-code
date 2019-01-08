@@ -45,8 +45,7 @@ export default props => {
   const { text, __html, results } = state
 
   const run = async (actualCode: ActualCode, runMode: boolean) => {
-    const { code } = await actualCode.getAppState()
-    let __html = await actualCode.run(text || code, { runMode })
+    let __html = await actualCode.run(text, { runMode })
     dispatch({ type: 'SET_HTML', __html })
     __html = await actualCode.waitFinished()
     dispatch({ type: 'SET_HTML', __html })
@@ -70,8 +69,8 @@ export default props => {
     async () => {
       const actualCode = await initActualCode(filename)
       const appState = await actualCode.getAppState()
-      const { code } = appState
-      dispatch({ type: 'SET_TEXT', text: code || '' })
+      const code = appState ? appState.code : ''
+      dispatch({ type: 'SET_TEXT', text: code })
       return actualCode
     },
     [filename]
@@ -106,8 +105,7 @@ export default props => {
         <button
           onClick={async () => {
             const actualCode = await _init
-            console.log('save', text)
-            actualCode.save(text)
+            await actualCode.save(text)
             setFilename(null)
           }}
         >

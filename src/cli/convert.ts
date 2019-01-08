@@ -112,8 +112,6 @@ const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
 }
 
 export const convert = async (filename: string, opts, outputfile?: string) => {
-  const reporter = new Reporter()
-
   filename = path.resolve(filename)
   if (outputfile) {
     outputfile = path.resolve(outputfile)
@@ -125,8 +123,8 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
     opts.disableInfo = true
   }
 
-  reporter.event('read file', { filename })
-  const actualCode = new ActualCode(filename, reporter)
+  // reporter.event('read file', { filename })
+  const actualCode = new ActualCode(filename)
 
   const sandboxOpts: SandboxOptions = {
     runMode: true
@@ -138,7 +136,7 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
   const doc = await actualCode.waitFinished()
 
   if (outputfile) {
-    reporter.event('write file', { filename: outputfile })
+    // reporter.event('write file', { filename: outputfile })
     await writeFile(outputfile, doc)
   }
   return doc

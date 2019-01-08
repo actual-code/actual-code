@@ -9,7 +9,7 @@ export interface Report {
 export type ReporterCallback = (report: Report) => void
 
 export class Reporter {
-  private _cbs: ReporterCallback[] = []
+  private _cb: ReporterCallback = () => {}
 
   event(event: 'read file', payload: { filename: string }): Promise<void>
   event(event: 'write file', payload: { filename: string }): Promise<void>
@@ -19,24 +19,22 @@ export class Reporter {
   event(event: 'register plugin', payload: { name: string }): Promise<void>
 
   async event(event: string, payload: any) {
-    this._cbs.forEach(cb => cb({ type: 'event', subType: event, payload }))
+    this._cb({ type: 'event', subType: event, payload })
   }
 
   async log(message: string) {
-    this._cbs.forEach(cb => cb({ type: 'log', data: message }))
+    this._cb({ type: 'log', data: message })
   }
 
   async debug(message: string) {
-    this._cbs.forEach(cb => cb({ type: 'debug', data: message }))
+    this._cb({ type: 'debug', data: message })
   }
 
   async output(hash: string, filetype: string, data: string | Buffer) {
-    this._cbs.forEach(cb =>
-      cb({ type: 'output', subType: filetype, hash, data })
-    )
+    this._cb({ type: 'output', subType: filetype, hash, data })
   }
 
-  addCallback(cb: ReporterCallback) {
-    this._cbs.push(cb)
+  setCallback(cb: ReporterCallback) {
+    this._cb = cb
   }
 }

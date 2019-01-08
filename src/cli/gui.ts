@@ -45,15 +45,13 @@ const actualCodeCarloPlugin = (): ActualCodePlugin => () => {
 }
 
 class Backend {
-  _reporter: Reporter
   _storage: Storage
-  constructor(reporter: Reporter, storage: Storage) {
-    this._reporter = reporter
+  constructor(storage: Storage) {
     this._storage = storage
   }
 
   initActualCode(id: string) {
-    const actualCode = new ActualCode(id, this._reporter, this._storage)
+    const actualCode = new ActualCode(id, this._storage)
 
     actualCode.registerPlugin(actualCodeCarloPlugin())
     return rpc.handle(actualCode)
@@ -61,10 +59,9 @@ class Backend {
 }
 
 export const bootGui = async opt => {
-  const reporter = new Reporter()
   const storage = await createStorage()
-  const backend = new Backend(reporter, storage)
-  reporter.log('GUI mode')
+  const backend = new Backend(storage)
+  // reporter.log('GUI mode')
 
   const cApp = await carlo.launch()
   cApp.serveFolder(outDir)

@@ -7,6 +7,7 @@ import { bundleApp } from './build/bundle-app'
 import { buildPkg } from './build/build-pkg'
 
 const watch = async () => {
+  process.env.NODE_ENV = 'development'
   const options = require('../tsconfig.json')
   const outDir = options.compilerOptions.outDir
   rimraf.sync(outDir)
@@ -16,6 +17,7 @@ const watch = async () => {
 }
 
 const build = async () => {
+  process.env.NODE_ENV = 'production'
   const options = require('../tsconfig.json')
   const outDir = options.compilerOptions.outDir
   rimraf.sync(outDir)

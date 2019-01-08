@@ -16,7 +16,6 @@ interface Carlo {
 
 declare global {
   interface Window {
-    stringifyHtml: typeof stringifyHtml
     getFileList: () => Promise<AppState[]>
     carlo: Carlo
     rpc
