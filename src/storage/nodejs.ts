@@ -4,7 +4,9 @@ import { parse, MDAST } from '../source'
 
 export const readMeta = async (hash: string) => {
   const buf = await readBlob(hash)
-  return JSON.parse(buf.toString('utf-8')) as Metadata
+  const metadata: Metadata = JSON.parse(buf.toString('utf-8'))
+  metadata.at = new Date(metadata.at)
+  return metadata
 }
 
 export class NodeJsStorage implements Storage {
@@ -30,24 +32,17 @@ export class NodeJsStorage implements Storage {
     const metadataAr = await Promise.all(
       hashes.map(async hash => readMeta(hash))
     )
+    const sortByDateDesc = (a: Metadata, b: Metadata) =>
+      a.at.valueOf() - b.at.valueOf()
 
-    metadataAr
-      .sort((a, b) => a.at.valueOf() - b.at.valueOf())
-      .forEach(metadata => {
-        this._updateIndex(metadata)
-      })
-
-    console.log(this._index)
+    metadataAr.sort(sortByDateDesc).forEach(metadata => {
+      this._updateIndex(metadata)
+    })
   }
 
   async toAppState(metadata: Metadata): Promise<AppState> {
     const code = (await readBlob(metadata.codeHash)).toString('utf-8')
-    const at =
-      typeof metadata.at === 'string' ? new Date(metadata.at) : metadata.at
-    console.log(typeof metadata.at)
-    console.log(metadata.at)
-    console.log(at.getHours())
-    return { ...metadata, at, code }
+    return { ...metadata, code }
   }
 
   async readById(id: string) {
