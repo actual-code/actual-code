@@ -1,4 +1,4 @@
-const { carlo, rpc } = window
+const { carlo } = window
 
 const _params = carlo.loadParams()
 

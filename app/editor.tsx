@@ -24,7 +24,7 @@ export default props => {
       })
       window.addEventListener('resize', () => ed.layout())
       return ed
-      // dispose が必要
+      // FIXME: dispose
     },
     [!ref.current]
   )

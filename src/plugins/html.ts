@@ -10,13 +10,8 @@ export class HtmlSandbox implements Sandbox {
     this.reporter = reporter
   }
 
-  async run(
-    code: string,
-    hash: string,
-    filetype: string,
-    meta: SandboxOptions
-  ) {
-    if (filetype !== 'html') {
+  async run(code: string, hash: string, lang: string, meta: SandboxOptions) {
+    if (lang !== 'html') {
       return false
     }
     this.reporter.output(hash, 'text/html', code)

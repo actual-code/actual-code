@@ -1,25 +1,45 @@
 import { Reporter, Report } from './reporter'
 import { getCodeBlocks, parse, MDAST, CodeBlock } from '../source'
-import { createStorage, Storage, AppState } from '../storage'
+import { Storage, AppState } from '../storage'
 import nodeJsPlugin from '../plugins/node-js'
 import shellPlugin from '../plugins/shell'
 import htmlPlugin from '../plugins/html'
 
 import { SandboxOptions, ActualCodeSandbox, SandboxPlugin } from './sandbox'
 
+/**
+ * Transform sandbox execution result.
+ * Called each time during sandbox is running.
+ */
 export type Transform = (input: Report) => Promise<Report>
+
+/**
+ * Called after execution for each code block.
+ */
 export type Output = (results: { [props: string]: Report[] }) => Promise<any>
 
+/**
+ * Process sandbox execution result
+ */
 export interface ResultProcessor {
   transform?: Transform
   output?: Output
 }
 
+/**
+ * ResultProcessor plugin initializer
+ */
 export type ResultProcessorPlugin = (
   root: MDAST.Root,
   codeBlocks: CodeBlock[]
 ) => Promise<ResultProcessor>
 
+/**
+ * actual-code plugin
+ * @param name - plugin name
+ * @param sandbox - implementation Sandbox plugin
+ * @param resultProcessor - implementation ResultProcessor plugin
+ */
 export type ActualCodePlugin = () => {
   name: string
   sandbox?: SandboxPlugin

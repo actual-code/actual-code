@@ -2,8 +2,8 @@ import { Storage, Metadata, AppState } from '.'
 import { writeBlob, listBlobs, readBlob } from './blob'
 import { parse, MDAST } from '../source'
 
-export const readMeta = async (hash: string) => {
-  const buf = await readBlob(hash)
+export const readMeta = async (appDir: string, hash: string) => {
+  const buf = await readBlob(appDir, hash)
   const metadata: Metadata = JSON.parse(buf.toString('utf-8'))
   metadata.at = new Date(metadata.at)
   return metadata
@@ -28,9 +28,9 @@ export class NodeJsStorage implements Storage {
   }
 
   private async _createIndex() {
-    const hashes = Array.from(new Set(await listBlobs('.json')))
+    const hashes = Array.from(new Set(await listBlobs(this._appDir, '.json')))
     const metadataAr = await Promise.all(
-      hashes.map(async hash => readMeta(hash))
+      hashes.map(async hash => readMeta(this._appDir, hash))
     )
     const sortByDateDesc = (a: Metadata, b: Metadata) =>
       a.at.valueOf() - b.at.valueOf()
@@ -41,7 +41,9 @@ export class NodeJsStorage implements Storage {
   }
 
   async toAppState(metadata: Metadata): Promise<AppState> {
-    const code = (await readBlob(metadata.codeHash)).toString('utf-8')
+    const code = (await readBlob(this._appDir, metadata.codeHash)).toString(
+      'utf-8'
+    )
     return { ...metadata, code }
   }
 
@@ -57,7 +59,7 @@ export class NodeJsStorage implements Storage {
   async updateAppState(id: string, code: string, results: any) {
     await this._init
 
-    const codeHash = await writeBlob(code, '.md')
+    const codeHash = await writeBlob(this._appDir, code, '.md')
 
     const { root } = await parse(code)
     const found = root.children.find(
@@ -79,7 +81,7 @@ export class NodeJsStorage implements Storage {
       id,
       results
     }
-    await writeBlob(JSON.stringify(metadata), '.json')
+    await writeBlob(this._appDir, JSON.stringify(metadata), '.json')
 
     await this._updateIndex(metadata)
   }

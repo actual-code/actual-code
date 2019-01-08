@@ -35,14 +35,9 @@ export class ShellSandbox implements Sandbox {
     this.rootPath = rootPath
     this.reporter = reporter
   }
-  async run(
-    code: string,
-    hash: string,
-    filetype: string,
-    meta: SandboxOptions
-  ) {
-    filetype = this.filetypes[filetype]
-    if (!filetype) {
+  async run(code: string, hash: string, lang: string, meta: SandboxOptions) {
+    lang = this.filetypes[lang]
+    if (!lang) {
       return false
     }
     if (code.startsWith('#! ')) {

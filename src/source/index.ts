@@ -1,14 +1,37 @@
-import { createHash } from 'crypto'
-
 import { safeLoad } from 'js-yaml'
 
 import { parseMarkdown, MDAST } from './unified'
 export { MDAST }
+import { sha256 } from '../utils'
 
-const sha256 = (text: string) => {
-  const hash = createHash('sha256')
-  hash.write(text)
-  return hash.digest().toString('hex')
+/**
+ * Each code block of actual-code markdown
+ */
+export interface CodeBlock {
+  /**
+   * source code string of code block
+   */
+  code: string
+  /**
+   * language of code block.
+   */
+  lang: string
+  /**
+   * meta data of code block
+   */
+  meta: { [props: string]: any }
+  /**
+   * parent node
+   */
+  parent: MDAST.Parent
+  /**
+   * order in parent node
+   */
+  index: number
+  /**
+   * identifier of code block.
+   */
+  hash: string
 }
 
 const traversal = async (
@@ -67,15 +90,6 @@ export const parse = async (markdownText: string) => {
   return { settings, root }
 }
 
-export interface CodeBlock {
-  code: string
-  filetype: string
-  meta: { [props: string]: any }
-  parent: MDAST.Parent
-  index: number
-  hash: string
-}
-
 export const getCodeBlocks = async (node: MDAST.Root) => {
   const codeBlocks: CodeBlock[] = []
   await traversal(node, node, async (node, parent, index) => {
@@ -95,7 +109,7 @@ export const getCodeBlocks = async (node: MDAST.Root) => {
 
     codeBlocks.push({
       code: node.value,
-      filetype,
+      lang: filetype,
       meta,
       parent,
       index,

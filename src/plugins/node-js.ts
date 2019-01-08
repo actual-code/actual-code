@@ -137,16 +137,12 @@ export class JsSandbox implements Sandbox {
     vm.createContext(this.ctx)
   }
 
-  async run(
-    code: string,
-    hash: string,
-    filetype: string,
-    meta: SandboxOptions
-  ) {
-    filetype = this.filetypes[filetype]
-    if (!filetype) {
+  async run(code: string, hash: string, lang: string, meta: SandboxOptions) {
+    lang = this.filetypes[lang]
+    if (!lang) {
       return false
     }
+    this.reporter.log(`run ${lang}`)
     try {
       const compiled = await babel.transformAsync(code, {
         ast: false,
@@ -163,7 +159,7 @@ export class JsSandbox implements Sandbox {
           presetTypescript
         ],
         sourceType: 'module',
-        filename: `file.${filetype}`
+        filename: `file.${lang}`
       })
       const timeout = meta.timeout || this.timeout
       const { consoleProxy, processProxy } = createProxies(this.reporter, hash)

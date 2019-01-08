@@ -51,20 +51,6 @@ export default props => {
     dispatch({ type: 'SET_HTML', __html })
   }
 
-  // useEffect(() => {
-  //   const outputString = (hash: string, data: string | Buffer) => {
-  //     const q = document.querySelector(`code.language-${hash}`)
-  //     if (!q) {
-  //       return
-  //     }
-  //     const result = data.toString() || results[hash] || q.textContent
-  //     dispatch({ type: 'SET_RESULT', data: result, hash })
-  //     q.textContent = result
-  //   }
-
-  //   // reporter を plugin に書き換える
-  // }, [])
-
   const _init = useMemo(
     async () => {
       const actualCode = await initActualCode(filename)

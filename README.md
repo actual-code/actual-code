@@ -4,33 +4,31 @@
 
 - [#actual_code](https://twitter.com/search?f=tweets&q=%23actual_code)
 
-Markdown はスクリプト言語です。何を言ってるかわからない？
+actual-code は Markdown のコードブロックをそれぞれの言語のソースコードと見なして実行するインタプリタです。JavaScript のコードブロックであれば Node.js で実行し、shell のコードブロックであればシェルスクリプトとみなして実行します。
 
-Markdown にはコードブロックでさまざまなな言語を埋め込めます。なら、その言語を順次実行すれば、もうそれはシェルスクリプトなどと同じようなスクリプト言語と言っても過言ではありません！！
+Chrome か Chromium をインストールしていれば、GUI アプリとして動作します。
 
-![hello-world](images/hello-world.png)
+## 注意: α バージョンです
 
-ちなみにこの理屈でいうと、任意のコードブロックを埋め込める言語ならなんでもスクリプト言語にできます。JSON でも Re:VIEW でも。
+開発中の α バージョンであり、まだ安定していません。内部の API や仕組み、操作方法などが変わる可能性があります。
 
-- Markdown のコードブロックを実際に Sandbox の中で走らせる
+現時点では、HTML, JavaScript, Shell script にのみ対応しています。
 
-## install
-
-```sh
-npm i -g @actual-code/bin
-```
+## Install
 
 ```sh
-npm i -D @actual-code/bin
+$ npm i -g @actual-code/bin
 ```
+
+## Usage (CLI)
 
 ```sh
-yarn add -D @actual-code/bin
+$ actual-code [-o output file] <script file>
 ```
 
-お好きなように
+指定した script file を実行し結果を表示します。-o オプションで、実行結果を挿入した Markdown を出力します。
 
-### markdown script
+## Usage (shbang)
 
 ````markdown
 #! /usr/bin/env actual-code
@@ -43,7 +41,6 @@ console.log('Hello, World!')
 ````
 
 ```sh
-$ npm i -g @actual-code/bin
 $ chmod +x script
 $ ./script
 Hello, World!
@@ -54,20 +51,12 @@ Markdown is Script Language!!!!!!!!!
 ## usage (GUI)
 
 ```sh
-$ yarn
-$ yarn build
-$ bin/actual-code
+$ actual-code
 ```
 
 手元に Chrome or Chromium がインストールされていれば GUI アプリが立ち上がります。一見よくある、Markdown リアルタイムプレビューアプリに見えますが、違うのは、コードブロックが実行されることです。
 
 一応自動セーブ機能ありますが、バグがあって消えたりすることもあるかもしれません。
-
-### markdown to markdown
-
-```sh
-bin/actual-code [-o outfile.md] <file.md>
-```
 
 # License
 

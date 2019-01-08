@@ -1,9 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'
-import assert from 'assert'
 
-import { Reporter, Report } from '../actual-code/reporter'
 import { SandboxOptions } from '../actual-code/sandbox'
 import { stringifyMarkdown, MDAST } from '../source/unified'
 import { ActualCode, ActualCodePlugin, Transform, Output } from '../actual-code'
@@ -30,19 +28,19 @@ const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
   }) => {
     switch (type) {
       case 'log': {
-        if (!opts.disableLog) {
+        if (opts.isVerbose) {
           process.stdout.write(`\x1b[36m[LOG]  ${getTime()}\x1b[m: ${data}\n`)
         }
         return null
       }
       case 'debug': {
-        if (!opts.disableDebug) {
+        if (opts.isVerbose) {
           process.stdout.write(`\x1b[33m[DEBUG]${getTime()}\x1b[m: ${data}\n`)
         }
         return null
       }
-      default: {
-        if (!opts.disableInfo) {
+      case 'event': {
+        if (opts.isVerbose) {
           process.stdout.write(
             `\x1b[32m[EVENT]${getTime()}\x1b[m: ${subType}${
               hash ? `.${hash}` : ''
@@ -117,11 +115,7 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
     outputfile = path.resolve(outputfile)
   }
 
-  let text = (await readFile(filename)).toString()
-  if (text.startsWith('#! ') && opts.disableDebug) {
-    opts.disableLog = true
-    opts.disableInfo = true
-  }
+  const text = (await readFile(filename)).toString()
 
   // reporter.event('read file', { filename })
   const actualCode = new ActualCode(filename)

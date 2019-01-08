@@ -32,9 +32,7 @@ const bootstrap = async () => {
   }
 
   const reporterOpts = {
-    disableInfo: !!args['--quiet'],
-    disableLog: !args['--verbose'],
-    disableDebug: !args['--verbose']
+    isVerbose: args['--verbose']
   }
 
   if (args._.length === 0) {

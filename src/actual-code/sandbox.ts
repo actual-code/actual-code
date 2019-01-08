@@ -23,7 +23,7 @@ export interface Sandbox {
   run: (
     code: string,
     hash: string,
-    filetype: string,
+    lang: string,
     meta: SandboxOptions
   ) => Promise<boolean>
 }
@@ -70,7 +70,7 @@ export class ActualCodeSandbox {
 
   async run(codeBlock: CodeBlock, opts: SandboxOptions) {
     await this._init
-    const { code, filetype, meta, hash } = codeBlock
+    const { code, lang, meta, hash } = codeBlock
     const opts2 = mergeOption(opts, meta)
 
     if (meta.plugin) {
@@ -89,7 +89,7 @@ export class ActualCodeSandbox {
     }
 
     for (const box of this._boxes) {
-      if (await box.run(code, hash, filetype, opts2)) {
+      if (await box.run(code, hash, lang, opts2)) {
         break
       }
     }

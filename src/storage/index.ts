@@ -23,7 +23,7 @@ export interface Storage {
 }
 
 export const createStorage = async (): Promise<Storage> => {
-  const appDir = path.join(os.homedir(), 'actual-code')
+  const appDir = path.join(os.homedir(), '.actual-code')
   mkdirp.sync(appDir)
   return new NodeJsStorage(appDir)
 }
