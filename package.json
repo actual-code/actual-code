@@ -1,6 +1,6 @@
 {
   "name": "@actual-code/bin",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Markdown is Script Language!",
   "license": "MIT",
   "repository": "git+https://github.com/erukiti/actual-code.git",
@@ -74,6 +74,5 @@
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
-  },
-  "main": "index.js"
+  }
 }

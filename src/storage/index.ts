@@ -24,6 +24,6 @@ export interface Storage {
 
 export const createStorage = async (): Promise<Storage> => {
   const appDir = path.join(os.homedir(), '.actual-code')
-  mkdirp.sync(appDir)
+  mkdirp.sync(path.join(appDir, 'blob'))
   return new NodeJsStorage(appDir)
 }
