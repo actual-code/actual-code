@@ -74,5 +74,8 @@
     "ts-jest": "^23.10.5",
     "ts-node": "^7.0.1",
     "typescript": "^3.2.2"
+  },
+  "pkg": {
+    "assets": "dist/**/*"
   }
 }

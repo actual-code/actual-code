@@ -24,7 +24,7 @@ const build = async () => {
   mkdirp.sync(outDir)
   await buildSrc('src/**/*.ts')
   await bundleApp('app/index.html', false)
-  // await buildPkg()
+  await buildPkg()
 }
 
 const subcommands = { watch, build }

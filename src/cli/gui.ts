@@ -1,15 +1,18 @@
+import * as fs from 'fs'
 import * as path from 'path'
+import * as os from 'os'
 
 import * as carlo from 'carlo'
 import { rpc } from 'carlo/rpc'
+import * as mkdirp from 'mkdirp'
 
 import { ActualCode, ActualCodePlugin, Output } from '../actual-code'
 import { createStorage, Storage } from '../storage'
-
+import { copyRecursive } from '../utils'
 import { CodeBlock } from '../source'
 import { MDAST, stringifyHtml } from '../source/unified'
 
-const outDir = path.join(__dirname, '..', 'app')
+const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'app-'))
 
 const actualCodeCarloPlugin = (): ActualCodePlugin => () => {
   const createOutput = (
@@ -61,7 +64,16 @@ export const bootGui = async opt => {
   const backend = new Backend(storage)
   // reporter.log('GUI mode')
 
-  const cApp = await carlo.launch()
+  const userDataDir = path.join(os.homedir(), '.actual-code', 'carlo')
+  mkdirp.sync(userDataDir)
+  const cApp = await carlo.launch({
+    userDataDir,
+    title: 'actual-code'
+  })
+
+  const appSourceDir = path.join(__dirname, '..', 'app')
+
+  await copyRecursive(appSourceDir, outDir)
   cApp.serveFolder(outDir)
   const window = cApp.mainWindow()
   // const page = window.pageForTest()

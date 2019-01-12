@@ -7,8 +7,10 @@ const createArgs = (os: string, arch: string, script: string) => {
     script,
     '--targets',
     `node10-${os}-${arch}`,
-    '--out-path',
-    path.join('build', `${os}-${arch}`)
+    '--output',
+    path.join('build', `${os}-${arch}`, 'actual-code'),
+    '-c',
+    path.join(__dirname, '..', '..', 'package.json')
   ]
 }
 
