@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as os from 'os'
+import { promisify } from 'util'
 
 import * as carlo from 'carlo'
 import { rpc } from 'carlo/rpc'
@@ -8,11 +9,10 @@ import * as mkdirp from 'mkdirp'
 
 import { ActualCode, ActualCodePlugin, Output } from '../actual-code'
 import { createStorage, Storage } from '../storage'
-import { copyRecursive } from '../utils'
 import { CodeBlock } from '../source'
 import { MDAST, stringifyHtml } from '../source/unified'
 
-const outDir = fs.mkdtempSync(path.join(os.tmpdir(), 'app-'))
+const readFile = promisify(fs.readFile)
 
 const actualCodeCarloPlugin = (): ActualCodePlugin => () => {
   const createOutput = (
@@ -72,20 +72,26 @@ export const bootGui = async opt => {
   })
 
   const appSourceDir = path.join(__dirname, '..', 'app')
+  cApp.serveHandler(async req => {
+    const p = req.url().replace(/^https:\/\/domain\//, '')
+    try {
+      const body = await readFile(path.join(appSourceDir, p))
+      req.fulfill({ body })
+    } catch (e) {
+      if (e.code === 'ENOENT') {
+        req.fulfill({ status: '404' })
+      } else {
+        req.fulfill({ status: '500' })
+      }
+    }
+  })
 
-  await copyRecursive(appSourceDir, outDir)
-  cApp.serveFolder(outDir)
   const window = cApp.mainWindow()
   // const page = window.pageForTest()
   // page.on('console', message => {
   //   console.log(message.type())
   //   console.log(message.text())
   //   console.log(message.args())
-  // })
-
-  // cApp.serveHandler(request => {
-  //   reporter.debug(`REQ ${request.url()}`)
-  //   request.continue()
   // })
 
   await cApp.exposeFunction('stringifyHtml', async vfile =>
