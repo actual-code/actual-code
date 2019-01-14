@@ -11,6 +11,13 @@ import { sha256 } from '../utils'
 
 const getBlobDir = (appDir: string) => path.join(appDir, 'blob')
 
+/**
+ * write blob
+ * @param appDir - application directory.
+ * @param data - write content
+ * @param ext - extension
+ * @return content hash
+ */
 export const writeBlob = async (
   appDir: string,
   data: string | Buffer,
@@ -27,6 +34,12 @@ export const writeBlob = async (
   })
 }
 
+/**
+ * list blobs that match the extension
+ * @param appDir - application directory.
+ * @param ext - extension
+ * @returns array of hash string
+ */
 export const listBlobs = async (appDir: string, ext: string) => {
   const blobDir = getBlobDir(appDir)
   const files = await readDir(blobDir)
@@ -35,16 +48,22 @@ export const listBlobs = async (appDir: string, ext: string) => {
     .map(filename => filename.replace(/\.[a-zA-Z0-9]+$/, ''))
 }
 
+/**
+ * read blob by hash
+ * @param appDir - application directory.
+ * @param hash - read target hash
+ * @returns content
+ */
 export const readBlob = async (appDir: string, hash: string) => {
   const blobDir = getBlobDir(appDir)
   const paths = await readDir(blobDir)
-  const filename = path.join(blobDir, paths.find(p => p.startsWith(hash)))
+  const filename = paths.find(p => p.startsWith(hash))
+  if (!filename) {
+    throw new Error('FILE NOT FOUND')
+  }
   const buf = await readFile(filename)
   if (sha256(buf) !== hash) {
-    // FIXME
-    // unlink
-    // report error
-    return
+    throw new Error('HASH IS INVALID')
   }
   return buf
 }
