@@ -57,7 +57,7 @@ describe('readBlob', () => {
       cb(null, [`${hash}.md`, 'piyo.json'])
     })
     fs.readFile.mockImplementation((filename, cb) => {
-      expect(filename).toBe(`${hash}.md`)
+      expect(filename).toBe(`/hoge/blob/${hash}.md`)
       cb(null, content)
     })
     await expect(readBlob('/hoge', hash)).resolves.toBe(content)
@@ -80,7 +80,7 @@ describe('readBlob', () => {
       cb(null, ['hoge.md', 'piyo.json'])
     })
     fs.readFile.mockImplementation((filename, cb) => {
-      expect(filename).toBe(`hoge.md`)
+      expect(filename).toBe(`/hoge/blob/hoge.md`)
       cb(null, content)
     })
     await expect(readBlob('/hoge', 'hoge')).rejects.toThrowError(

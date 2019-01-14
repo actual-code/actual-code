@@ -61,7 +61,7 @@ export const readBlob = async (appDir: string, hash: string) => {
   if (!filename) {
     throw new Error('FILE NOT FOUND')
   }
-  const buf = await readFile(filename)
+  const buf = await readFile(path.join(appDir, 'blob', filename))
   if (sha256(buf) !== hash) {
     throw new Error('HASH IS INVALID')
   }
