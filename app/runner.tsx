@@ -1,17 +1,17 @@
 import React, { useEffect, useMemo, useReducer } from 'react'
 
-import Editor from './editor'
+import Editor from './editor/monaco'
 import { initActualCode } from './frontend'
 
 export interface State {
   text: string
-  __html: string
+  __html: string | null
   results: { [hash: string]: string }
 }
 
 const initialState: State = {
   text: '',
-  __html: '',
+  __html: null,
   results: {}
 }
 
@@ -45,10 +45,12 @@ export default props => {
   const { text, __html, results } = state
 
   const run = async (actualCode: ActualCode, runMode: boolean) => {
-    let __html = await actualCode.run(text, { runMode })
+    const __html = await actualCode.run(text, { runMode })
     dispatch({ type: 'SET_HTML', __html })
-    __html = await actualCode.waitFinished()
-    dispatch({ type: 'SET_HTML', __html })
+    const __html2 = await actualCode.waitFinished()
+    if (__html !== __html2) {
+      dispatch({ type: 'SET_HTML', __html: __html2 })
+    }
   }
 
   const _init = useMemo(
@@ -100,7 +102,7 @@ export default props => {
       </nav>
 
       <Editor
-        setText={(text: string) => dispatch({ type: 'SET_TEXT', text })}
+        onChange={(text: string) => dispatch({ type: 'SET_TEXT', text })}
         filename={filename}
         value={text}
         style={{ gridRow: '2', gridColumn: '1' }}
