@@ -1,7 +1,7 @@
 import { createHash } from 'crypto'
 
-export const getHash = (data: string | Buffer) => {
-  const sha256 = createHash('sha256')
-  sha256.write(data)
-  return sha256.digest().toString('hex')
+export const sha256 = (data: string | Buffer) => {
+  const hash = createHash('sha256')
+  hash.write(data)
+  return hash.digest().toString('hex')
 }

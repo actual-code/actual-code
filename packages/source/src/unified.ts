@@ -10,6 +10,7 @@ import frontmatter from 'remark-frontmatter'
 import stringify from 'remark-stringify'
 
 import * as MDAST from './mdast'
+export { MDAST }
 
 const markdown = unified()
   .use(parse)
