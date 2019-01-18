@@ -29,7 +29,7 @@ export const createBuiler = (opts: Partial<BuilderOptions>) => {
       basePath: path.resolve('packages', name),
       nodeEnv: 'development',
       sourceMatch: ['src/**/*.(j|t)s', 'src/**/*.(j|t)sx'],
-      ignored: ['.d.ts', '.test.(j|t)s'],
+      ignored: ['**/*.d.ts', '**/*.test.js', '**/*.test.ts'],
       entrypoints: [],
     }
     projects.push({ ...defaultOption, ...baseOpts, ...proj, name })
