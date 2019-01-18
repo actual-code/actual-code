@@ -2,10 +2,14 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { promisify } from 'util'
 
-import { SandboxOptions } from '../actual-code/sandbox'
-import { stringifyMarkdown, MDAST } from '../source/unified'
-import { ActualCode, ActualCodePlugin, Transform, Output } from '../actual-code'
-import { CodeBlock } from '../source'
+import { SandboxOptions } from '@actual-code/core'
+import { stringifyMarkdown, MDAST, CodeBlock } from '@actual-code/source'
+import {
+  ActualCode,
+  ActualCodePlugin,
+  Transform,
+  Output,
+} from '@actual-code/core'
 
 const readFile = promisify(fs.readFile)
 const writeFile = promisify(fs.writeFile)
@@ -24,7 +28,7 @@ const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
     subType,
     data,
     hash,
-    payload
+    payload,
   }) => {
     switch (type) {
       case 'log': {
@@ -86,12 +90,12 @@ const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
           )
           const node: MDAST.Code = {
             type: 'code',
-            value: data
+            value: data,
           }
           codeBlock.parent.children = [
             ...codeBlock.parent.children.slice(0, codeBlock.index + 1),
             node,
-            ...codeBlock.parent.children.slice(codeBlock.index + 1)
+            ...codeBlock.parent.children.slice(codeBlock.index + 1),
           ]
         }
       })
@@ -103,9 +107,9 @@ const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
     resultProcessor: async (root, codeBlocks) => {
       return {
         transform,
-        output: createOutput(root, codeBlocks)
+        output: createOutput(root, codeBlocks),
       }
-    }
+    },
   }
 }
 
@@ -121,7 +125,7 @@ export const convert = async (filename: string, opts, outputfile?: string) => {
   const actualCode = new ActualCode(filename)
 
   const sandboxOpts: SandboxOptions = {
-    runMode: true
+    runMode: true,
   }
 
   actualCode.registerPlugin(actualCodeCliPlugin(opts))

@@ -3,7 +3,7 @@ import { NodePath } from '@babel/traverse'
 
 import { generateAst, generateCode } from './ast'
 import { BaseSource } from '../source'
-import { getHash } from '../../utils'
+import { getHash } from '../utils'
 
 export class BabelSource implements BaseSource {
   filename: string

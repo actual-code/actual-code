@@ -1,6 +1,6 @@
 import { Storage, Metadata, AppState } from '.'
 import { writeBlob, listBlobs, readBlob } from './blob'
-import { parse, MDAST } from '../source'
+import { parse, MDAST } from '@actual-code/source'
 
 export const readMeta = async (appDir: string, hash: string) => {
   const buf = await readBlob(appDir, hash)
@@ -18,26 +18,6 @@ export class NodeJsStorage implements Storage {
     this._appDir = appDir
 
     this._init = this._createIndex()
-  }
-
-  private async _updateIndex(metadata: Metadata) {
-    if (!(metadata.id in this._index)) {
-      this._index[metadata.id] = []
-    }
-    this._index[metadata.id].unshift(metadata)
-  }
-
-  private async _createIndex() {
-    const hashes = Array.from(new Set(await listBlobs(this._appDir, '.json')))
-    const metadataAr = await Promise.all(
-      hashes.map(async hash => readMeta(this._appDir, hash))
-    )
-    const sortByDateDesc = (a: Metadata, b: Metadata) =>
-      a.at.valueOf() - b.at.valueOf()
-
-    metadataAr.sort(sortByDateDesc).forEach(metadata => {
-      this._updateIndex(metadata)
-    })
   }
 
   async toAppState(metadata: Metadata): Promise<AppState> {
@@ -79,7 +59,7 @@ export class NodeJsStorage implements Storage {
       tags: [],
       at: new Date(),
       id,
-      results
+      results,
     }
     await writeBlob(this._appDir, JSON.stringify(metadata), '.json')
 
@@ -94,5 +74,25 @@ export class NodeJsStorage implements Storage {
     // FIXME sort
 
     return appStates
+  }
+
+  private async _updateIndex(metadata: Metadata) {
+    if (!(metadata.id in this._index)) {
+      this._index[metadata.id] = []
+    }
+    this._index[metadata.id].unshift(metadata)
+  }
+
+  private async _createIndex() {
+    const hashes = Array.from(new Set(await listBlobs(this._appDir, '.json')))
+    const metadataAr = await Promise.all(
+      hashes.map(async hash => readMeta(this._appDir, hash))
+    )
+    const sortByDateDesc = (a: Metadata, b: Metadata) =>
+      a.at.valueOf() - b.at.valueOf()
+
+    metadataAr.sort(sortByDateDesc).forEach(metadata => {
+      this._updateIndex(metadata)
+    })
   }
 }

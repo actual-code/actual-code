@@ -1,0 +1,47 @@
+{
+  "name": "@actual-code/core",
+  "version": "0.2.3",
+  "description": "Markdown is Script Language!",
+  "license": "MIT",
+  "repository": "erukiti/actual-code",
+  "keyword": [
+    "Markdown",
+    "interpreter",
+    "JavaScript",
+    "TypeScript",
+    "shell script",
+    "actual-code",
+    "#actual_code"
+  ],
+  "author": "SASAKI Shunsuke <erukiti+npm@gmail.com>",
+  "main": "dist/index.js",
+  "types": "src/index.ts",
+  "files": [
+    "README.md",
+    "dist/"
+  ],
+  "dependencies": {
+    "@babel/core": "7.2.2",
+    "@babel/preset-env": "7.2.3",
+    "@babel/preset-typescript": "7.1.0",
+    "arg": "4.1.0",
+    "js-yaml": "3.12.1",
+    "mkdirp": "0.5.1",
+    "remark": "10.0.1",
+    "remark-breaks": "1.0.2",
+    "remark-frontmatter": "1.3.1",
+    "remark-highlight.js": "5.1.0",
+    "remark-html": "9.0.0",
+    "remark-html-katex": "1.2.0",
+    "remark-math": "1.0.5",
+    "remark-parse": "6.0.3",
+    "remark-stringify": "6.0.4",
+    "source-map-support": "0.5.10",
+    "unified": "7.1.0",
+    "uuidv4": "2.0.0",
+    "write-file-atomic": "2.3.0"
+  },
+  "peerDependencies": {
+    "@actual-code/source": "0.2.3"
+  }
+}

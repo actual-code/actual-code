@@ -7,10 +7,9 @@ import * as carlo from 'carlo'
 import { rpc } from 'carlo/rpc'
 import * as mkdirp from 'mkdirp'
 
-import { ActualCode, ActualCodePlugin, Output } from '../actual-code'
-import { createStorage, Storage } from '../storage'
-import { CodeBlock } from '../source'
-import { MDAST, stringifyHtml } from '../source/unified'
+import { ActualCode, ActualCodePlugin, Output } from '@actual-code/core'
+import { createStorage, Storage } from '@actual-code/core'
+import { MDAST, stringifyHtml, CodeBlock } from '@actual-code/source'
 
 const readFile = promisify(fs.readFile)
 
@@ -29,7 +28,7 @@ const actualCodeCarloPlugin = (): ActualCodePlugin => () => {
         codeBlock.parent.children = [
           ...codeBlock.parent.children.slice(0, codeBlock.index + 1),
           node,
-          ...codeBlock.parent.children.slice(codeBlock.index + 1)
+          ...codeBlock.parent.children.slice(codeBlock.index + 1),
         ]
       }
     })
@@ -39,9 +38,9 @@ const actualCodeCarloPlugin = (): ActualCodePlugin => () => {
     name: 'actual-code carlo app',
     resultProcessor: async (root, codeBlocks) => {
       return {
-        output: createOutput(root, codeBlocks)
+        output: createOutput(root, codeBlocks),
       }
-    }
+    },
   }
 }
 
@@ -68,10 +67,11 @@ export const bootGui = async opt => {
   mkdirp.sync(userDataDir)
   const cApp = await carlo.launch({
     userDataDir,
-    title: 'actual-code'
+    title: 'actual-code',
   })
 
-  const appSourceDir = path.join(__dirname, '..', 'app')
+  const appSourceDir = path.dirname(require.resolve('@actual-code/gui'))
+  console.log(appSourceDir)
   cApp.serveHandler(async req => {
     const p = req.url().replace(/^https:\/\/domain\//, '')
     try {

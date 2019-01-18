@@ -1,5 +1,5 @@
 import { Reporter, Report } from './reporter'
-import { getCodeBlocks, parse, MDAST, CodeBlock } from '../source'
+import { getCodeBlocks, parse, MDAST, CodeBlock } from '@actual-code/source'
 import { Storage, AppState } from '../storage'
 import nodeJsPlugin from '../plugins/node-js'
 import shellPlugin from '../plugins/shell'
@@ -47,11 +47,11 @@ export type ActualCodePlugin = () => {
 }
 
 export class ActualCode {
+  id: string
   private _reporter: Reporter = new Reporter()
   private _init: Promise<void>
   private _runningState: Promise<any> = null
   private _sandbox: ActualCodeSandbox
-  id: string
   private _storage?: Storage
   private _plugins: ActualCodePlugin[] = [nodeJsPlugin, shellPlugin, htmlPlugin]
   private _resultProcessors: ResultProcessorPlugin[] = []
@@ -66,17 +66,6 @@ export class ActualCode {
       }
     }
     this._init = init()
-  }
-
-  private async _addPlugin(plugin: ActualCodePlugin) {
-    const { name, sandbox, resultProcessor } = plugin()
-    this._reporter.event('register plugin', { name })
-    if (sandbox) {
-      await this._sandbox.addPlugin(sandbox)
-    }
-    if (resultProcessor) {
-      this._resultProcessors.push(resultProcessor)
-    }
   }
 
   async registerPlugin(plugin: ActualCodePlugin | string) {
@@ -160,5 +149,16 @@ export class ActualCode {
     const result = await this._runningState
     this._runningState = null
     return result
+  }
+
+  private async _addPlugin(plugin: ActualCodePlugin) {
+    const { name, sandbox, resultProcessor } = plugin()
+    this._reporter.event('register plugin', { name })
+    if (sandbox) {
+      await this._sandbox.addPlugin(sandbox)
+    }
+    if (resultProcessor) {
+      this._resultProcessors.push(resultProcessor)
+    }
   }
 }

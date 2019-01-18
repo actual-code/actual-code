@@ -1,0 +1,31 @@
+{
+  "name": "@actual-code/bin",
+  "version": "0.2.3",
+  "description": "Markdown is Script Language!",
+  "license": "MIT",
+  "repository": "erukiti/actual-code",
+  "keyword": [
+    "Markdown",
+    "interpreter",
+    "JavaScript",
+    "TypeScript",
+    "shell script",
+    "actual-code",
+    "#actual_code"
+  ],
+  "author": "SASAKI Shunsuke <erukiti+npm@gmail.com>",
+  "bin": {
+    "actual-code": "bin/actual-code"
+  },
+  "files": [
+    "README.md",
+    "bin/",
+    "dist/"
+  ],
+  "dependencies": {
+    "source-map-support": "0.5.10",
+    "@actual-code/core": "0.2.3",
+    "@actual-code/source": "0.2.3",
+    "@actual-code/gui": "0.2.3"
+  }
+}

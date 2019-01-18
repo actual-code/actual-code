@@ -12,7 +12,7 @@ export interface State {
 const initialState: State = {
   text: '',
   __html: null,
-  results: {}
+  results: {},
 }
 
 const actions: { [props: string]: (state: State, action) => State } = {
@@ -28,7 +28,7 @@ const actions: { [props: string]: (state: State, action) => State } = {
     const { hash, data } = action
     const results = { ...state.results, [hash]: data }
     return { ...state, results }
-  }
+  },
 }
 
 const reducer = (state: State, action) => {
@@ -79,7 +79,7 @@ export default props => {
         gridAutoRows: 'auto',
         gridAutoColumns: 'auto',
         height: '100vh',
-        width: 'calc(100% - 10px)'
+        width: 'calc(100% - 10px)',
       }}
     >
       <nav style={{ gridRow: '1', gridColumn: '1/3' }}>
@@ -101,12 +101,13 @@ export default props => {
         </button>
       </nav>
 
-      <Editor
-        onChange={(text: string) => dispatch({ type: 'SET_TEXT', text })}
-        filename={filename}
-        value={text}
-        style={{ gridRow: '2', gridColumn: '1' }}
-      />
+      <div style={{ gridRow: '2', gridColumn: '1' }}>
+        <Editor
+          onChange={(s: string) => dispatch({ type: 'SET_TEXT', text: s })}
+          // filename={filename}
+          value={text}
+        />
+      </div>
       <div
         dangerouslySetInnerHTML={{ __html }}
         className="markdown-body"

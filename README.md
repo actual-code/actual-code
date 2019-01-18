@@ -58,7 +58,7 @@ $ actual-code
 
 一応自動セーブ機能ありますが、バグがあって消えたりすることもあるかもしれません。
 
-# License
+## License
 
 Copyright 2018-2019 SASAKI Shunsuke <erukiti@gmail.com>
 

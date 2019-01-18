@@ -1,0 +1,32 @@
+{
+  "name": "@actual-code/gui",
+  "version": "0.2.3",
+  "description": "Markdown is Script Language!",
+  "license": "MIT",
+  "repository": "erukiti/actual-code",
+  "keyword": [
+    "Markdown",
+    "interpreter",
+    "JavaScript",
+    "TypeScript",
+    "shell script",
+    "actual-code",
+    "#actual_code"
+  ],
+  "author": "SASAKI Shunsuke <erukiti+npm@gmail.com>",
+  "main": "dist/index.html",
+  "files": [
+    "README.md",
+    "dist/"
+  ],
+  "dependencies": {
+    "carlo": "0.9.43",
+    "monaco-editor": "0.15.6",
+    "react": "16.8.0-alpha.0",
+    "react-dom": "16.8.0-alpha.0",
+    "uuidv4": "2.0.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3"
+  }
+}

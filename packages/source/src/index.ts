@@ -1,8 +1,11 @@
 import { safeLoad } from 'js-yaml'
 
-import { parseMarkdown, MDAST } from './unified'
+export * from './unified'
+
+import * as MDAST from './mdast'
+import { parseMarkdown } from './unified'
+import { getHash } from './utils'
 export { MDAST }
-import { sha256 } from '../utils'
 
 /**
  * Each code block of actual-code markdown
@@ -92,28 +95,28 @@ export const parse = async (markdownText: string) => {
 
 export const getCodeBlocks = async (node: MDAST.Root) => {
   const codeBlocks: CodeBlock[] = []
-  await traversal(node, node, async (node, parent, index) => {
-    if (node.type !== 'code') {
+  await traversal(node, node, async (n, parent, index) => {
+    if (n.type !== 'code') {
       return
     }
 
-    const meta = parseMeta(node.meta)
+    const meta = parseMeta(n.meta)
 
-    const filetype = node.lang
+    const filetype = n.lang
     if (meta.timeout) {
-      meta.timeout = Number.parseInt(meta.timeout)
+      meta.timeout = Number.parseInt(meta.timeout, 10)
     }
     if (typeof meta.runMode === 'string') {
       meta.runMode = meta.runMode === 'true'
     }
 
     codeBlocks.push({
-      code: node.value,
+      code: n.value,
       lang: filetype,
       meta,
       parent,
       index,
-      hash: sha256(node.value)
+      hash: getHash(n.value),
     })
   })
   return codeBlocks

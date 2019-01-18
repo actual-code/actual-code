@@ -7,7 +7,7 @@ const mkdtemp = promisify(fs.mkdtemp)
 const writeFile = promisify(fs.writeFile)
 
 import { ActualCode } from '.'
-import { CodeBlock } from '../source'
+import { CodeBlock } from '@actual-code/source'
 import { Reporter } from './reporter'
 
 export interface SandboxOptions {
@@ -36,7 +36,7 @@ const mergeOption = (
     timeout: opt2.timeout || opt1.timeout,
     runMode: 'runMode' in opt2 ? opt2.runMode : opt1.runMode,
     browser: opt2.browser || opt1.browser,
-    file: opt2.file
+    file: opt2.file,
   }
 }
 

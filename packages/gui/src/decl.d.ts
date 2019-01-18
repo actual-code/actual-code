@@ -1,6 +1,9 @@
-import { ActualCode, ActualCodePlugin } from '../src/actual-code'
-import { SandboxOptions } from '../src/actual-code/sandbox'
-import { AppState } from '../src/storage'
+import {
+  ActualCode,
+  ActualCodePlugin,
+  SandboxOptions,
+  AppState,
+} from '@actual-code/core'
 
 interface Backend {
   initActualCode: (id: string) => Promise<ActualCode>

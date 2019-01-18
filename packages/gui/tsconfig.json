@@ -16,5 +16,5 @@
     "resolveJsonModule": true,
     "outDir": "dist/"
   },
-  "include": ["packages/*/src/**/*"]
+  "include": ["src/**/*"]
 }
