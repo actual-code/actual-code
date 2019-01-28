@@ -17,6 +17,7 @@
   "main": "dist/index.html",
   "files": [
     "README.md",
+    "src/",
     "dist/"
   ],
   "dependencies": {

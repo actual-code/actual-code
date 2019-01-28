@@ -18,6 +18,7 @@
   "types": "src/index.ts",
   "files": [
     "README.md",
+    "src/",
     "dist/"
   ],
   "dependencies": {
