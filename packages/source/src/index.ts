@@ -22,31 +22,43 @@ export interface CodeBlock {
    */
   meta: { [props: string]: any }
   /**
-   * parent node
+   * pointer from root node
    */
-  parent: MDAST.Parent
-  /**
-   * order in parent node
-   */
-  index: number
+  pointers: number[]
   /**
    * identifier of code block.
    */
   hash: string
 }
 
-const traversal = (
+const traverse = (
   node: MDAST.Node,
-  parent: MDAST.Parent,
-  cb: (node: MDAST.Node, parent: MDAST.Parent, index: number) => void,
-  index = 0
+  cb: (node: MDAST.Node, pointers: number[]) => void,
+  pointers: number[] = []
 ) => {
-  cb(node, parent, index)
+  cb(node, pointers)
   if ('children' in node) {
-    const children = node.children as MDAST.Content[]
+    const children = node.children as MDAST.Node[]
     children.forEach((child, index) => {
-      traversal(child, node as MDAST.Parent, cb, index)
+      traverse(child, cb, [...pointers, index])
     })
+  }
+}
+
+export const insertAfter = (
+  root: MDAST.Node,
+  pointers: number[],
+  node: MDAST.Node
+) => {
+  if (pointers.length > 1) {
+    insertAfter(root.children as MDAST.Node, pointers.slice(1), node)
+  } else {
+    const index = pointers[0]
+    root.children = [
+      ...(root.children as MDAST.Node[]).slice(0, index + 1),
+      node,
+      ...(root.children as MDAST.Node[]).slice(index + 1),
+    ]
   }
 }
 
@@ -75,7 +87,7 @@ const reFrontmatter = /^---\n([^]*)\n---\n/
 
 const getCodeBlocks = (root: MDAST.Root) => {
   const codeBlocks: CodeBlock[] = []
-  traversal(root, root, (node, parent, index) => {
+  traverse(root, (node, pointers) => {
     if (node.type !== 'code') {
       return
     }
@@ -94,8 +106,7 @@ const getCodeBlocks = (root: MDAST.Root) => {
       code: node.value,
       lang: filetype,
       meta,
-      parent,
-      index,
+      pointers,
       hash: sha256(node.value),
     })
   })

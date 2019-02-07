@@ -9,7 +9,12 @@ import * as mkdirp from 'mkdirp'
 
 import { ActualCode, ActualCodePlugin, Output } from '@actual-code/core'
 import { createStorage, Storage } from '@actual-code/core'
-import { MDAST, stringifyHtml, CodeBlock } from '@actual-code/source'
+import {
+  MDAST,
+  stringifyHtml,
+  CodeBlock,
+  insertAfter,
+} from '@actual-code/source'
 
 const readFile = promisify(fs.readFile)
 
@@ -25,11 +30,7 @@ const actualCodeCarloPlugin = (): ActualCodePlugin => () => {
           ''
         )
         const node: MDAST.Code = { type: 'code', value }
-        codeBlock.parent.children = [
-          ...codeBlock.parent.children.slice(0, codeBlock.index + 1),
-          node,
-          ...codeBlock.parent.children.slice(codeBlock.index + 1),
-        ]
+        insertAfter(root, codeBlock.pointers, node)
       }
     })
     return stringifyHtml(root)

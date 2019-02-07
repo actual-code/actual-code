@@ -3,7 +3,12 @@ import * as path from 'path'
 import { promisify } from 'util'
 
 import { SandboxOptions } from '@actual-code/core'
-import { stringifyMarkdown, MDAST, CodeBlock } from '@actual-code/source'
+import {
+  stringifyMarkdown,
+  MDAST,
+  CodeBlock,
+  insertAfter,
+} from '@actual-code/source'
 import {
   ActualCode,
   ActualCodePlugin,
@@ -92,11 +97,7 @@ const actualCodeCliPlugin = (opts): ActualCodePlugin => () => {
             type: 'code',
             value: data,
           }
-          codeBlock.parent.children = [
-            ...codeBlock.parent.children.slice(0, codeBlock.index + 1),
-            node,
-            ...codeBlock.parent.children.slice(codeBlock.index + 1),
-          ]
+          insertAfter(root, codeBlock.pointers, node)
         }
       })
     }
