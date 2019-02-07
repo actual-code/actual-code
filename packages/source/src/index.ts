@@ -35,17 +35,17 @@ export interface CodeBlock {
   hash: string
 }
 
-const traversal = async (
+const traversal = (
   node: MDAST.Node,
   parent: MDAST.Parent,
-  cb: (node: MDAST.Node, parent: MDAST.Parent, index: number) => Promise<void>,
+  cb: (node: MDAST.Node, parent: MDAST.Parent, index: number) => void,
   index = 0
 ) => {
-  await cb(node, parent, index)
+  cb(node, parent, index)
   let i = 0
   const children = 'children' in node ? (node.children as MDAST.Content[]) : []
   for (const child of children) {
-    await traversal(child, node as MDAST.Parent, cb, i)
+    traversal(child, node as MDAST.Parent, cb, i)
     i++
   }
 }
@@ -73,9 +73,9 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
 
 const reFrontmatter = /^---\n([^]*)\n---\n/
 
-const getCodeBlocks = async (root: MDAST.Root) => {
+const getCodeBlocks = (root: MDAST.Root) => {
   const codeBlocks: CodeBlock[] = []
-  await traversal(root, root, async (node, parent, index) => {
+  traversal(root, root, (node, parent, index) => {
     if (node.type !== 'code') {
       return
     }
@@ -117,6 +117,6 @@ export const parseActualCode = async (markdownText: string) => {
   }
 
   const root = parseMarkdown(markdownText)
-  const codeBlocks = await getCodeBlocks(root)
+  const codeBlocks = getCodeBlocks(root)
   return { settings, root, codeBlocks }
 }
