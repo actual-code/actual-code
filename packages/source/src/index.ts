@@ -1,9 +1,9 @@
 import { safeLoad } from 'js-yaml'
 
-export * from './unified'
+export * from './markdown'
 import { sha256 } from './utils'
 import * as MDAST from './mdast'
-import { parseMarkdown } from './unified'
+import { parseMarkdown } from './markdown'
 
 /**
  * Each code block of actual-code markdown
@@ -73,7 +73,7 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
 
 const reFrontmatter = /^---\n([^]*)\n---\n/
 
-export const parse = async (markdownText: string) => {
+export const parseActualCode = async (markdownText: string) => {
   if (!markdownText) {
     markdownText = ''
   }
@@ -88,12 +88,8 @@ export const parse = async (markdownText: string) => {
   }
 
   const root = parseMarkdown(markdownText)
-  return { settings, root }
-}
-
-export const getCodeBlocks = async (node: MDAST.Root) => {
   const codeBlocks: CodeBlock[] = []
-  await traversal(node, node, async (node, parent, index) => {
+  await traversal(root, root, async (node, parent, index) => {
     if (node.type !== 'code') {
       return
     }
@@ -117,5 +113,5 @@ export const getCodeBlocks = async (node: MDAST.Root) => {
       hash: sha256(node.value),
     })
   })
-  return codeBlocks
+  return { settings, root, codeBlocks }
 }

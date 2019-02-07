@@ -1,5 +1,5 @@
 import { Reporter, Report } from './reporter'
-import { getCodeBlocks, parse, MDAST, CodeBlock } from '@actual-code/source'
+import { parseActualCode, MDAST, CodeBlock } from '@actual-code/source'
 import { Storage, AppState } from '../storage'
 import nodeJsPlugin from '../plugins/node-js'
 import shellPlugin from '../plugins/shell'
@@ -82,8 +82,7 @@ export class ActualCode {
 
   async run(code: string, opts: SandboxOptions) {
     await this._init
-    const { settings, root } = await parse(code)
-    const codeBlocks = await getCodeBlocks(root)
+    const { root, codeBlocks } = await parseActualCode(code)
 
     const resultProcessors: ResultProcessor[] = []
     for (const plugin of this._resultProcessors) {

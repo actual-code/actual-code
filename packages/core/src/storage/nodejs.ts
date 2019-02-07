@@ -1,6 +1,6 @@
 import { Storage, Metadata, AppState } from '.'
 import { writeBlob, listBlobs, readBlob } from './blob'
-import { parse, MDAST } from '@actual-code/source'
+import { parseActualCode, MDAST } from '@actual-code/source'
 
 export const readMeta = async (appDir: string, hash: string) => {
   const buf = await readBlob(appDir, hash)
@@ -41,7 +41,7 @@ export class NodeJsStorage implements Storage {
 
     const codeHash = await writeBlob(this._appDir, code, '.md')
 
-    const { root } = await parse(code)
+    const { root } = await parseActualCode(code)
     const found = root.children.find(
       child => child.type === 'heading'
     ) as MDAST.Heading
