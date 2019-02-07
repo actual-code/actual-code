@@ -73,21 +73,7 @@ export const parseMeta = (meta: string): { [props: string]: any } => {
 
 const reFrontmatter = /^---\n([^]*)\n---\n/
 
-export const parseActualCode = async (markdownText: string) => {
-  if (!markdownText) {
-    markdownText = ''
-  }
-  if (markdownText.startsWith('#! ')) {
-    markdownText = markdownText.slice(markdownText.indexOf('\n'))
-  }
-
-  const matched = reFrontmatter.exec(markdownText)
-  const settings = matched ? safeLoad(matched[1]) : {}
-  if (matched) {
-    markdownText = markdownText.slice(matched[0].length)
-  }
-
-  const root = parseMarkdown(markdownText)
+const getCodeBlocks = async (root: MDAST.Root) => {
   const codeBlocks: CodeBlock[] = []
   await traversal(root, root, async (node, parent, index) => {
     if (node.type !== 'code') {
@@ -113,5 +99,24 @@ export const parseActualCode = async (markdownText: string) => {
       hash: sha256(node.value),
     })
   })
+  return codeBlocks
+}
+
+export const parseActualCode = async (markdownText: string) => {
+  if (!markdownText) {
+    markdownText = ''
+  }
+  if (markdownText.startsWith('#! ')) {
+    markdownText = markdownText.slice(markdownText.indexOf('\n'))
+  }
+
+  const matched = reFrontmatter.exec(markdownText)
+  const settings = matched ? safeLoad(matched[1]) : {}
+  if (matched) {
+    markdownText = markdownText.slice(matched[0].length)
+  }
+
+  const root = parseMarkdown(markdownText)
+  const codeBlocks = await getCodeBlocks(root)
   return { settings, root, codeBlocks }
 }
