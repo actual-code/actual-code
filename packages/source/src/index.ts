@@ -42,11 +42,11 @@ const traversal = (
   index = 0
 ) => {
   cb(node, parent, index)
-  let i = 0
-  const children = 'children' in node ? (node.children as MDAST.Content[]) : []
-  for (const child of children) {
-    traversal(child, node as MDAST.Parent, cb, i)
-    i++
+  if ('children' in node) {
+    const children = node.children as MDAST.Content[]
+    children.forEach((child, index) => {
+      traversal(child, node as MDAST.Parent, cb, index)
+    })
   }
 }
 
