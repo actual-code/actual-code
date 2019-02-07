@@ -1,12 +1,6 @@
-export interface Report {
-  type: 'output' | 'event' | 'log' | 'debug'
-  subType?: string
-  hash?: string
-  data?: string | Buffer
-  payload?: any
-}
+import { Output } from '.'
 
-export type ReporterCallback = (report: Report) => void
+export type ReporterCallback = (report: Output) => void
 
 export class Reporter {
   private _cb: ReporterCallback = () => {}

@@ -10,6 +10,7 @@
     "no-mixed-operators": "error",
     "no-console": "off",
     "no-undef": "off",
+    "no-dupe-class-members": "off",
     "@typescript-eslint/indent": "off",
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-non-null-assertion": "off",
@@ -20,8 +21,7 @@
     "@typescript-eslint/no-object-literal-type-assertion": "off",
     "@typescript-eslint/no-parameter-properties": "off",
     "@typescript-eslint/member-delimiter-style": "off",
-    "@typescript-eslint/array-type": "off",
-    "no-dupe-class-members": "off"
+    "@typescript-eslint/array-type": "off"
   },
   "parserOptions": {
     "sourceType": "module",

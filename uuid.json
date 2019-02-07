@@ -1,0 +1,647 @@
+{
+  "source": {
+    "type": "root",
+    "children": [
+      {
+        "type": "heading",
+        "depth": 1,
+        "children": [
+          {
+            "type": "text",
+            "value": "How to use uuidv4",
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 3,
+                "offset": 2
+              },
+              "end": {
+                "line": 1,
+                "column": 20,
+                "offset": 19
+              },
+              "indent": []
+            }
+          }
+        ],
+        "position": {
+          "start": {
+            "line": 1,
+            "column": 1,
+            "offset": 0
+          },
+          "end": {
+            "line": 1,
+            "column": 20,
+            "offset": 19
+          },
+          "indent": []
+        }
+      },
+      {
+        "type": "heading",
+        "depth": 2,
+        "children": [
+          {
+            "type": "text",
+            "value": "install",
+            "position": {
+              "start": {
+                "line": 3,
+                "column": 4,
+                "offset": 24
+              },
+              "end": {
+                "line": 3,
+                "column": 11,
+                "offset": 31
+              },
+              "indent": []
+            }
+          }
+        ],
+        "position": {
+          "start": {
+            "line": 3,
+            "column": 1,
+            "offset": 21
+          },
+          "end": {
+            "line": 3,
+            "column": 11,
+            "offset": 31
+          },
+          "indent": []
+        }
+      },
+      {
+        "type": "code",
+        "lang": "sh",
+        "meta": "{quiet}",
+        "value": "$ yarn init -y\n$ yarn add uuidv4",
+        "position": {
+          "start": {
+            "line": 5,
+            "column": 1,
+            "offset": 33
+          },
+          "end": {
+            "line": 8,
+            "column": 4,
+            "offset": 83
+          },
+          "indent": [
+            1,
+            1,
+            1
+          ]
+        }
+      },
+      {
+        "type": "heading",
+        "depth": 2,
+        "children": [
+          {
+            "type": "text",
+            "value": "JS",
+            "position": {
+              "start": {
+                "line": 10,
+                "column": 4,
+                "offset": 88
+              },
+              "end": {
+                "line": 10,
+                "column": 6,
+                "offset": 90
+              },
+              "indent": []
+            }
+          }
+        ],
+        "position": {
+          "start": {
+            "line": 10,
+            "column": 1,
+            "offset": 85
+          },
+          "end": {
+            "line": 10,
+            "column": 6,
+            "offset": 90
+          },
+          "indent": []
+        }
+      },
+      {
+        "type": "code",
+        "lang": "js",
+        "meta": null,
+        "value": "const uuidv4 = require('uuidv4')\nconsole.log(uuidv4())",
+        "position": {
+          "start": {
+            "line": 12,
+            "column": 1,
+            "offset": 92
+          },
+          "end": {
+            "line": 15,
+            "column": 4,
+            "offset": 156
+          },
+          "indent": [
+            1,
+            1,
+            1
+          ]
+        }
+      }
+    ],
+    "position": {
+      "start": {
+        "line": 1,
+        "column": 1,
+        "offset": 0
+      },
+      "end": {
+        "line": 16,
+        "column": 1,
+        "offset": 157
+      }
+    }
+  },
+  "codeBlocks": [
+    {
+      "code": "$ yarn init -y\n$ yarn add uuidv4",
+      "lang": "sh",
+      "meta": {
+        "quiet": true
+      },
+      "parent": {
+        "type": "root",
+        "children": [
+          {
+            "type": "heading",
+            "depth": 1,
+            "children": [
+              {
+                "type": "text",
+                "value": "How to use uuidv4",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 3,
+                    "offset": 2
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 20,
+                    "offset": 19
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 20,
+                "offset": 19
+              },
+              "indent": []
+            }
+          },
+          {
+            "type": "heading",
+            "depth": 2,
+            "children": [
+              {
+                "type": "text",
+                "value": "install",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 24
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 11,
+                    "offset": 31
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 3,
+                "column": 1,
+                "offset": 21
+              },
+              "end": {
+                "line": 3,
+                "column": 11,
+                "offset": 31
+              },
+              "indent": []
+            }
+          },
+          {
+            "type": "code",
+            "lang": "sh",
+            "meta": "{quiet}",
+            "value": "$ yarn init -y\n$ yarn add uuidv4",
+            "position": {
+              "start": {
+                "line": 5,
+                "column": 1,
+                "offset": 33
+              },
+              "end": {
+                "line": 8,
+                "column": 4,
+                "offset": 83
+              },
+              "indent": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "type": "heading",
+            "depth": 2,
+            "children": [
+              {
+                "type": "text",
+                "value": "JS",
+                "position": {
+                  "start": {
+                    "line": 10,
+                    "column": 4,
+                    "offset": 88
+                  },
+                  "end": {
+                    "line": 10,
+                    "column": 6,
+                    "offset": 90
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 10,
+                "column": 1,
+                "offset": 85
+              },
+              "end": {
+                "line": 10,
+                "column": 6,
+                "offset": 90
+              },
+              "indent": []
+            }
+          },
+          {
+            "type": "code",
+            "lang": "js",
+            "meta": null,
+            "value": "const uuidv4 = require('uuidv4')\nconsole.log(uuidv4())",
+            "position": {
+              "start": {
+                "line": 12,
+                "column": 1,
+                "offset": 92
+              },
+              "end": {
+                "line": 15,
+                "column": 4,
+                "offset": 156
+              },
+              "indent": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "position": {
+          "start": {
+            "line": 1,
+            "column": 1,
+            "offset": 0
+          },
+          "end": {
+            "line": 16,
+            "column": 1,
+            "offset": 157
+          }
+        }
+      },
+      "index": 2,
+      "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+    },
+    {
+      "code": "const uuidv4 = require('uuidv4')\nconsole.log(uuidv4())",
+      "lang": "js",
+      "meta": {},
+      "parent": {
+        "type": "root",
+        "children": [
+          {
+            "type": "heading",
+            "depth": 1,
+            "children": [
+              {
+                "type": "text",
+                "value": "How to use uuidv4",
+                "position": {
+                  "start": {
+                    "line": 1,
+                    "column": 3,
+                    "offset": 2
+                  },
+                  "end": {
+                    "line": 1,
+                    "column": 20,
+                    "offset": 19
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 1,
+                "column": 1,
+                "offset": 0
+              },
+              "end": {
+                "line": 1,
+                "column": 20,
+                "offset": 19
+              },
+              "indent": []
+            }
+          },
+          {
+            "type": "heading",
+            "depth": 2,
+            "children": [
+              {
+                "type": "text",
+                "value": "install",
+                "position": {
+                  "start": {
+                    "line": 3,
+                    "column": 4,
+                    "offset": 24
+                  },
+                  "end": {
+                    "line": 3,
+                    "column": 11,
+                    "offset": 31
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 3,
+                "column": 1,
+                "offset": 21
+              },
+              "end": {
+                "line": 3,
+                "column": 11,
+                "offset": 31
+              },
+              "indent": []
+            }
+          },
+          {
+            "type": "code",
+            "lang": "sh",
+            "meta": "{quiet}",
+            "value": "$ yarn init -y\n$ yarn add uuidv4",
+            "position": {
+              "start": {
+                "line": 5,
+                "column": 1,
+                "offset": 33
+              },
+              "end": {
+                "line": 8,
+                "column": 4,
+                "offset": 83
+              },
+              "indent": [
+                1,
+                1,
+                1
+              ]
+            }
+          },
+          {
+            "type": "heading",
+            "depth": 2,
+            "children": [
+              {
+                "type": "text",
+                "value": "JS",
+                "position": {
+                  "start": {
+                    "line": 10,
+                    "column": 4,
+                    "offset": 88
+                  },
+                  "end": {
+                    "line": 10,
+                    "column": 6,
+                    "offset": 90
+                  },
+                  "indent": []
+                }
+              }
+            ],
+            "position": {
+              "start": {
+                "line": 10,
+                "column": 1,
+                "offset": 85
+              },
+              "end": {
+                "line": 10,
+                "column": 6,
+                "offset": 90
+              },
+              "indent": []
+            }
+          },
+          {
+            "type": "code",
+            "lang": "js",
+            "meta": null,
+            "value": "const uuidv4 = require('uuidv4')\nconsole.log(uuidv4())",
+            "position": {
+              "start": {
+                "line": 12,
+                "column": 1,
+                "offset": 92
+              },
+              "end": {
+                "line": 15,
+                "column": 4,
+                "offset": 156
+              },
+              "indent": [
+                1,
+                1,
+                1
+              ]
+            }
+          }
+        ],
+        "position": {
+          "start": {
+            "line": 1,
+            "column": 1,
+            "offset": 0
+          },
+          "end": {
+            "line": 16,
+            "column": 1,
+            "offset": 157
+          }
+        }
+      },
+      "index": 4,
+      "hash": "1f9329c73471bf4a637091be39a6f8fa8cdd5351f8ce1efcdfcaed6e6642febd"
+    }
+  ],
+  "results": {
+    "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94": [
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "yarn init v1.12.3\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stderr",
+        "data": "warning The yes flag has been set. This will automatically answer yes to all questions, which may have security implications.\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "success Saved package.json\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "Done in 0.04s.\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "yarn add v1.12.3\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "info No lockfile found.\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "[1/4] Resolving packages...\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "[2/4] Fetching packages...\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "[3/4] Linking dependencies...\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "[4/4] Building fresh packages...\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "success Saved lockfile.\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "success Saved 3 new dependencies.\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "info Direct dependencies\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "└─ uuidv4@2.0.0\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "info All dependencies\n├─ sha-1@0.1.1\n├─ uuid@3.3.2\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "└─ uuidv4@2.0.0\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      },
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "Done in 0.36s.\n",
+        "hash": "a35f59c417b90ddca3c5f43ef66aefbc9a5d748fcef686a14294b9a2ff551b94"
+      }
+    ],
+    "1f9329c73471bf4a637091be39a6f8fa8cdd5351f8ce1efcdfcaed6e6642febd": [
+      {
+        "type": "output",
+        "subType": "stdout",
+        "data": "42798da7-bea8-421b-b556-2dc6ada1d168\n",
+        "hash": "1f9329c73471bf4a637091be39a6f8fa8cdd5351f8ce1efcdfcaed6e6642febd"
+      }
+    ]
+  }
+}

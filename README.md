@@ -23,10 +23,14 @@ $ npm i -g @actual-code/bin
 ## Usage (CLI)
 
 ```sh
-$ actual-code [-o output file] <script file>
+$ actual-code [-o output.json] [--convert output.md] <script file>
 ```
 
-指定した script file を実行し結果を表示します。-o オプションで、実行結果を挿入した Markdown を出力します。
+指定した script file を実行し結果を表示します。
+
+-o オプションで、ソースの解析結果と実行結果を JSON で指定したファイルに出力します。
+
+--convert オプションで、元のソースに実行結果のテキストを差し込んだ Markdown を指定したファイルに出力します。
 
 ## Usage (shbang)
 
@@ -47,16 +51,6 @@ Hello, World!
 ```
 
 Markdown is Script Language!!!!!!!!!
-
-## usage (GUI)
-
-```sh
-$ actual-code
-```
-
-手元に Chrome or Chromium がインストールされていれば GUI アプリが立ち上がります。一見よくある、Markdown リアルタイムプレビューアプリに見えますが、違うのは、コードブロックが実行されることです。
-
-一応自動セーブ機能ありますが、バグがあって消えたりすることもあるかもしれません。
 
 ## License
 

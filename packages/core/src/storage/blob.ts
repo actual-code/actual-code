@@ -26,9 +26,9 @@ export const writeBlob = async (
   const hash = sha256(data)
   const blobDir = getBlobDir(appDir)
   const encoding = typeof data === 'string' ? 'utf-8' : undefined
-  return new Promise<string>((resolve, reject) => {
+  return new Promise<string>(resolve => {
     writeFileAtomic.sync(path.join(blobDir, `${hash}${ext}`), data, {
-      encoding
+      encoding,
     })
     resolve(hash)
   })

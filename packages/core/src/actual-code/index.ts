@@ -1,38 +1,38 @@
-import { Reporter, Report } from './reporter'
 import { parseActualCode, MDAST, CodeBlock } from '@actual-code/source'
+
+import { Reporter } from './reporter'
+
 import { Storage, AppState } from '../storage'
+import { SandboxOptions, ActualCodeSandbox, SandboxPlugin } from './sandbox'
 import nodeJsPlugin from '../plugins/node-js'
 import shellPlugin from '../plugins/shell'
 import htmlPlugin from '../plugins/html'
 
-import { SandboxOptions, ActualCodeSandbox, SandboxPlugin } from './sandbox'
+export interface Output {
+  type: 'output' | 'event' | 'log' | 'debug'
+  subType?: string
+  hash?: string
+  data?: string | Buffer
+  payload?: any
+}
+
+export interface Results {
+  [props: string]: Output[]
+}
+
+export type OutputPlugin = (
+  root: MDAST.Root,
+  codeBlocks: CodeBlock[]
+) => Promise<(results: Results) => Promise<any>>
 
 /**
  * Transform sandbox execution result.
  * Called each time during sandbox is running.
  */
-export type Transform = (input: Report) => Promise<Report>
-
-/**
- * Called after execution for each code block.
- */
-export type Output = (results: { [props: string]: Report[] }) => Promise<any>
-
-/**
- * Process sandbox execution result
- */
-export interface ResultProcessor {
-  transform?: Transform
-  output?: Output
-}
-
-/**
- * ResultProcessor plugin initializer
- */
-export type ResultProcessorPlugin = (
+export type TransformPlugin = (
   root: MDAST.Root,
   codeBlocks: CodeBlock[]
-) => Promise<ResultProcessor>
+) => Promise<(output: Output) => Promise<Output>>
 
 /**
  * actual-code plugin
@@ -43,7 +43,8 @@ export type ResultProcessorPlugin = (
 export type ActualCodePlugin = () => {
   name: string
   sandbox?: SandboxPlugin
-  resultProcessor?: ResultProcessorPlugin
+  output?: OutputPlugin | OutputPlugin[]
+  transform?: TransformPlugin | TransformPlugin[]
 }
 
 export class ActualCode {
@@ -54,7 +55,8 @@ export class ActualCode {
   private _sandbox: ActualCodeSandbox
   private _storage?: Storage
   private _plugins: ActualCodePlugin[] = [nodeJsPlugin, shellPlugin, htmlPlugin]
-  private _resultProcessors: ResultProcessorPlugin[] = []
+  private _outputPlugins: OutputPlugin[] = []
+  private _transformPlugins: TransformPlugin[] = []
 
   constructor(id: string, storage?: Storage) {
     this.id = id
@@ -84,22 +86,22 @@ export class ActualCode {
     await this._init
     const { root, codeBlocks } = await parseActualCode(code)
 
-    const resultProcessors: ResultProcessor[] = []
-    for (const plugin of this._resultProcessors) {
-      resultProcessors.push(await plugin(root, codeBlocks))
-    }
+    const transformPlugins = await Promise.all(
+      this._transformPlugins.map(p => p(root, codeBlocks))
+    )
+    const outputPlugins = await Promise.all(
+      this._outputPlugins.map(p => p(root, codeBlocks))
+    )
 
-    const results: { [props: string]: Report[] } = {}
+    const results: { [props: string]: Output[] } = {}
 
     this._reporter.setCallback(async report => {
       await this._init
 
-      for (const p of resultProcessors) {
-        if (p.transform) {
-          report = await p.transform(report)
-          if (!report) {
-            return
-          }
+      for (const p of transformPlugins) {
+        report = await p(report)
+        if (!report) {
+          return
         }
       }
 
@@ -108,8 +110,6 @@ export class ActualCode {
       }
       results[report.hash].push(report)
     })
-
-    const outputProcessor = resultProcessors.find(p => 'output' in p)
 
     const runner = async () => {
       this._reporter.debug('run markdown script')
@@ -121,22 +121,19 @@ export class ActualCode {
       if (opts.runMode) {
         await this.save(code, results)
       }
-      if (outputProcessor) {
-        return outputProcessor.output(results)
-      } else {
-        return null
+      if (outputPlugins.length > 0) {
+        const snapshot = JSON.stringify(results)
+        outputPlugins.forEach(p => p(JSON.parse(snapshot)))
       }
     }
     this._runningState = runner()
 
-    if (outputProcessor) {
-      return outputProcessor.output(null)
-    } else {
-      return null
+    if (outputPlugins.length > 0) {
+      outputPlugins.forEach(p => p(null))
     }
   }
 
-  async save(code: string, results?: { [props: string]: Report[] }) {
+  async save(code: string, results?: { [props: string]: Output[] }) {
     await this._init
 
     if (this._storage) {
@@ -151,13 +148,16 @@ export class ActualCode {
   }
 
   private async _addPlugin(plugin: ActualCodePlugin) {
-    const { name, sandbox, resultProcessor } = plugin()
+    const { name, sandbox, output, transform } = plugin()
     this._reporter.event('register plugin', { name })
     if (sandbox) {
       await this._sandbox.addPlugin(sandbox)
     }
-    if (resultProcessor) {
-      this._resultProcessors.push(resultProcessor)
+    if (output) {
+      this._outputPlugins = this._outputPlugins.concat(output)
+    }
+    if (transform) {
+      this._transformPlugins = this._transformPlugins.concat(transform)
     }
   }
 }
