@@ -1,4 +1,4 @@
-import { Sandbox, SandboxOptions } from '../actual-code/sandbox'
+import { Sandbox } from '../actual-code/sandbox'
 import { ActualCodePlugin } from '../actual-code'
 import { Reporter } from '../actual-code/reporter'
 
@@ -10,7 +10,7 @@ export class HtmlSandbox implements Sandbox {
     this.reporter = reporter
   }
 
-  async run(code: string, hash: string, lang: string, meta: SandboxOptions) {
+  async run(code: string, hash: string, lang: string) {
     if (lang !== 'html') {
       return false
     }
@@ -22,7 +22,7 @@ export class HtmlSandbox implements Sandbox {
 const plugin: ActualCodePlugin = () => {
   return {
     name: 'HTML',
-    sandbox: async (reporter, rootPath) => new HtmlSandbox(reporter, rootPath)
+    sandbox: async (reporter, rootPath) => new HtmlSandbox(reporter, rootPath),
   }
 }
 
