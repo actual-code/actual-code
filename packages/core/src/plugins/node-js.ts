@@ -19,7 +19,7 @@ const createProxies = (reporter: Reporter, hash: string) => {
     return new Writable({
       write: value => {
         reporter.output(hash, name, value)
-      }
+      },
     })
   }
   const stdout = createWritable('stdout')
@@ -35,7 +35,7 @@ const createProxies = (reporter: Reporter, hash: string) => {
         default:
           return process[name].bind(process)
       }
-    }
+    },
   })
   const consoleProxy = new Proxy(console, {
     get: (target, name) => {
@@ -57,7 +57,7 @@ const createProxies = (reporter: Reporter, hash: string) => {
           `${args.map(arg => format(arg)).join(' ')}\n`
         )
       }
-    }
+    },
   })
 
   return { processProxy, consoleProxy }
@@ -109,7 +109,7 @@ export class JsSandbox implements Sandbox {
     ts: 'ts',
     typescript: 'ts',
     jsx: 'jsx',
-    tsx: 'tsx'
+    tsx: 'tsx',
   }
   reporter: Reporter
   timeout: number
@@ -132,7 +132,7 @@ export class JsSandbox implements Sandbox {
       process: processProxy,
       Buffer,
       console: consoleProxy,
-      exports: {}
+      exports: {},
     }
     vm.createContext(this.ctx)
   }
@@ -141,6 +141,9 @@ export class JsSandbox implements Sandbox {
     lang = this.filetypes[lang]
     if (!lang) {
       return false
+    }
+    if (meta.browser) {
+      return true
     }
     this.reporter.log(`run ${lang}`)
     try {
@@ -152,14 +155,14 @@ export class JsSandbox implements Sandbox {
             {
               targets: {
                 node: process.version,
-                browsers: ['last 2 Chrome version']
-              }
-            }
+                browsers: ['last 2 Chrome version'],
+              },
+            },
           ],
-          presetTypescript
+          presetTypescript,
         ],
         sourceType: 'module',
-        filename: `file.${lang}`
+        filename: `file.${lang}`,
       })
       const timeout = meta.timeout || this.timeout
       const { consoleProxy, processProxy } = createProxies(this.reporter, hash)
@@ -176,7 +179,7 @@ export class JsSandbox implements Sandbox {
 const plugin: ActualCodePlugin = () => {
   return {
     name: 'Node.js',
-    sandbox: async (reporter, rootPath) => new JsSandbox(reporter, rootPath)
+    sandbox: async (reporter, rootPath) => new JsSandbox(reporter, rootPath),
   }
 }
 
