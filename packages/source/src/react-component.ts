@@ -27,7 +27,8 @@ const inlineCode = (tree: MDAST.InlineCode) =>
 
 const breakNode = () => '\n'
 
-const code = (tree: MDAST.Code) => createElement('pre', tree.value)
+const code = (tree: MDAST.Code) =>
+  createElement('pre', { children: tree.value })
 
 const link = (tree: MDAST.Link) => c('a', tree, { href: tree.url })
 
@@ -78,8 +79,5 @@ export const compiler = (tree: MDAST.Node) => {
   return compilers[tree.type](tree)
 }
 
-export default function mdToReact() {
-  this.Compiler = (tree: MDAST.Root) => {
-    return compiler(tree)
-  }
-}
+export const mdastToReact = (tree: MDAST.Root) =>
+  compiler(tree) as ReactElement<any>

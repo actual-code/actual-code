@@ -97,6 +97,14 @@ test('', () => {
 })
 
 test('', () => {
+  expect(md('```js\nconsole.log(1)\n```\n')).toEqual(
+    <>
+      <pre>console.log(1)</pre>
+    </>
+  )
+})
+
+test('', () => {
   expect(md('*hoge*_fuga_')).toEqual(
     <>
       <p>

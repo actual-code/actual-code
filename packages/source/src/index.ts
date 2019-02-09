@@ -4,6 +4,7 @@ export * from './markdown'
 import { sha256 } from './utils'
 import * as MDAST from './mdast'
 import { parseMarkdown } from './markdown'
+export { mdastToReact } from './react-component'
 
 /**
  * Each code block of actual-code markdown
