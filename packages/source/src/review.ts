@@ -4,11 +4,11 @@ interface Context {
   list: number
 }
 
-export const root = (tree: MDAST.Root, context: Context) => {
+const root = (tree: MDAST.Root, context: Context) => {
   return tree.children.map(child => compiler(child, context)).join('\n')
 }
 
-export const heading = (tree: MDAST.Heading, context: Context) => {
+const heading = (tree: MDAST.Heading, context: Context) => {
   const options = []
   const s = tree.children
     .map(child => {
@@ -24,58 +24,66 @@ export const heading = (tree: MDAST.Heading, context: Context) => {
   return `${'='.repeat(tree.depth)}${option} ${s}`
 }
 
-export const text = (tree: MDAST.Text) => {
+const text = (tree: MDAST.Text) => {
   return tree.value
 }
 
-export const paragraph = (tree: MDAST.Paragraph, context: Context) => {
+const paragraph = (tree: MDAST.Paragraph, context: Context) => {
   return `\n${tree.children.map(child => compiler(child, context)).join('')}\n`
 }
 
-export const inlineCode = (tree: MDAST.InlineCode) => {
+const inlineCode = (tree: MDAST.InlineCode) => {
   return `@<code>{${tree.value}}`
 }
 
-export const breakNode = (tree: MDAST.Break) => {
+const breakNode = () => {
   return `\n`
 }
 
-export const code = (tree: MDAST.Code) => {
+const code = (tree: MDAST.Code) => {
   const lang = tree.lang ? `[${tree.lang}]` : ''
   return `//listnum[][]${lang}{\n${tree.value}\n//}`
 }
 
-export const link = (tree: MDAST.Link, context: Context) => {
+const link = (tree: MDAST.Link, context: Context) => {
   const s = tree.children.map(child => compiler(child, context)).join('')
   return `@<href>{${tree.url}${s ? `, ${s}` : ''}}`
 }
 
-export const list = (tree: MDAST.List, context: Context) => {
+const list = (tree: MDAST.List, context: Context) => {
   return tree.children
     .map(child => compiler(child, { ...context, list: context.list + 1 }))
     .join('')
 }
 
-export const listItem = (tree: MDAST.ListItem, context: Context) => {
+const listItem = (tree: MDAST.ListItem, context: Context) => {
   return ` ${'*'.repeat(context.list)} ${tree.children
     .map(child => compiler(child, context))
     .join('')
     .trim()}\n`
 }
 
+const ignore = () => ''
+
+const blockquote = (tree: MDAST.Blockquote, context: Context) => {
+  return `//quote{\n${tree.children.map(child => compiler(child, context))}}\n`
+}
+
 const compilers: {
   [props: string]: (tree: MDAST.Node, context: Context) => string
 } = {
   root,
-  heading,
-  text,
   paragraph,
+  heading,
+  thematicBreak: ignore,
+  blockquote,
+  text,
   inlineCode,
   break: breakNode,
   code,
   link,
   list,
-  listItem
+  listItem,
 }
 
 export const compiler = (tree: MDAST.Node, context: Context): string => {

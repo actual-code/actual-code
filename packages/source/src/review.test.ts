@@ -51,3 +51,15 @@ describe('list', () => {
     expect(mdToReview('* hoge\n  - fuga')).toBe(' * hoge\n ** fuga\n')
   })
 })
+
+describe('thematic break', () => {
+  test('', () => {
+    expect(mdToReview('---\n')).toBe('')
+  })
+})
+
+describe('blockquote', () => {
+  test('', () => {
+    expect(mdToReview('> hoge\n')).toBe('//quote{\n\nhoge\n}\n')
+  })
+})
