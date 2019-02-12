@@ -12,8 +12,7 @@ export interface Output {
   type: 'output' | 'event' | 'log' | 'debug'
   subType?: string
   hash?: string
-  data?: string | Buffer
-  payload?: any
+  payload: any
 }
 
 export interface Results {
@@ -93,7 +92,7 @@ export class ActualCode {
       this._outputPlugins.map(p => p(root, codeBlocks))
     )
 
-    const results: { [props: string]: Output[] } = {}
+    const results: Results = {}
 
     this._reporter.setCallback(async report => {
       await this._init

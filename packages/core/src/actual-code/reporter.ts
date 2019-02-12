@@ -17,15 +17,15 @@ export class Reporter {
   }
 
   async log(message: string) {
-    this._cb({ type: 'log', data: message })
+    this._cb({ type: 'log', payload: message })
   }
 
   async debug(message: string) {
-    this._cb({ type: 'debug', data: message })
+    this._cb({ type: 'debug', payload: message })
   }
 
-  async output(hash: string, filetype: string, data: string | Buffer) {
-    this._cb({ type: 'output', subType: filetype, hash, data })
+  async output(hash: string, filetype: string, payload: any) {
+    this._cb({ type: 'output', subType: filetype, hash, payload })
   }
 
   setCallback(cb: ReporterCallback) {

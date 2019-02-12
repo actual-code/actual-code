@@ -21,7 +21,8 @@
     "@typescript-eslint/no-object-literal-type-assertion": "off",
     "@typescript-eslint/no-parameter-properties": "off",
     "@typescript-eslint/member-delimiter-style": "off",
-    "@typescript-eslint/array-type": "off"
+    "@typescript-eslint/array-type": "off",
+    "@typescript-eslint/no-unused-vars": "off"
   },
   "parserOptions": {
     "sourceType": "module",

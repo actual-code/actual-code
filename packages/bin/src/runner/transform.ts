@@ -10,23 +10,17 @@ const getTime = () => {
 
 export const createTransform = (
   isVerbose: boolean
-): TransformPlugin => async () => async ({
-  type,
-  subType,
-  data,
-  hash,
-  payload,
-}) => {
+): TransformPlugin => async () => async ({ type, subType, hash, payload }) => {
   switch (type) {
     case 'log': {
       if (isVerbose) {
-        process.stdout.write(`\x1b[36m[LOG]  ${getTime()}\x1b[m: ${data}\n`)
+        process.stdout.write(`\x1b[36m[LOG]  ${getTime()}\x1b[m: ${payload}\n`)
       }
       return null
     }
     case 'debug': {
       if (isVerbose) {
-        process.stdout.write(`\x1b[33m[DEBUG]${getTime()}\x1b[m: ${data}\n`)
+        process.stdout.write(`\x1b[33m[DEBUG]${getTime()}\x1b[m: ${payload}\n`)
       }
       return null
     }
@@ -35,18 +29,18 @@ export const createTransform = (
         process.stdout.write(
           `\x1b[32m[EVENT]${getTime()}\x1b[m: ${subType}${
             hash ? `.${hash}` : ''
-          }${hash === data ? '' : ` ${data}`}\n`
+          }\n`
         )
       }
       return null
     }
     case 'output': {
       if (subType === 'stdout') {
-        process.stdout.write(data.toString())
+        process.stdout.write(payload.toString())
       } else if (subType === 'stderr') {
-        process.stderr.write(data.toString())
+        process.stderr.write(payload.toString())
       }
-      return { type, subType, data, hash, payload }
+      return { type, subType, hash, payload }
     }
   }
 }

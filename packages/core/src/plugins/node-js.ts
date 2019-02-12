@@ -146,6 +146,7 @@ export class JsSandbox implements Sandbox {
       return true
     }
     this.reporter.log(`run ${lang}`)
+    this.reporter.output(hash, 'env', process.versions)
     try {
       const compiled = await babel.transformAsync(code, {
         ast: false,

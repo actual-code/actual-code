@@ -33,7 +33,7 @@ export const convert = async (
               }
               data += `---${res.subType}\n`
             }
-            data += res.data
+            data += res.payload.toString()
             return { filetype: res.subType, data }
           },
           { filetype: '', data: '' }
