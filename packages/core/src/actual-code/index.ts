@@ -4,6 +4,7 @@ import { Reporter } from './reporter'
 
 import { Storage, AppState } from '../storage'
 import { SandboxOptions, ActualCodeSandbox, SandboxPlugin } from './sandbox'
+import browserPlugin from '../plugins/browser'
 import nodeJsPlugin from '../plugins/node-js'
 import shellPlugin from '../plugins/shell'
 import htmlPlugin from '../plugins/html'
@@ -53,7 +54,12 @@ export class ActualCode {
   private _runningState: Promise<any> = null
   private _sandbox: ActualCodeSandbox
   private _storage?: Storage
-  private _plugins: ActualCodePlugin[] = [nodeJsPlugin, shellPlugin, htmlPlugin]
+  private _plugins: ActualCodePlugin[] = [
+    browserPlugin,
+    nodeJsPlugin,
+    shellPlugin,
+    htmlPlugin,
+  ]
   private _outputPlugins: OutputPlugin[] = []
   private _transformPlugins: TransformPlugin[] = []
 
