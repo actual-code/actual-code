@@ -23,7 +23,8 @@
   ],
   "dependencies": {
     "@babel/core": "7.2.2",
-    "@babel/preset-env": "7.2.3",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "7.3.1",
     "@babel/preset-typescript": "7.1.0",
     "arg": "4.1.0",
     "js-yaml": "3.12.1",
@@ -39,8 +40,8 @@
     "remark-stringify": "6.0.4",
     "source-map-support": "0.5.10",
     "unified": "7.1.0",
-    "uuidv4": "2.0.0",
-    "write-file-atomic": "2.3.0"
+    "uuidv4": "3.0.1",
+    "write-file-atomic": "2.4.2"
   },
   "peerDependencies": {
     "@actual-code/source": "0.2.3"

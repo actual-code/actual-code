@@ -2,12 +2,14 @@ import { ActualCodePlugin, OutputPlugin } from '@actual-code/core'
 
 import { convert } from './convert'
 import { output } from './output'
+import { browser } from './browser'
 import { createTransform } from './transform'
 
 export interface ActualCodeCliPluginParams {
   isVerbose: boolean
   output: string
   convert: string
+  browser: boolean
 }
 
 export const actualCodeCliPlugin = (
@@ -22,6 +24,11 @@ export const actualCodeCliPlugin = (
   if (params.convert) {
     outputPlugins.push(async (root, codeBlocks) => async results =>
       convert(root, codeBlocks, params.convert, results)
+    )
+  }
+  if (params.browser) {
+    outputPlugins.push(async (root, codeBlocks) => async results =>
+      browser(root, codeBlocks, results)
     )
   }
   return {

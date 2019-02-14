@@ -16,6 +16,23 @@ export const sha256 = (data: string | Buffer) => {
   return hash.digest().toString('hex')
 }
 
+export const readDirRecursive = async (dir: string): Promise<string[]> => {
+  const entries = await readDir(dir)
+  const res = await Promise.all(
+    entries.map(async entry => {
+      const name = path.join(dir, entry)
+      const st = await stat(name)
+      if (st.isDirectory()) {
+        return readDirRecursive(name)
+      } else {
+        return name
+      }
+    })
+  )
+
+  return [].concat(...res)
+}
+
 export const copyRecursive = async (srcDir: string, destDir: string) => {
   const dirs = await readDir(srcDir)
   Promise.all(

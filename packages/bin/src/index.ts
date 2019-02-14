@@ -11,9 +11,11 @@ const bootstrap = async () => {
     '--verbose': Boolean,
     '--version': Boolean,
     '--help': Boolean,
+    '--browser': Boolean,
 
     '-o': '--output',
     '-v': '--version',
+    '-b': '--browser',
   })
 
   if (args['--version']) {
@@ -31,6 +33,7 @@ const bootstrap = async () => {
     isVerbose: args['--verbose'],
     output: args['--output'],
     convert: args['--convert'],
+    browser: args['--browser'],
   }
 
   await runner(args._[0], params)

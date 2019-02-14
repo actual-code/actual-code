@@ -125,3 +125,11 @@ test('', () => {
     </>
   )
 })
+
+test('', () => {
+  expect(md('<iframe src="hoge"></iframe>\n')).toEqual(
+    <>
+      <iframe src="hoge" />
+    </>
+  )
+})

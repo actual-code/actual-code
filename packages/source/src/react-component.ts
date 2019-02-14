@@ -40,7 +40,11 @@ const table = (tree: MDAST.Table) => c('table', tree)
 const tableRow = (tree: MDAST.TableRow) => c('tr', tree)
 const tableCell = (tree: MDAST.TableCell) => c('td', tree)
 
-// html
+const html = (tree: MDAST.HTML) => {
+  // FIXME!!!!!!!!
+  const src = tree.value.replace(/<iframe\s+src="([^"]+)"><\/iframe>/, '$1')
+  return createElement('iframe', { src })
+}
 
 const yaml = () => null
 
@@ -70,6 +74,7 @@ const compilers: {
   emphasis,
   strong,
   delete: _delete,
+  html,
 }
 
 export const compiler = (tree: MDAST.Node) => {

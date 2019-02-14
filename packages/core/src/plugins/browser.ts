@@ -1,20 +1,23 @@
 import * as path from 'path'
+import * as fs from 'fs'
+import { promisify } from 'util'
 import * as childProcess from 'child_process'
 
+const readFile = promisify(fs.readFile)
+
+import { readDirRecursive } from '../utils'
 import { Sandbox, SandboxOptions } from '../actual-code/sandbox'
 import { ActualCodePlugin } from '../actual-code'
 import { Reporter } from '../actual-code/reporter'
-
-import { parseMarkdown } from '@actual-code/source'
 
 const _exec = (cmd: string) =>
   new Promise((resolve, reject) => {
     const proc = childProcess.exec(cmd)
     proc.stdout.on('data', chunk => {
-      console.log(chunk)
+      process.stdout.write(chunk)
     })
     proc.stderr.on('data', chunk => {
-      console.log(chunk)
+      process.stderr.write(chunk)
     })
     proc.on('close', code => {
       resolve()
@@ -54,16 +57,12 @@ export class BrowserSandbox implements Sandbox {
     ))
 
     const filename = meta.file
-    const nodes = parseMarkdown(
-      `<iframe src="https://domain/${filename}"></iframe>`
-    ).children
 
-    console.log(path.join(process.cwd(), filename))
-
-    const outDir = path.join(process.cwd(), 'dist')
+    const outDir = path.join(process.cwd(), '.actual-code')
     const entryFile = path.join(process.cwd(), filename)
     const opts = {
       outDir,
+      publicUrl: '/frame',
       outFile: filename,
       sourceMaps: true,
       hmr: false,
@@ -72,6 +71,8 @@ export class BrowserSandbox implements Sandbox {
     this.reporter.debug('parcel-bundler: compile')
     const bundler = new Bundler(entryFile, opts)
     await bundler.bundle()
+
+    this.reporter.output(hash, 'browser', { filename })
 
     return true
   }

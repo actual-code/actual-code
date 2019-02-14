@@ -16,8 +16,14 @@ export interface Output {
   payload: any
 }
 
+interface Result {
+  type: 'output' | 'event' | 'log' | 'debug'
+  subType?: string
+  payload: any
+}
+
 export interface Results {
-  [props: string]: Output[]
+  [props: string]: Result[]
 }
 
 export type OutputPlugin = (
@@ -109,11 +115,12 @@ export class ActualCode {
           return
         }
       }
+      const { hash, type, subType, payload } = report
 
-      if (!(report.hash in results)) {
-        results[report.hash] = []
+      if (!(hash in results)) {
+        results[hash] = []
       }
-      results[report.hash].push(report)
+      results[hash].push({ type, subType, payload })
     })
 
     const runner = async () => {

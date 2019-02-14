@@ -18,8 +18,10 @@ export const convert = async (
   results: Results
 ) => {
   if (results) {
-    codeBlocks.reverse().forEach(codeBlock => {
-      if (codeBlock.hash in results) {
+    codeBlocks
+      .filter(codeBlock => codeBlock.hash in results)
+      .reverse()
+      .forEach(codeBlock => {
         const { data } = results[codeBlock.hash].reduce(
           (acc, res) => {
             if (res.type !== 'output') {
@@ -43,8 +45,7 @@ export const convert = async (
           value: data,
         }
         insertAfter(root, codeBlock.pointers, node)
-      }
-    })
+      })
   }
   await writeFile(outputFilename, stringifyMarkdown(root))
 }
